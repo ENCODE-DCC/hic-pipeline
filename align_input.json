@@ -1,0 +1,11 @@
+{
+    "hic.fastq_files": ["frag_R1.fastq.gz", "frag_R2.fastq.gz"],
+    "hic.chrsz": "chrom.sizes",
+    "hic.restriction_sites": "juicedir/restriction_sites/hg19_MboI.txt",
+    "hic.one": "references/male.hg19.fa.pac",
+    "hic.two": "references/male.hg19.fa",
+    "hic.three": "references/male.hg19.fa.sa",
+    "hic.four": "references/male.hg19.fa.bwt",
+    "hic.five": "references/male.hg19.fa.amb",
+    "hic.six": "references/male.hg19.fa.ann"
+}
