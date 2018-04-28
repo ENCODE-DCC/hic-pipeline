@@ -1,11 +1,9 @@
 {
-    "hic.fastq_files": ["frag_R1.fastq.gz", "frag_R2.fastq.gz"],
-    "hic.chrsz": "chrom.sizes",
-    "hic.restriction_sites": "juicedir/restriction_sites/hg19_MboI.txt",
-    "hic.one": "references/male.hg19.fa.pac",
-    "hic.two": "references/male.hg19.fa",
-    "hic.three": "references/male.hg19.fa.sa",
-    "hic.four": "references/male.hg19.fa.bwt",
-    "hic.five": "references/male.hg19.fa.amb",
-    "hic.six": "references/male.hg19.fa.ann"
+    "hic.fastq_files": [
+        "/Users/idan/Desktop/bucket/subsumpled_fastqs/encode-hic-pipeline-Fsubsampled_fastqs-FHIC003_S2_L001_R2_001.subsample.fastq.gz",
+        "/Users/idan/Desktop/bucket/subsumpled_fastqs/encode-hic-pipeline-subsampled_fastqs-FHIC003_S2_L001_R1_001.subsample.fastq.gz"],
+    "hic.chrsz": "/Users/idan/Desktop/bucket/reference_grch38_chr10_chrM/encode-hic-pipeline-Freference_grch38_chr10_chrM-Fhg38_chr19_chrM.chrom.sizes",
+    "hic.restriction_sites": "/Users/idan/Desktop/bucket/reference_grch38_chr10_chrM/encode-hic-pipeline-Freference_grch38_chr10_chrM-FGRCh38_no_alt_analysis_set_GCA_000001405.15.chr19_chrM_MboI.txt",
+    "hic.reference_index": "/Users/idan/Desktop/bucket/genome_reference_index/index.tar.gz"
+
 }
