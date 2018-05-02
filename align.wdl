@@ -1,19 +1,37 @@
 workflow hic {
-    Array[File] fastq_files
+    Array[Array[File]] fastq_files
     File restriction_sites
     File chrsz
     File reference_index
 
-    call align { input:
-        restriction = restriction_sites,
-        fastqs = fastq_files,
-        chrsz = chrsz,
-        bwa_index = reference_index
+
+    Int fastqs_len = length(fastq_files)
+    
+    scatter(i in range(fastqs_len)){
+        call align { input:
+            restriction = restriction_sites,
+            fastqs = fastq_files[i],
+            chrsz = chrsz,
+            bwa_index = reference_index
+        }
     }
 
     call merge { input:
         bams = align.out_files
     }
+
+    call merge_sort { input:
+        sort_files = align.sort_file
+    }
+
+    #call dedup { input:
+    #    merged_sort = merge_sort.out_file
+    #}
+
+    #call create_hic { input:
+    #    chrsz = chrsz,
+    #    pairs_file = dedup.out_file
+    #}
 }
 
 
@@ -45,7 +63,8 @@ task align {
     }
 
     output {
-        Array[File] out_files = glob("data/splits/*.bam")
+        File out_files = glob("data/splits/*alignable.bam")[0]
+        File sort_file = glob("data/splits/*.sort.txt")[0]
        
     }
 
@@ -63,6 +82,62 @@ task merge {
 
     output {
         File out_file = glob('merged.bam')[0]
+    }
+
+    runtime {
+        docker : "aidenlab/juicer:latest"
+    }
+}
+
+task merge_sort {
+    Array[File] sort_files
+
+    command {
+        sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 10% ${sep=' ' sort_files}  > merged_sort.txt
+
+    }
+
+    output {
+        File out_file = glob('merged_sort.txt')[0]
+    }
+
+    runtime {
+        docker : "aidenlab/juicer:latest"
+
+        #> 8 processors
+        #> a lot of memory
+    }
+}
+
+task dedup {
+    File merged_sort
+
+    command {
+        touch dups.txt
+        touch optdups.txt
+        touch merged_nodups.txt
+        awk -f /opt/scripts/common/dups.awk ${merged_sort}
+    }
+
+    output {
+        File out_file = glob('merged_nodups.txt')[0]
+    }
+
+    runtime {
+        docker : "aidenlab/juicer:latest"
+    }
+}
+
+task create_hic {
+    File pairs_file
+    File chrsz
+
+    command {
+        /opt/scripts/common/juicer_tools pre -s inter.txt -g inter_hists.m -q 1 ${pairs_file} inter.hic ${chrsz}
+    }
+
+    output {
+        File out_file = glob('inter.hic')[0]
     }
 
     runtime {

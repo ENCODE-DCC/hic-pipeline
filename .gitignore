@@ -1,4 +1,4 @@
-cromwell-30.1.jar
+cromwell*.jar
 cromwell-executions/
 cromwell-workflow-logs/
 test/

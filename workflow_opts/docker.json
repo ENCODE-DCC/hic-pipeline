@@ -1,0 +1,7 @@
+{
+    "default_runtime_attributes": {
+        "docker" : "aidenlab/juicer:latest",
+        "zones": "us-west1-a us-west1-b us-west1-c",
+        "preemptible": "0"
+    }
+}
