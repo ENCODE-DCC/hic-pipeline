@@ -54,13 +54,12 @@ RUN ln -s /opt/juicer/CPU/common/juicer_tools.1.7.6_jcuda.0.8.jar /opt/juicer/CP
 RUN ln -s juicer/CPU scripts
 
 # Version number contained in image
-ADD VERSION .
+# ADD VERSION .
 
 # For sorting, LC_ALL is C
 ENV LC_ALL C
 ENV PATH=/opt:/opt/scripts:/opt/scripts/common:$PATH
 
-ENTRYPOINT ["juicer.sh", "-D", "/opt"]
 CMD ["-h"]
 
 

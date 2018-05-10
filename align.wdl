@@ -24,14 +24,18 @@ workflow hic {
         sort_files = align.sort_file
     }
 
-    #call dedup { input:
-    #    merged_sort = merge_sort.out_file
-    #}
+    call dedup { input:
+        merged_sort = merge_sort.out_file
+    }
 
-    #call create_hic { input:
-    #    chrsz = chrsz,
-    #    pairs_file = dedup.out_file
-    #}
+    call create_hic { input:
+        chrsz = chrsz,
+        pairs_file = dedup.out_file
+    }
+
+    call call_tads { input:
+        hic_file = create_hic.out_file
+    }
 }
 
 
@@ -59,6 +63,7 @@ task align {
         tar -xvf ${bwa_index}
         ref_path="$data_path/reference/hg38_chr19_chrM-bwa_index-GRCh38_no_alt_analysis_set_GCA_000001405.15.chr19_chrM.fasta/GRCh38_no_alt_analysis_set_GCA_000001405.15.chr19_chrM.fasta"
         cd ../..
+        echo $ref_path
         bash /opt/scripts/juicer.sh -D /opt -d $data_path -S alignonly -z $ref_path -p ${chrsz} -y ${restriction} -s MboI
     }
 
@@ -69,7 +74,7 @@ task align {
     }
 
     runtime {
-        docker : "aidenlab/juicer:latest"
+        docker : "quay.io/gabdank/juicer:encode05022018"
     }
 }
 
@@ -85,7 +90,7 @@ task merge {
     }
 
     runtime {
-        docker : "aidenlab/juicer:latest"
+        docker : "quay.io/gabdank/juicer:encode05022018"
     }
 }
 
@@ -102,7 +107,7 @@ task merge_sort {
     }
 
     runtime {
-        docker : "aidenlab/juicer:latest"
+        docker : "quay.io/gabdank/juicer:encode05022018"
 
         #> 8 processors
         #> a lot of memory
@@ -124,7 +129,7 @@ task dedup {
     }
 
     runtime {
-        docker : "aidenlab/juicer:latest"
+        docker : "quay.io/gabdank/juicer:encode05022018"
     }
 }
 
@@ -141,6 +146,22 @@ task create_hic {
     }
 
     runtime {
-        docker : "aidenlab/juicer:latest"
+        docker : "quay.io/gabdank/juicer:encode05022018"
+    }
+}
+
+task call_tads {
+    File hic_file
+
+    command {
+        /opt/scripts/common/juicer_tools arrowhead ${hic_file} contact_domains --ignore_sparsity
+    }
+
+    output {
+        Array[File] out_file = glob('contact_domains/*.bedpe')
+    }
+
+    runtime {
+        docker : "quay.io/gabdank/juicer:encode05022018"
     }
 }
