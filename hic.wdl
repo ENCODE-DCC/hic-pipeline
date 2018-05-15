@@ -1,5 +1,5 @@
 workflow hic {
-    Array[Array[File]]? fastq_files
+    Array[Array[File]] fastq_files
     File restriction_sites
     File chrsz
     File reference_index
@@ -20,9 +20,9 @@ workflow hic {
     #    bams = align.out_files
     #}
 
-    #call merge_sort { input:
-    #    sort_files = align.sort_file
-    #}
+    call merge_sort { input:
+        sort_files = align.sort_file
+    }
 
     #call dedup { input:
     #    merged_sort = merge_sort.out_file

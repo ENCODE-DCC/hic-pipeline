@@ -1,0 +1,16 @@
+{
+    "hic.fastq_files": [
+        [
+            "/Users/idan/Desktop/bucket/scatter_test/two_pairs/read_1.1.fastq.gz",
+            "/Users/idan/Desktop/bucket/scatter_test/two_pairs/read_2.1.fastq.gz"
+        ],
+        [
+            "/Users/idan/Desktop/bucket/scatter_test/two_pairs/read_1.2.fastq.gz",
+            "/Users/idan/Desktop/bucket/scatter_test/two_pairs/read_2.2.fastq.gz"
+        ]
+    ],
+    "hic.chrsz": "/Users/idan/Desktop/bucket/reference_grch38_chr10_chrM/encode-hic-pipeline-Freference_grch38_chr10_chrM-Fhg38_chr19_chrM.chrom.sizes",
+    "hic.restriction_sites": "/Users/idan/Desktop/bucket/reference_grch38_chr10_chrM/encode-hic-pipeline-Freference_grch38_chr10_chrM-FGRCh38_no_alt_analysis_set_GCA_000001405.15.chr19_chrM_MboI.txt",
+    "hic.reference_index": "/Users/idan/Desktop/bucket/genome_reference_index/index.tar.gz"
+
+}
