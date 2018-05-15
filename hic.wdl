@@ -16,14 +16,29 @@ workflow hic {
         }
     }
 
-    #call merge { input:
-    #    bams = align.out_files
-    #}
+    
+    Array[Array[File]] bam_files = [
+        align.collisions,
+        align.collisions_low_mapq,
+        align.unampped,
+        align.mapq0,
+        align.alignable
+    ]
 
-    call merge_sort { input:
-        sort_files = align.sort_file
+    Int bams_len = length(bam_files)
+    scatter(i in range(bams_len)){
+        call merge { input:
+            bams = bam_files[i]
+        }
     }
 
+
+    call merge_sort { input:
+        sort_files = align.sort_file,
+        
+    }
+
+    # we can collect the alignabel.bam using the array merge.out_file
     #call dedup { input:
     #    merged_sort = merge_sort.out_file
     #}
@@ -99,7 +114,6 @@ task merge_sort {
 
     command {
         sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 10% ${sep=' ' sort_files}  > merged_sort.txt
-
     }
 
     output {
