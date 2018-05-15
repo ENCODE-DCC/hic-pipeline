@@ -1,5 +1,5 @@
 workflow hic {
-    Array[Array[File]] fastq_files
+    Array[Array[File]]? fastq_files
     File restriction_sites
     File chrsz
     File reference_index
@@ -12,59 +12,53 @@ workflow hic {
             restriction = restriction_sites,
             fastqs = fastq_files[i],
             chrsz = chrsz,
-            bwa_index = reference_index
+            idx_tar = reference_index
         }
     }
 
-    call merge { input:
-        bams = align.out_files
-    }
+    #call merge { input:
+    #    bams = align.out_files
+    #}
 
-    call merge_sort { input:
-        sort_files = align.sort_file
-    }
+    #call merge_sort { input:
+    #    sort_files = align.sort_file
+    #}
 
-    call dedup { input:
-        merged_sort = merge_sort.out_file
-    }
+    #call dedup { input:
+    #    merged_sort = merge_sort.out_file
+    #}
 
-    call create_hic { input:
-        chrsz = chrsz,
-        pairs_file = dedup.out_file
-    }
+    #call create_hic { input:
+    #    chrsz = chrsz,
+    #    pairs_file = dedup.out_file
+    #}
 
-    call call_tads { input:
-        hic_file = create_hic.out_file
-    }
+    #call call_tads { input:
+    #    hic_file = create_hic.out_file
+    #}
 }
 
 
 task align {
-    File chrsz
-    File restriction
-    Array[File] fastqs
-    File bwa_index
+	File idx_tar 		# reference bwa index tar
+	Array[File] fastqs 	# [read_end_id]
+    File chrsz          # chromosome sizes file
+    File restriction    # restriction enzyme sites in the reference genome
 
-
-    command {
-        
-        mkdir data && cd data && mkdir fastq && cd ..
-        cd data && mkdir reference
+    command {       
+        mkdir data && cd data && mkdir fastq && mkdir reference
         data_path=$(pwd)
-        echo $(pwd) > data.txt
-        cd ..
-        cd data/fastq
+        cd fastq
         ln -s ${fastqs[0]} $(pwd)/frag_R1.fastq.gz
         ln -s ${fastqs[1]} $(pwd)/frag_R2.fastq.gz
-        echo $(ls) > res2.txt
+        cd ../reference && tar -xvf ${idx_tar}
+        index_folder=$(ls)
+        cd $index_folder
+        reference_fasta=$(ls | head -1) 
+        reference_folder=$(pwd)
+        reference_index_path=$reference_folder/$reference_fasta
         cd ../..
-        cd data/reference
-        echo ${bwa_index}
-        tar -xvf ${bwa_index}
-        ref_path="$data_path/reference/hg38_chr19_chrM-bwa_index-GRCh38_no_alt_analysis_set_GCA_000001405.15.chr19_chrM.fasta/GRCh38_no_alt_analysis_set_GCA_000001405.15.chr19_chrM.fasta"
-        cd ../..
-        echo $ref_path
-        bash /opt/scripts/juicer.sh -D /opt -d $data_path -S alignonly -z $ref_path -p ${chrsz} -y ${restriction} -s MboI
+        bash /opt/scripts/juicer.sh -D /opt -d $data_path -S alignonly -z $reference_index_path -p ${chrsz} -y ${restriction} -s MboI
     }
 
     output {
@@ -142,6 +136,7 @@ task create_hic {
     }
 
     output {
+        # add inter_30 stuff
         File out_file = glob('inter.hic')[0]
     }
 
