@@ -153,6 +153,11 @@ task create_hic {
 
     command {
         /opt/scripts/common/juicer_tools pre -s inter.txt -g inter_hists.m -q 1 ${pairs_file} inter.hic ${chrsz}
+ 
+ /opt/scripts/common/juicer_tools pre -s inter_30.txt -g inter_30_hists.m -q 30 ${pairs_file} inter_30.hic ${chrsz}
+ 
+ use https://github.com/theaidenlab/juicer/blob/encode/CPU/common/stats_sub.awk for stats
+ 
     }
 
     output {
@@ -166,7 +171,7 @@ task create_hic {
 }
 
 task call_tads {
-    File hic_file
+    File hic_file <  inter_30
 
     command {
         /opt/scripts/common/juicer_tools arrowhead ${hic_file} contact_domains --ignore_sparsity
