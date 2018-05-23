@@ -53,9 +53,9 @@ workflow hic {
         pairs_file = dedup.out_file
     }
 
-    #call call_tads { input:
-    #    hic_file = create_hic.out_file
-    #}
+    call call_tads { input:
+        hic_file = create_hic.out_file
+    }
 }
 
 
