@@ -56,6 +56,10 @@ workflow hic {
     call call_tads { input:
         hic_file = create_hic.out_file
     }
+
+     output {
+        File hic_file = create_hic.out_file
+    }
 }
 
 
@@ -93,8 +97,8 @@ task align {
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05232018"
-        cpu : 32
-        memory: "64G"
+        #cpu : 32
+        #memory: "64G"
     }
 }
 
@@ -202,7 +206,7 @@ task call_loops {
 
     runtime {
         docker : "quay.io/gabdank/nvidia-juicer:v1.2"
-        gpuType: "nvidia-tesla-k80" gpuCount: 2 zones: ["us-west1-b"]
+        #gpuType: "nvidia-tesla-k80" gpuCount: 2 zones: ["us-west1-b"]
 
     }
 }
