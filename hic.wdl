@@ -19,46 +19,8 @@ workflow hic {
     }
 
     
-    Array[Array[File]] bam_files = [
-        align.collisions,
-        align.collisions_low_mapq,
-        align.unampped,
-        align.mapq0,
-        align.alignable
-    ]
-
-    Int bams_len = length(bam_files)
-    scatter(i in range(bams_len)){
-        call merge { input:
-            bams = bam_files[i]
-        }
-    }
-
-
-    call merge_sort { input:
-        sort_files = align.sort_file,
-        
-    }
-
-    # TODO
-    # we can collect the alignable.bam using the array merge.out_file
-    # Pipeline output for the portal
-
-    call dedup { input:
-        merged_sort = merge_sort.out_file
-    }
-
-    call create_hic { input:
-        chrsz = chrsz,
-        pairs_file = dedup.out_file
-    }
-
-    call call_tads { input:
-        hic_file = create_hic.out_file
-    }
-
     output {
-        File hic_file = create_hic.out_file
+        File alignable = align.alignable
     }
 }
 
@@ -86,132 +48,10 @@ task align {
     }
 
     output {
-        File collisions = glob("data/splits/*_collisions.bam")[0]
-        File collisions_low_mapq = glob("data/splits/*_collisions_low_mapq.bam")[0]
-        File unampped = glob("data/splits/*_unmapped.bam")[0]
-        File mapq0 = glob("data/splits/*_mapq0.bam")[0]
-        File alignable = glob("data/splits/*_alignable.bam")[0]
-        File sort_file = glob("data/splits/*.sort.txt")[0]
-       
+        File alignable = glob("data/splits/*_alignable.bam")[0]   
     }
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05232018"
-        memory : "32 GB"
-        cpu : 32
-    }
-}
-
-task merge {
-    Array[File] bams
-
-    command {
-        samtools merge merged.bam ${sep=' ' bams}   
-    }
-
-    output {
-        File out_file = glob('merged.bam')[0]
-    }
-
-    runtime {
-        docker : "quay.io/gabdank/juicer:encode05232018"
-
-    }
-}
-
-task merge_sort {
-    Array[File] sort_files
-
-    command {
-        sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 10% ${sep=' ' sort_files}  > merged_sort.txt
-    }
-
-    output {
-        File out_file = glob('merged_sort.txt')[0]
-    }
-
-    runtime {
-        docker : "quay.io/gabdank/juicer:encode05232018"
-        memory: "32 GB"
-        cpu: 8
-        #> 8 processors
-        #> a lot of memory
-    }
-}
-
-task dedup {
-    File merged_sort
-
-    command {
-        touch dups.txt
-        touch optdups.txt
-        touch merged_nodups.txt
-        awk -f /opt/scripts/common/dups.awk ${merged_sort}
-    }
-
-    output {
-        File out_file = glob('merged_nodups.txt')[0]
-    }
-
-    runtime {
-        docker : "quay.io/gabdank/juicer:encode05232018"
-        memory: "32 GB"
-    }
-}
-
-task create_hic {
-    File pairs_file
-    File chrsz
-
-    command {
-        /opt/scripts/common/juicer_tools pre -s inter_30.txt -g inter_30_hists.m -q 30 ${pairs_file} inter_30.hic ${chrsz}
- 
-        #use https://github.com/theaidenlab/juicer/blob/encode/CPU/common/stats_sub.awk for stats
- 
-    }
-
-    output {
-        # add inter_30 stuff
-        File out_file = glob('*.hic')[0]
-    }
-
-    runtime {
-        docker : "quay.io/gabdank/juicer:encode05232018"
-        memory: "32 GB"
-    }
-}
-
-task call_tads {
-    File hic_file
-
-    command {
-        /opt/scripts/common/juicer_tools arrowhead ${hic_file} contact_domains --ignore_sparsity
-    }
-
-    output {
-        Array[File] out_file = glob('contact_domains/*.bedpe')
-    }
-
-    runtime {
-        docker : "quay.io/gabdank/juicer:encode05232018"
-        memory: "32 GB"
-    }
-}
-
-task call_loops {
-    File hic_file
-
-    command {
-       /opt/scripts/common/juicer_tools hiccups ${hic_file} contact_loops
-    }
-
-    output {
-        Array[File] out_file = glob('contact_loops/*.*')
-    }
-
-    runtime {
-        docker : "quay.io/gabdank/nvidia-juicer:v1.2"
-        #gpuType: "nvidia-tesla-k80" gpuCount: 2 zones: ["us-west1-b"]
-
     }
 }
