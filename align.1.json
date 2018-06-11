@@ -1,9 +1,0 @@
-{
-    "hic.fastq_files": [[
-        "/Users/idan/Desktop/bucket/subsumpled_fastqs/encode-hic-pipeline-subsampled_fastqs-FHIC003_S2_L001_R1_001.subsample.fastq.gz",
-        "/Users/idan/Desktop/bucket/subsumpled_fastqs/encode-hic-pipeline-subsampled_fastqs-FHIC003_S2_L001_R2_001.subsample.fastq.gz"]],
-    "hic.chrsz": "/Users/idan/Desktop/bucket/REAL/chrom.sizes",
-    "hic.restriction_sites": "/Users/idan/Desktop/bucket/REAL/grch38_MboI.txt",
-    "hic.reference_index": "/Users/idan/Desktop/bucket/REAL/ENCFF643CGH.tar.gz"
-
-}

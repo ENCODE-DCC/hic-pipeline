@@ -1,9 +1,0 @@
-{
-    "hic.fastq_files": [[
-        "dx://project-FG6yF5j00ByYzB7Y5yX1Q7BF:file-FG88qZQ00BygFqB3F2zQp8z0",
-        "dx://project-FG6yF5j00ByYzB7Y5yX1Q7BF:file-FG88qZQ00Byqz55Q9898VVYk"]],
-    "hic.chrsz": "dx://project-FG6yF5j00ByYzB7Y5yX1Q7BF:file-FG8j1xQ00ByVv4Y45g88Jpfq",
-    "hic.restriction_sites": "dx://project-FG6yF5j00ByYzB7Y5yX1Q7BF:file-FG8kp7j00ByZVQV6882xX9p5",
-    "hic.reference_index": "dx://project-FG6yF5j00ByYzB7Y5yX1Q7BF:file-FG88kF800ByQPvFBFP0Kkp9Y"
-
-}
