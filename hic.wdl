@@ -57,7 +57,7 @@ workflow hic {
         hic_file = create_hic.out_file
     }
 
-     output {
+    output {
         File hic_file = create_hic.out_file
     }
 }
@@ -97,8 +97,8 @@ task align {
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05232018"
-        #cpu : 32
-        #memory: "64G"
+        memory : "32 GB"
+        cpu : 32
     }
 }
 
@@ -115,6 +115,7 @@ task merge {
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05232018"
+
     }
 }
 
@@ -131,7 +132,8 @@ task merge_sort {
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05232018"
-
+        memory: "32 GB"
+        cpu: 8
         #> 8 processors
         #> a lot of memory
     }
@@ -153,6 +155,7 @@ task dedup {
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05232018"
+        memory: "32 GB"
     }
 }
 
@@ -174,6 +177,7 @@ task create_hic {
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05232018"
+        memory: "32 GB"
     }
 }
 
@@ -190,6 +194,7 @@ task call_tads {
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05232018"
+        memory: "32 GB"
     }
 }
 
