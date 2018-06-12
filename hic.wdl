@@ -9,14 +9,14 @@ workflow hic {
     # TODO
     # we need to support scatterring over libraries as well
     # TODO
-    scatter(i in range(fastqs_len)){
-        call align { input:
-            restriction = restriction_sites,
-            fastqs = fastq_files[i],
-            chrsz = chrsz,
-            idx_tar = reference_index
-        }
+    
+    call align { input:
+        restriction = restriction_sites,
+        fastqs = fastq_files[0],
+        chrsz = chrsz,
+        idx_tar = reference_index
     }
+    
 
     
     output {
