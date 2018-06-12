@@ -18,8 +18,27 @@ workflow hic {
         }
     }
 
-    output {
-        File alignable = align.alignable
+   # output {
+    #    Array[File] alignable = align.alignable
+    #}
+
+    Array[Array[File]] bam_files = [
+       align.collisions,
+       align.collisions_low_mapq,
+       align.unampped,
+       align.mapq0,
+       align.alignable
+   ]
+    Int bams_len = length(bam_files)
+    
+     scatter(i in range(bams_len)){
+        call merge { input:
+           bams = bam_files[i]
+        }
+    }
+     
+     call merge_sort { input:
+       sort_files = align.sort_file,  
     }
 }
 
@@ -47,10 +66,54 @@ task align {
     }
 
     output {
-        File alignable = glob("data/splits/*_alignable.bam")[0]   
+        File collisions = glob("data/splits/*_collisions.bam")[0]
+        File collisions_low_mapq = glob("data/splits/*_collisions_low_mapq.bam")[0]
+        File unampped = glob("data/splits/*_unmapped.bam")[0]
+        File mapq0 = glob("data/splits/*_mapq0.bam")[0]
+        File alignable = glob("data/splits/*_alignable.bam")[0]
+        File sort_file = glob("data/splits/*.sort.txt")[0]
+   
     }
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05232018"
+        cpu : 32
+        memory: "64G"
     }
 }
+
+task merge {
+   Array[File] bams
+
+   command {
+       samtools merge merged.bam ${sep=' ' bams}  
+   }
+
+  output {
+       File out_file = glob('merged.bam')[0]
+   }
+
+  runtime {
+       docker : "quay.io/gabdank/juicer:encode05022018"
+   }
+}
+
+task merge_sort {
+   Array[File] sort_files
+
+   command {
+       sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 10% ${sep=' ' sort_files}  > merged_sort.txt
+   }
+
+  output {
+       File out_file = glob('merged_sort.txt')[0]
+   }
+
+  runtime {
+       docker : "quay.io/gabdank/juicer:encode05022018"
+
+       #> 8 processors
+       #> a lot of memory
+   }
+}
+
