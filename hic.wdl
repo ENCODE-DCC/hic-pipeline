@@ -9,16 +9,15 @@ workflow hic {
     # TODO
     # we need to support scatterring over libraries as well
     # TODO
-    
-    call align { input:
-        restriction = restriction_sites,
-        fastqs = fastq_files[0],
-        chrsz = chrsz,
-        idx_tar = reference_index
+    scatter(i in range(fastqs_len)){
+        call align { input:
+            restriction = restriction_sites,
+            fastqs = fastq_files[i],
+            chrsz = chrsz,
+            idx_tar = reference_index
+        }
     }
-    
 
-    
     output {
         File alignable = align.alignable
     }
