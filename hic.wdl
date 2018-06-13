@@ -42,6 +42,12 @@ workflow hic {
        merged_sort = merge_sort.out_file
     }
 
+    call create_hic { input:
+        chrsz = chrsz, 
+        pairs_file = dedup.out_file
+    }
+
+
 }
 
 
@@ -138,3 +144,22 @@ task dedup {
        docker : "quay.io/gabdank/juicer:encode05022018"
    }
 }
+
+task create_hic {
+   File pairs_file
+   File chrsz
+
+   command {
+       /opt/scripts/common/juicer_tools pre -s inter.txt -g inter_hists.m -q 1 ${pairs_file} inter.hic ${chrsz}
+   }
+
+  output {
+       # add inter_30 stuff
+       File out_file = glob('inter.hic')[0]
+   }
+
+  runtime {
+       docker : "quay.io/gabdank/juicer:encode05022018"
+   }
+}
+
