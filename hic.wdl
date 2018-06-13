@@ -18,10 +18,6 @@ workflow hic {
         }
     }
 
-   # output {
-    #    Array[File] alignable = align.alignable
-    #}
-
     Array[Array[File]] bam_files = [
        align.collisions,
        align.collisions_low_mapq,
@@ -40,7 +36,14 @@ workflow hic {
      call merge_sort { input:
        sort_files = align.sort_file,  
     }
+   
+    # we can collect the alignable.bam using the array merge.out_file
+    call dedup { input:
+       merged_sort = merge_sort.out_file
+    }
+
 }
+
 
 
 task align {
@@ -117,3 +120,21 @@ task merge_sort {
    }
 }
 
+task dedup {
+   File merged_sort
+
+   command {
+       touch dups.txt
+       touch optdups.txt
+       touch merged_nodups.txt
+       awk -f /opt/scripts/common/dups.awk ${merged_sort}
+   }
+
+  output {
+       File out_file = glob('merged_nodups.txt')[0]
+   }
+
+  runtime {
+       docker : "quay.io/gabdank/juicer:encode05022018"
+   }
+}
