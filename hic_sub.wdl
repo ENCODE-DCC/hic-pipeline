@@ -1,43 +1,49 @@
+##Encode DCC Hi-C pipeline
+##Author Ana Cismaru (anacismaru@gmail.com)
+
 workflow hic_sub{
-    Array[Array[File]] fastq_files
+    Array[Array[File]] sub_fastq = [] #[lib_id][fastq_id][read_end_id]
+    Array[Array[File]] sub_input_bams = []  #[collisions, collisions_low_mapq, unampped, mapq0, alignable]
+    Array[File] sub_input_sort_files = []
+    File? sub_input_merged_sort #input to dedup
+    
     File sub_restriction_sites
     File sub_chrsz
     File sub_reference_index
-
-    Int fastqs_len = length(fastq_files)
+    
 
         #input: fastqs
         #output: bam files
+        Int fastqs_len = length(sub_fastq)
         scatter(i in range(fastqs_len)){
             call align { input:
                 restriction = sub_restriction_sites,
-                fastqs = fastq_files[i],
+                fastqs = sub_fastq[i],
                 chrsz = sub_chrsz,
                 idx_tar = sub_reference_index
             }
         }
-     #flatten bams here
-        #Array[File] bams = flatten([align.out_file, input_bams])  #for separate user entry point
-        Int bams_len = length(align.out_file)
+        #flatten bams here  
+        Array[Array[File]] bams = flatten([align.out_file, sub_input_bams])  #for separate user entry point
         
         #input: bam files
         #output: Array of merged bam files
-        scatter(i in range(bams_len)){
+        scatter(bam in bams){
             call merge { input:
-            bams = align.out_file[i]
+            bam = bam
             }
         }
 
-    #     #input: sort.txt 
-    #     #output: Array of merged sort.txt
+        #input: sort.txt 
+        #output: Array of merged sort.txt
         call merge_sort { input:
-         sort_files_ = align.sort_file,  
-         }
-    #    # Array[File] sort_files = flatten([merge_sort.out_file, input_sort_files]) #for separate user entry point
+         sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else align.sort_file,  
+         }    
 
-    #     # we can collect the alignable.bam using the array merge.out_file
+        # we can collect the alignable.bam using the array merge.out_file
         call dedup { input:
-         merged_sort = merge_sort.out_file#sort_files
+        #fix
+         merged_sort = if defined(sub_input_merged_sort) then sub_input_merged_sort else merge_sort.out_file
          }
     
     output{
@@ -89,10 +95,10 @@ task align {
 }
 
 task merge {
-   Array[File] bams
+   Array[File] bam
 
    command {
-       samtools merge merged.bam ${sep=' ' bams}  
+       samtools merge merged.bam ${sep=' ' bam}  
    }
 
   output {

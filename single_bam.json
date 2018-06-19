@@ -1,0 +1,14 @@
+{ 
+    "hic.input_bams": ["/Users/anacismaru/Documents/ENCODE/hic-pipeline/cromwell-executions/hic/cad7bfb1-9f12-4932-a5fc-390c9ab43cfd/call-hic_sub/shard-0/hic_sub/a2df38b4-4751-4e72-9975-87b17c128e2e/call-align/shard-0/execution/glob-3634357155b76042ef4c1fffa9e85b9c/output_0_collisions.bam ",
+         "/Users/anacismaru/Documents/ENCODE/hic-pipeline/cromwell-executions/hic/cad7bfb1-9f12-4932-a5fc-390c9ab43cfd/call-hic_sub/shard-0/hic_sub/a2df38b4-4751-4e72-9975-87b17c128e2e/call-align/shard-0/execution/glob-e15db0a96e6fe71bdaa02be0b21ccfba/output_0_collisions_low_mapq.bam", 
+        "/Users/anacismaru/Documents/ENCODE/hic-pipeline/cromwell-executions/hic/cad7bfb1-9f12-4932-a5fc-390c9ab43cfd/call-hic_sub/shard-0/hic_sub/a2df38b4-4751-4e72-9975-87b17c128e2e/call-align/shard-0/execution/glob-698d88994360ce15284bb3ccfdd645e1/output_0_unmapped.bam ", 
+        "/Users/anacismaru/Documents/ENCODE/hic-pipeline/cromwell-executions/hic/cad7bfb1-9f12-4932-a5fc-390c9ab43cfd/call-hic_sub/shard-0/hic_sub/a2df38b4-4751-4e72-9975-87b17c128e2e/call-align/shard-0/execution/glob-4edfe48feb8fe731cde567af2c22b04e/output_0_mapq0.bam",
+        "/Users/anacismaru/Documents/ENCODE/hic-pipeline/cromwell-executions/hic/cad7bfb1-9f12-4932-a5fc-390c9ab43cfd/call-hic_sub/shard-0/hic_sub/a2df38b4-4751-4e72-9975-87b17c128e2e/call-align/shard-0/execution/glob-beb1f5a94e2a99f238d7508ab986688c/output_0_alignable.bam"], 
+    "hic.input_sort_files": "/Users/anacismaru/Documents/ENCODE/hic-pipeline/cromwell-executions/hic/cad7bfb1-9f12-4932-a5fc-390c9ab43cfd/call-hic_sub/shard-0/hic_sub/a2df38b4-4751-4e72-9975-87b17c128e2e/call-align/shard-0/execution/glob-1995ddf9d3e2f522a6e7069ec7b248c9/output_0.sort.txt",
+        
+    "hic.chrsz": "/Users/anacismaru/Desktop/bucket/encode-hic-pipeline-Freference_grch38_chr10_chrM-Fhg38_chr19_chrM.chrom.sizes",
+    "hic.restriction_sites": "/Users/anacismaru/Desktop/bucket/encode-hic-pipeline-Freference_grch38_chr10_chrM-FGRCh38_no_alt_analysis_set_GCA_000001405.15.chr19_chrM_MboI.txt",
+    "hic.reference_index": "/Users/anacismaru/Desktop/bucket/index.tar.gz"
+
+}
+
