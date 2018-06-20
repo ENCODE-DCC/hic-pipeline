@@ -1,11 +1,4 @@
-{ 
-    "hic.input_bams": [[
-        ["/Users/anacismaru/Desktop/bucket/bam_1/collisions.bam", 
-        "/Users/anacismaru/Desktop/bucket/bam_1/collisions_low_mapq.bam", 
-        "/Users/anacismaru/Desktop/bucket/bam_1/unmapped.bam",
-        "/Users/anacismaru/Desktop/bucket/bam_1/mapq0.bam",
-        "/Users/anacismaru/Desktop/bucket/bam_1/alignable.bam"]
-        ]], 
+{
     "hic.input_sort_files": [["/Users/anacismaru/Desktop/bucket/bam_1/sort.txt"]],
         
     "hic.chrsz": "/Users/anacismaru/Desktop/bucket/encode-hic-pipeline-Freference_grch38_chr10_chrM-Fhg38_chr19_chrM.chrom.sizes",

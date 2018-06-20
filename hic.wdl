@@ -18,7 +18,7 @@ workflow hic {
 
     #determine range of scatter
     Int lib_length = if (length(fastq) > 0) then length(fastq)
-    else if  (length(input_bams) > 0) then length(input_bams)
+    else if  (length(input_bams) > 0) then length(input_bams) ##technically the number should be same for bams and sort_files
     else if (length(input_sort_files) > 0) then length(input_sort_files)
     else length(input_merged_sort)
 
@@ -30,7 +30,7 @@ workflow hic {
         call sub.hic_sub{ input:
         sub_fastq = if (length(fastq) > 0) then fastq[i] else [],
         sub_input_bams = if (length(input_bams) > 0) then input_bams[i] else [],
-        sub_input_sort_files = if (length(input_bams) > 0) then input_sort_files[i] else [],
+        sub_input_sort_files = if (length(input_sort_files) > 0) then input_sort_files[i] else [],
         sub_input_merged_sort = if length(input_merged_sort)>0 then input_merged_sort[i] else sub_ms,
 
         sub_restriction_sites = restriction_sites,

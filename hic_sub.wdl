@@ -94,6 +94,70 @@ task align {
     }
 }
 
+# task test_align {
+# 	File idx_tar 		# reference bwa index tar
+# 	Array[File] fastqs 	# [read_end_id]
+#     File chrsz          # chromosome sizes file
+#     File restriction    # restriction enzyme sites in the reference genome
+
+#     command {       
+#         mkdir reference
+#         cd ../reference && tar -xvf ${idx_tar}
+#         index_folder=$(ls)
+#         cd $index_folder
+#         reference_fasta=$(ls | head -1) 
+#         reference_folder=$(pwd)
+#         reference_index_path=$reference_folder/$reference_fasta
+       
+#        # Align reads
+#         echo "Running command $bwa_cmd mem -SP5M $threadstring $refSeq $file1 $file2 > ${curr_ostem}.sam" 
+#         $bwa_cmd mem -SP5M $threadstring $reference_index_path $fastqs[0] $fastqs[1] > ${curr_ostem}.sam
+#         if [ $? -ne 0 ]
+#         then
+#             echo "***! Alignment of $file1 $file2 failed."
+#             exit 1
+#         else                                                            
+# 	    echo "(-:  Align of ${curr_ostem}.sam done successfully"
+#         fi
+       
+       
+       
+       
+       
+#        mkdir data && cd data && mkdir fastq && mkdir reference
+#         data_path=$(pwd)
+#         cd fastq
+#         ln -s ${fastqs[0]} $(pwd)/frag_R1.fastq.gz
+#         ln -s ${fastqs[1]} $(pwd)/frag_R2.fastq.gz
+#         cd ../reference && tar -xvf ${idx_tar}
+#         index_folder=$(ls)
+#         cd $index_folder
+#         reference_fasta=$(ls | head -1) 
+#         reference_folder=$(pwd)
+#         reference_index_path=$reference_folder/$reference_fasta
+#         cd ../..
+#         bash /opt/scripts/juicer.sh -D /opt -d $data_path -S alignonly -z $reference_index_path -p ${chrsz} -y ${restriction} -s MboI
+#     }
+
+#     output {
+#         File collisions = glob("data/splits/*_collisions.bam")[0]
+#         File collisions_low_mapq = glob("data/splits/*_collisions_low_mapq.bam")[0]
+#         File unampped = glob("data/splits/*_unmapped.bam")[0]
+#         File mapq0 = glob("data/splits/*_mapq0.bam")[0]
+#         File alignable = glob("data/splits/*_alignable.bam")[0]
+#         #TODO: reformat last 5 variables as an array or create tsv to mapping to those locations
+#         Array[File] out_file = [collisions, collisions_low_mapq, unampped, mapq0, alignable]
+#         File sort_file = glob("data/splits/*.sort.txt")[0]
+   
+#     }
+
+#     runtime {
+#         docker : "quay.io/gabdank/juicer:encode05232018"
+#         cpu : 32
+#         memory: "64G"
+#     }
+# }
+
 task merge {
    Array[File] bam
 
