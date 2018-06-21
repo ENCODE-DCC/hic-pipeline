@@ -16,7 +16,7 @@ workflow hic_sub{
         #output: bam files
         Int fastqs_len = length(sub_fastq)
         scatter(i in range(fastqs_len)){
-            call align { input:
+            call test_align { input:
                 restriction = sub_restriction_sites,
                 fastqs = sub_fastq[i],
                 chrsz = sub_chrsz,
@@ -24,7 +24,7 @@ workflow hic_sub{
             }
         }
         #flatten bams here  
-        Array[Array[File]] bams = flatten([align.out_file, sub_input_bams])  #for separate user entry point
+        Array[Array[File]] bams = flatten([test_align.out_file, sub_input_bams])  #for separate user entry point
         
         #input: bam files
         #output: Array of merged bam files
@@ -37,7 +37,7 @@ workflow hic_sub{
         #input: sort.txt 
         #output: Array of merged sort.txt
         call merge_sort { input:
-         sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else align.sort_file,  
+         sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else test_align.sort_file,  
          }    
 
         # we can collect the alignable.bam using the array merge.out_file
@@ -89,74 +89,90 @@ task align {
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05232018"
-        cpu : 32
+        cpu : 32  #bring this into command scope as threadstring or create optional input 
         memory: "64G"
     }
 }
 
-# task test_align {
-# 	File idx_tar 		# reference bwa index tar
-# 	Array[File] fastqs 	# [read_end_id]
-#     File chrsz          # chromosome sizes file
-#     File restriction    # restriction enzyme sites in the reference genome
+task test_align {
+	File idx_tar 		# reference bwa index tar
+	Array[File] fastqs 	# [read_end_id]
+    File chrsz          # chromosome sizes file
+    File restriction    # restriction enzyme sites in the reference genome
 
-#     command {       
-#         mkdir reference
-#         cd ../reference && tar -xvf ${idx_tar}
-#         index_folder=$(ls)
-#         cd $index_folder
-#         reference_fasta=$(ls | head -1) 
-#         reference_folder=$(pwd)
-#         reference_index_path=$reference_folder/$reference_fasta
+    command {     
+        echo "Starting align"  
+        mkdir data && cd data && mkdir reference
+        data_path=$(pwd)
+        cd reference && tar -xvf ${idx_tar}
+        index_folder=$(ls)
+        cd $index_folder
+        reference_fasta=$(ls | head -1) 
+        reference_folder=$(pwd)
+        reference_index_path=$reference_folder/$reference_fasta
+        cd ../..
        
-#        # Align reads
-#         echo "Running command $bwa_cmd mem -SP5M $threadstring $refSeq $file1 $file2 > ${curr_ostem}.sam" 
-#         $bwa_cmd mem -SP5M $threadstring $reference_index_path $fastqs[0] $fastqs[1] > ${curr_ostem}.sam
-#         if [ $? -ne 0 ]
-#         then
-#             echo "***! Alignment of $file1 $file2 failed."
-#             exit 1
-#         else                                                            
-# 	    echo "(-:  Align of ${curr_ostem}.sam done successfully"
-#         fi
+       # Align reads
+       #TODO: Deal with threadstring (get value from run time or make it an optioinal input)
+        echo "Running bwa command"
+        bwa mem -SP5M -t 4 $reference_index_path ${fastqs[0]} ${fastqs[1]} > result.sam
        
-       
-       
-       
-       
-#        mkdir data && cd data && mkdir fastq && mkdir reference
-#         data_path=$(pwd)
-#         cd fastq
-#         ln -s ${fastqs[0]} $(pwd)/frag_R1.fastq.gz
-#         ln -s ${fastqs[1]} $(pwd)/frag_R2.fastq.gz
-#         cd ../reference && tar -xvf ${idx_tar}
-#         index_folder=$(ls)
-#         cd $index_folder
-#         reference_fasta=$(ls | head -1) 
-#         reference_folder=$(pwd)
-#         reference_index_path=$reference_folder/$reference_fasta
-#         cd ../..
-#         bash /opt/scripts/juicer.sh -D /opt -d $data_path -S alignonly -z $reference_index_path -p ${chrsz} -y ${restriction} -s MboI
-#     }
+        
+	    # chimeric takes in $name$ext
+       echo "Running chimeric script"
+	    awk -v "fname"=result -f /opt/scripts/common/chimeric_blacklist.awk result.sam
+        
+        # if any normal reads were written, find what fragment they correspond
+	    # to and store that
+	    echo "Running fragment"
+        echo $restriction
+        /opt/scripts/common/fragment.pl result_norm.txt result_frag.txt ${restriction}   ##restriction used to be site_file   
+	    
+	
+       	
+        # convert sams to bams and delete the sams
+        echo "Converting sam to bam"
+	    samtools view -hb result_collisions.sam > collisions.bam
+        samtools view -hb result_collisions_low_mapq.sam > collisions_low_mapq.bam
+        samtools view -hb result_unmapped.sam > unmapped.bam
+        samtools view -hb result_mapq0.sam > mapq0.bam
+        samtools view -hb result_alignable.sam > alignable.bam
 
-#     output {
-#         File collisions = glob("data/splits/*_collisions.bam")[0]
-#         File collisions_low_mapq = glob("data/splits/*_collisions_low_mapq.bam")[0]
-#         File unampped = glob("data/splits/*_unmapped.bam")[0]
-#         File mapq0 = glob("data/splits/*_mapq0.bam")[0]
-#         File alignable = glob("data/splits/*_alignable.bam")[0]
-#         #TODO: reformat last 5 variables as an array or create tsv to mapping to those locations
-#         Array[File] out_file = [collisions, collisions_low_mapq, unampped, mapq0, alignable]
-#         File sort_file = glob("data/splits/*.sort.txt")[0]
+        # remove all sams EXCEPT alignable, which we need for deduping
+        echo "Removed all sams except alignable"
+	    rm result_collisions.sam result_collisions_low_mapq.sam result_unmapped.sam result_mapq0.sam result_alignable.sam
+
+        # sort by chromosome, fragment, strand, and position
+	    sort -T /opt/HIC_tmp -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n result_frag.txt > sort.txt
+        if [ $? -ne 0 ]
+    	then
+            echo "***! Failure during sort"
+            exit 1
+    	else
+            rm result_norm.txt result_frag.txt
+	    fi
+        
+
+    }
+
+    output {
+        File collisions = glob("data/collisions.bam")[0]
+        File collisions_low_mapq = glob("data/collisions_low_mapq.bam")[0]
+        File unampped = glob("data/unmapped.bam")[0]
+        File mapq0 = glob("data/mapq0.bam")[0]
+        File alignable = glob("data/alignable.bam")[0]
+        #TODO: reformat last 5 variables as an array or create tsv to mapping to those locations
+        Array[File] out_file = [collisions, collisions_low_mapq, unampped, mapq0, alignable]
+        File sort_file = glob("data/sort.txt")[0]
    
-#     }
+    }
 
-#     runtime {
-#         docker : "quay.io/gabdank/juicer:encode05232018"
-#         cpu : 32
-#         memory: "64G"
-#     }
-# }
+    runtime {
+        docker : "quay.io/gabdank/juicer:encode05232018"
+        cpu : 32
+        memory: "64G"
+    }
+}
 
 task merge {
    Array[File] bam

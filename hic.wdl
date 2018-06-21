@@ -4,6 +4,7 @@
 import "hic_sub.wdl" as sub
 workflow hic {
    #User inputs
+   # fastq files should look like filename_R1.fastq and filename_R2.fastq 
     Array[Array[Array[File]]] fastq = [] #[lib_id][fastq_id][read_end_id]
     Array[Array[Array[File]]] input_bams = [] #[lib_id] MAKE 3D like fastqs
     Array[Array[File]] input_sort_files = [] #[lib_id] 2d Array [lib[sort1, sirt2]]
