@@ -16,7 +16,7 @@ workflow hic_sub{
         #output: bam files
         Int fastqs_len = length(sub_fastq)
         scatter(i in range(fastqs_len)){
-            call test_align { input:
+            call align { input:
                 restriction = sub_restriction_sites,
                 fastqs = sub_fastq[i],
                 chrsz = sub_chrsz,
@@ -24,7 +24,7 @@ workflow hic_sub{
             }
         }
         #flatten bams here  
-        Array[Array[File]] bams = flatten([test_align.out_file, sub_input_bams])  #for separate user entry point
+        Array[Array[File]] bams = flatten([align.out_file, sub_input_bams])  #for separate user entry point
         
         #input: bam files
         #output: Array of merged bam files
@@ -37,7 +37,7 @@ workflow hic_sub{
         #input: sort.txt 
         #output: Array of merged sort.txt
         call merge_sort { input:
-         sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else test_align.sort_file,  
+         sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else align.sort_file,  
          }    
 
         # we can collect the alignable.bam using the array merge.out_file
@@ -54,47 +54,6 @@ workflow hic_sub{
 }
 
 task align {
-	File idx_tar 		# reference bwa index tar
-	Array[File] fastqs 	# [read_end_id]
-    File chrsz          # chromosome sizes file
-    File restriction    # restriction enzyme sites in the reference genome
-
-    command {       
-        mkdir data && cd data && mkdir fastq && mkdir reference
-        data_path=$(pwd)
-        cd fastq
-        ln -s ${fastqs[0]} $(pwd)/frag_R1.fastq.gz
-        ln -s ${fastqs[1]} $(pwd)/frag_R2.fastq.gz
-        cd ../reference && tar -xvf ${idx_tar}
-        index_folder=$(ls)
-        cd $index_folder
-        reference_fasta=$(ls | head -1) 
-        reference_folder=$(pwd)
-        reference_index_path=$reference_folder/$reference_fasta
-        cd ../..
-        bash /opt/scripts/juicer.sh -D /opt -d $data_path -S alignonly -z $reference_index_path -p ${chrsz} -y ${restriction} -s MboI
-    }
-
-    output {
-        File collisions = glob("data/splits/*_collisions.bam")[0]
-        File collisions_low_mapq = glob("data/splits/*_collisions_low_mapq.bam")[0]
-        File unampped = glob("data/splits/*_unmapped.bam")[0]
-        File mapq0 = glob("data/splits/*_mapq0.bam")[0]
-        File alignable = glob("data/splits/*_alignable.bam")[0]
-        #TODO: reformat last 5 variables as an array or create tsv to mapping to those locations
-        Array[File] out_file = [collisions, collisions_low_mapq, unampped, mapq0, alignable]
-        File sort_file = glob("data/splits/*.sort.txt")[0]
-   
-    }
-
-    runtime {
-        docker : "quay.io/gabdank/juicer:encode05232018"
-        cpu : 32  #bring this into command scope as threadstring or create optional input 
-        memory: "64G"
-    }
-}
-
-task test_align {
 	File idx_tar 		# reference bwa index tar
 	Array[File] fastqs 	# [read_end_id]
     File chrsz          # chromosome sizes file
