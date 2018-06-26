@@ -1,0 +1,19 @@
+{ 
+    "test_align.fastqs": [
+        "/Users/anacismaru/Desktop/bucket/test_align/read_1.fastq.gz",
+        "/Users/anacismaru/Desktop/bucket/test_align/read_2.fastq.gz"], 
+        
+    "test_align.chrsz": "/Users/anacismaru/Desktop/bucket/test_align/chrM.chrom.sizes",
+    "test_align.restriction": "/Users/anacismaru/Desktop/bucket/test_align/restriction.txt",
+    "test_align.idx_tar": "/Users/anacismaru/Desktop/bucket/index.tar.gz",
+    "test_align.ref_bams": [
+        "/Users/anacismaru/Desktop/bucket/test_align/collisions.bam",
+        "/Users/anacismaru/Desktop/bucket/test_align/collisions_low_mapq.bam",
+        "/Users/anacismaru/Desktop/bucket/test_align/unmapped.bam",
+        "/Users/anacismaru/Desktop/bucket/test_align/mapq0.bam",
+        "/Users/anacismaru/Desktop/bucket/test_align/alignable.bam"
+    ]
+
+}
+
+

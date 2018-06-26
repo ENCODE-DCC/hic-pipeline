@@ -3,7 +3,7 @@
 
 workflow hic_sub{
     Array[Array[File]] sub_fastq = [] #[lib_id][fastq_id][read_end_id]
-    Array[Array[File]] sub_input_bams = []  #[collisions, collisions_low_mapq, unampped, mapq0, alignable]
+    Array[Array[File]] sub_input_bams = []  #[collisions, collisions_low_mapq, unmapped, mapq0, alignable]
     Array[File] sub_input_sort_files = []
     File? sub_input_merged_sort #input to dedup
     
@@ -42,7 +42,6 @@ workflow hic_sub{
 
         # we can collect the alignable.bam using the array merge.out_file
         call dedup { input:
-        #fix
          merged_sort = if defined(sub_input_merged_sort) then sub_input_merged_sort else merge_sort.out_file
          }
     
@@ -117,11 +116,11 @@ task align {
     output {
         File collisions = glob("data/collisions.bam")[0]
         File collisions_low_mapq = glob("data/collisions_low_mapq.bam")[0]
-        File unampped = glob("data/unmapped.bam")[0]
+        File unmapped = glob("data/unmapped.bam")[0]
         File mapq0 = glob("data/mapq0.bam")[0]
         File alignable = glob("data/alignable.bam")[0]
         #TODO: reformat last 5 variables as an array or create tsv to mapping to those locations
-        Array[File] out_file = [collisions, collisions_low_mapq, unampped, mapq0, alignable]
+        Array[File] out_file = [collisions, collisions_low_mapq, unmapped, mapq0, alignable]
         File sort_file = glob("data/sort.txt")[0]
    
     }
