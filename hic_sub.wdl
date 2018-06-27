@@ -23,22 +23,26 @@ workflow hic_sub{
                 idx_tar = sub_reference_index
             }
         }
-        #flatten bams here  
-        Array[Array[File]] bams = flatten([align.out_file, sub_input_bams])  #for separate user entry point
+      
+        # Array[Array[File]] bams = flatten([align.out_file, sub_input_bams])  #for separate user entry point
         
-        #input: bam files
-        #output: Array of merged bam files
-        scatter(bam in bams){
-            call merge { input:
-            bam = bam
-            }
-        }
+        # #input: bam files
+        # #output: Array of merged bam files
+        # scatter(bam in bams){
+        #     call merge { input:
+        #     bam = bam
+        #     }
+        # }
 
         #input: sort.txt 
         #output: Array of merged sort.txt
         call merge_sort { input:
          sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else align.sort_file,  
-         }    
+         } 
+
+        call align_qc { input:
+            norm_res = align.norm_res
+        }   
 
         # we can collect the alignable.bam using the array merge.out_file
         call dedup { input:
@@ -48,6 +52,8 @@ workflow hic_sub{
     output{
         File out_dedup = dedup.out_file
         File out_chrsz = sub_chrsz
+        File norm_res_json = align_qc.out_file
+        File merged_nodups = dedup.out_file
 
     }
 }
@@ -57,6 +63,8 @@ task align {
 	Array[File] fastqs 	# [read_end_id]
     File chrsz          # chromosome sizes file
     File restriction    # restriction enzyme sites in the reference genome
+
+    Int? cpu
 
     command {     
         echo "Starting align"  
@@ -71,9 +79,8 @@ task align {
         cd ../..
        
        # Align reads
-       #TODO: Deal with threadstring (get value from run time or make it an optioinal input)
         echo "Running bwa command"
-        bwa mem -SP5M -t 4 $reference_index_path ${fastqs[0]} ${fastqs[1]} > result.sam
+        bwa mem -SP5M -t ${select_first([cpu,4])} $reference_index_path ${fastqs[0]} ${fastqs[1]} > result.sam
        
         
 	    # chimeric takes in $name$ext
@@ -96,8 +103,7 @@ task align {
         samtools view -hb result_mapq0.sam > mapq0.bam
         samtools view -hb result_alignable.sam > alignable.bam
 
-        # remove all sams EXCEPT alignable, which we need for deduping
-        echo "Removed all sams except alignable"
+        #removed all sam files
 	    rm result_collisions.sam result_collisions_low_mapq.sam result_unmapped.sam result_mapq0.sam result_alignable.sam
 
         # sort by chromosome, fragment, strand, and position
@@ -105,9 +111,7 @@ task align {
         if [ $? -ne 0 ]
     	then
             echo "***! Failure during sort"
-            exit 1
-    	else
-            rm result_norm.txt result_frag.txt
+            exit 1x
 	    fi
         
 
@@ -122,6 +126,7 @@ task align {
         #TODO: reformat last 5 variables as an array or create tsv to mapping to those locations
         Array[File] out_file = [collisions, collisions_low_mapq, unmapped, mapq0, alignable]
         File sort_file = glob("data/sort.txt")[0]
+        File norm_res = glob("data/result_norm.txt.res.txt")[0]
    
     }
 
@@ -184,4 +189,48 @@ task dedup {
   runtime {
        docker : "quay.io/gabdank/juicer:encode05022018"
    }
+}
+
+task align_qc {
+	Array[String] norm_res
+	
+
+	command <<<
+		python <<CODE	
+		import json
+
+count_total_reads = 0
+count_unmapped = 0
+count_reg = 0
+count_norm = 0
+count_collisions = 0
+count_lowqcollisions = 0
+count_mapq0 = 0
+for(norm in norm_res):
+    with open(norm,'r') as fp:
+        values = fp.read().split()
+        count_total_reads += values[0]
+        count_unmapped += values[1]
+        count_reg += values[2]
+        count_norm += values[3]
+        count_collisions += values[4]
+        count_lowqcollisions += values[5]
+        count_mapq0 += values[6]
+    fp.close()
+data = {"Total reads": count_total_reads, "Total Unmapped": count_unmapped, "Total regular": count_reg,"Total normal": count_norm, "Total collisions": count_collisions, "Total lowqcollisions": count_lowqcollisions,"Total mapq0": count_mapq0}
+
+with open('align_qc.json', 'w') as outfile:
+    json.dump(data, outfile)
+out_file.close()
+		CODE
+	>>>
+    output{
+        File out_file = glob("align_qc.json")[0]
+    }
+    runtime{
+        cpu : 1
+		memory : "4000 MB"
+		time : 1
+		disks : "local-disk 50 HDD" 
+    }
 }
