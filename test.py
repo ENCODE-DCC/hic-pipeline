@@ -7,7 +7,7 @@ count_norm = 0
 count_collisions = 0
 count_lowqcollisions = 0
 count_mapq0 = 0
-for(norm in norm_res):
+for norm in norm_res:
     with open(norm,'r') as fp:
         values = fp.read().split()
         count_total_reads += values[0]
@@ -22,6 +22,6 @@ data = {"Total reads": count_total_reads, "Total Unmapped": count_unmapped, "Tot
 
 with open('align_qc.json', 'w') as outfile:
     json.dump(data, outfile)
-out_file.close()
+outfile.close()
 
 
