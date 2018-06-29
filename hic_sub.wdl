@@ -88,17 +88,12 @@ task align {
        # Align reads
         echo "Running bwa command"
         bwa mem -SP5M -t ${select_first([cpu,4])} $reference_index_path ${fastqs[0]} ${fastqs[1]} > result.sam
-       
+       #GOOD UNTIL HERE
         
 	    # chimeric takes in $name$ext
-       echo "Running chimeric script"
+        echo "Running chimeric script"
 	    awk -v "fname"=result -f /opt/scripts/common/chimeric_blacklist.awk result.sam
         
-        # if any normal reads were written, find what fragment they correspond
-	    # to and store that
-	    echo "Running fragment"
-        echo $restriction
-        /opt/scripts/common/fragment.pl result_norm.txt result_frag.txt ${restriction}   ##restriction used to be site_file   
 	    
 	
        	
@@ -111,7 +106,7 @@ task align {
         samtools view -hb result_alignable.sam > alignable.bam
 
         #removed all sam files
-	    rm result_collisions.sam result_collisions_low_mapq.sam result_unmapped.sam result_mapq0.sam result_alignable.sam
+	   
 
         # sort by chromosome, fragment, strand, and position
 	    sort -T /opt/HIC_tmp -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n result_frag.txt > sort.txt
