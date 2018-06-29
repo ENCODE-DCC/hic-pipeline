@@ -3,8 +3,7 @@
 
 import "hic_sub.wdl" as sub
 workflow hic {
-   #User inputs
-   # fastq files should look like filename_R1.fastq and filename_R2.fastq 
+   #User inputs 
     Array[Array[Array[File]]] fastq = [] #[lib_id][fastq_id][read_end_id]
     Array[Array[Array[File]]] input_bams = [] #[lib_id] MAKE 3D like fastqs
     Array[Array[File]] input_sort_files = [] #[lib_id] 2d Array [lib[sort1, sirt2]]
@@ -51,19 +50,21 @@ workflow hic {
     }
     
     #  call qc_report{ input:
-    #  #TODO: FIND A WAY TO MERGE NORM_RES
-    #  norm_res = norm.out_file,
+    #  ligation = ligation,
     #  merged_nodups = merge_pairs_file.out_file,
     #  site_file = restriction_sites
     #  }
     
-    # # call call_tads { input:
-    # #   hic_file = create_hic.out_file
-    # # }
+    # call call_tads { input:
+    #   hic_file = create_hic.out_file
+    # }
 
-   
+   output{
+   File out_file = create_hic.out_file 
+ }
 
 }
+
 
 task merge_pairs_file{
     Array[File] not_merged_pe
@@ -216,50 +217,7 @@ task strip_headers{
 	}
 }
 
-# task qc_report{
-#     File norm_res
-#     File merged_nodups
-#     File site_file
-#     command{
-#        ## Set ligation junction based on restriction enzyme
-#       ##DO WE NEED THIS AND HOW DO I GET IT FROM RESTRICTION FILE
-    
-#       if [ -z "$ligation" ]
-#           then
-#                case $site in
-#                HindIII) ligation="AAGCTAGCTT";;
-#                DpnII) ligation="GATCGATC";;
-#                MboI) ligation="GATCGATC";;
-#                NcoI) ligation="CCATGCATGG";;
-#                none) ligation="XXXX";;
-#                *)  ligation="XXXX"
-#                    echo "$site not listed as recognized enzyme. Using $site_file as site file"
-#                    echo "Ligation junction is undefined"
-#                esac
-#            fi
-          
-#        #is this echo correct? It wanted the last line of the header file,but we did not make this file, but this should be the last line
-#        #what is headfile??
-#        echo "$0 $@"| awk '{printf"%-1000s\n", $0}' > inter_30.txt;  #what does this ; do?
-# #Got rid of an $outputdir in front of the first inter_30.txt
-# #Is merged_nodups coming from dedups? ligation?
 
-
-#         cat ${norm_res} | awk -f /opt/scripts/common/stats_sub.awk >> inter_30.txt
-#         java -cp /opt/scripts/common/ LibraryComplexity inter_30.txt >> inter_30.txt
-#         /opt/scripts/common/statistics.pl -s ${site_file} -l $ligation -o inter_30.txt -q 30 ${merged_nodups}
-    
-        
-#     }
-#     output{
-#         File out_file = glob("inter_30.txt")[0]
-#     }
-#     runtime{
-#         docker : "quay.io/gabdank/juicer:encode05232018"
-#         cpu : 32
-#         memory: "64G"
-#     }
-# }
 
 
 

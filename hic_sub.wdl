@@ -24,15 +24,21 @@ workflow hic_sub{
             }
         }
       
-        # Array[Array[File]] bams = flatten([align.out_file, sub_input_bams])  #for separate user entry point
+        Array[Array[File]] bams = flatten([align.out_file, sub_input_bams])  #for separate user entry point
         
-        # #input: bam files
-        # #output: Array of merged bam files
-        # scatter(bam in bams){
-        #     call merge { input:
-        #     bam = bam
-        #     }
-        # }
+        #TODO FIX THIS MERGE< IT IS WRONG
+        #input: bam files
+        #output: Array of merged bam files
+        scatter(bam in bams){
+            call merge { input:
+            coll = bam[0],
+            coll_low = bam[1],
+            unmap = bam[2],
+            map = bam[3],
+            alignable = bam[4]
+            }
+        }
+        
 
         #input: sort.txt 
         #output: Array of merged sort.txt
@@ -40,9 +46,10 @@ workflow hic_sub{
          sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else align.sort_file,  
          } 
 
-        call align_qc { input:
-            norm_res = align.norm_res
-        }   
+        # call align_qc { input:
+        #     norm_res = align.norm_res
+
+        # }   
 
         # we can collect the alignable.bam using the array merge.out_file
         call dedup { input:
@@ -52,7 +59,7 @@ workflow hic_sub{
     output{
         File out_dedup = dedup.out_file
         File out_chrsz = sub_chrsz
-        File norm_res_json = align_qc.out_file
+        #File norm_res_json = align_qc.out_file
         File merged_nodups = dedup.out_file
 
     }
@@ -138,14 +145,26 @@ task align {
 }
 
 task merge {
-   Array[File] bam
+    Array[File] coll 
+    Array[File] coll_low 
+    Array[File] unmap 
+    Array[File] map 
+    Array[File] alignable 
 
    command {
-       samtools merge merged.bam ${sep=' ' bam}  
+       samtools merge merged_collisions.bam ${sep=' ' coll} 
+       samtools merge merged_collisions_lowmapq.bam ${sep=' ' coll_low}
+       samtools merge merged_unmapped.bam ${sep=' ' unmap}
+       samtools merge merged_mapq0.bam ${sep=' ' map}
+       samtools merge merged_alignable.bam ${sep=' ' alignable} 
    }
 
   output {
-       File out_file = glob('merged.bam')[0]
+       File m_collisions= glob('merged_collisions.bam')[0]
+       File m_coll_low = glob('merged_collisions_lowmapq.bam')[0]
+       File m_unmap = glob('merged_unmapped.bam')[0]
+       File m_map = glob('merged_mapq0.bam')[0]
+       File m_align = glob('merged_alignable.bam')[0]
    }
 
   runtime {

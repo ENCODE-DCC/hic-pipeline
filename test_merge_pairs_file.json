@@ -1,6 +1,0 @@
-{ 
-    "test_merge_pairs_file.not_merged": [
-        "/Users/anacismaru/Desktop/bucket/test_mpairs/merged_nodups.txt"], 
-        
-    "test_merge_pairs_file.ref_merged_pairs": "/Users/anacismaru/Desktop/bucket/test_mpairs/merged_pairs.txt"
-}
