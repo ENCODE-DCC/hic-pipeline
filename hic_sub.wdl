@@ -72,6 +72,7 @@ task align {
     File restriction    # restriction enzyme sites in the reference genome
 
     Int? cpu
+  
 
     command {     
         echo "Starting align"  
@@ -93,9 +94,12 @@ task align {
 	    # chimeric takes in $name$ext
         echo "Running chimeric script"
 	    awk -v "fname"=result -f /opt/scripts/common/chimeric_blacklist.awk result.sam
-        
-	    
-	
+
+        # if any normal reads were written, find what fragment they correspond
+ 	    # to and store that
+ 	    echo "Running fragment"
+        echo $restriction
+        /opt/scripts/common/fragment.pl result_norm.txt result_frag.txt ${restriction}   
        	
         # convert sams to bams and delete the sams
         echo "Converting sam to bam"
@@ -106,8 +110,9 @@ task align {
         samtools view -hb result_alignable.sam > alignable.bam
 
         #removed all sam files
-	   
-
+        ##restriction used to be site_file
+        rm result_collisions.sam result_collisions_low_mapq.sam result_unmapped.sam result_mapq0.sam result_alignable.sam
+    
         # sort by chromosome, fragment, strand, and position
 	    sort -T /opt/HIC_tmp -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n result_frag.txt > sort.txt
         if [ $? -ne 0 ]
@@ -129,7 +134,8 @@ task align {
         Array[File] out_file = [collisions, collisions_low_mapq, unmapped, mapq0, alignable]
         File sort_file = glob("data/sort.txt")[0]
         File norm_res = glob("data/result_norm.txt.res.txt")[0]
-   
+        
+
     }
 
     runtime {
