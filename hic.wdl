@@ -194,7 +194,6 @@ task compare_md5sum {
 	runtime {
 		cpu : 1
 		memory : "4000 MB"
-		time : 1
 		disks : "local-disk 50 HDD"		
 	}
 }
@@ -212,7 +211,6 @@ task strip_headers{
         docker : "quay.io/gabdank/juicer:encode05232018"
 		cpu : 1
 		memory : "4000 MB"
-		time : 1
 		disks : "local-disk 50 HDD"     		
 	}
 }

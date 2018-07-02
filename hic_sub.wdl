@@ -138,7 +138,7 @@ task align {
     runtime {
         docker : "quay.io/gabdank/juicer:encode05232018"
         cpu : 32
-        memory: "64G"
+        memory: "64 GB"
     }
 }
 
@@ -248,7 +248,6 @@ task align_qc {
     runtime{
         cpu : 1
 		memory : "4000 MB"
-		time : 1
 		disks : "local-disk 50 HDD" 
     }
 }
