@@ -1,10 +1,10 @@
 { 
     "hic.input_bams": [[
-        ["/Users/anacismaru/Desktop/bucket/bam_1/collisions.bam", 
-        "/Users/anacismaru/Desktop/bucket/bam_1/collisions_low_mapq.bam", 
-        "/Users/anacismaru/Desktop/bucket/bam_1/unmapped.bam",
-        "/Users/anacismaru/Desktop/bucket/bam_1/mapq0.bam",
-        "/Users/anacismaru/Desktop/bucket/bam_1/alignable.bam"]
+            ["/Users/anacismaru/Desktop/bucket/bam_1/collisions.bam"],
+            ["/Users/anacismaru/Desktop/bucket/bam_1/collisions_low_mapq.bam"], 
+            ["/Users/anacismaru/Desktop/bucket/bam_1/unmapped.bam"],
+            ["/Users/anacismaru/Desktop/bucket/bam_1/mapq0.bam"],
+            ["/Users/anacismaru/Desktop/bucket/bam_1/alignable.bam"]
         ]], 
     "hic.input_sort_files": [["/Users/anacismaru/Desktop/bucket/bam_1/sort.txt"]],
         

@@ -24,19 +24,20 @@ workflow hic_sub{
             }
         }
       
-        Array[Array[File]] bams = flatten([align.out_file, sub_input_bams])  #for separate user entry point
-        
-        #TODO FIX THIS MERGE< IT IS WRONG
+        Array[File] collisions = if length(sub_input_bams)>0 then sub_input_bams[0] else align.collisions  #for separate user entry point
+        Array[File] collisions_low = if length(sub_input_bams)>0 then sub_input_bams[1] else align.collisions_low_mapq
+        Array[File] unmapped = if length(sub_input_bams)>0 then sub_input_bams[2] else align.unmapped
+        Array[File] mapq0 = if length(sub_input_bams)>0 then sub_input_bams[3] else align.mapq0
+        Array[File] alignable = if length(sub_input_bams)>0 then sub_input_bams[4] else align.alignable       
+    
         #input: bam files
-        #output: Array of merged bam files
-        scatter(bam in bams){
-            call merge { input:
-            coll = bam[0],
-            coll_low = bam[1],
-            unmap = bam[2],
-            map = bam[3],
-            alignable = bam[4]
-            }
+        #output: Array of merged bam files 
+        call merge { input:
+        collisions = collisions,
+        collisions_low = collisions_low,
+        unmapped = unmapped,
+        mapq0 = mapq0,
+        alignable = alignable
         }
         
 
@@ -121,7 +122,6 @@ task align {
             exit 1x
 	    fi
         
-
     }
 
     output {
@@ -130,12 +130,9 @@ task align {
         File unmapped = glob("data/unmapped.bam")[0]
         File mapq0 = glob("data/mapq0.bam")[0]
         File alignable = glob("data/alignable.bam")[0]
-        #TODO: reformat last 5 variables as an array or create tsv to mapping to those locations
-        Array[File] out_file = [collisions, collisions_low_mapq, unmapped, mapq0, alignable]
         File sort_file = glob("data/sort.txt")[0]
         File norm_res = glob("data/result_norm.txt.res.txt")[0]
-        
-
+        Array[File] out_file = [collisions,collisions_low_mapq,unmapped,mapq0,alignable]
     }
 
     runtime {
@@ -146,19 +143,19 @@ task align {
 }
 
 task merge {
-    Array[File] coll 
-    Array[File] coll_low 
-    Array[File] unmap 
-    Array[File] map 
-    Array[File] alignable 
-
-   command {
-       samtools merge merged_collisions.bam ${sep=' ' coll} 
-       samtools merge merged_collisions_lowmapq.bam ${sep=' ' coll_low}
-       samtools merge merged_unmapped.bam ${sep=' ' unmap}
-       samtools merge merged_mapq0.bam ${sep=' ' map}
+    Array[File] collisions
+    Array[File] collisions_low
+    Array[File] unmapped
+    Array[File] mapq0 
+    Array[File] alignable
+     
+    command <<<
+       samtools merge merged_collisions.bam ${sep=' ' collisions} 
+       samtools merge merged_collisions_lowmapq.bam ${sep=' ' collisions_low}
+       samtools merge merged_unmapped.bam ${sep=' ' unmapped}
+       samtools merge merged_mapq0.bam ${sep=' ' mapq0}
        samtools merge merged_alignable.bam ${sep=' ' alignable} 
-   }
+    >>>
 
   output {
        File m_collisions= glob('merged_collisions.bam')[0]
