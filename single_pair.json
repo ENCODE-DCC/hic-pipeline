@@ -1,9 +1,11 @@
-{
+{ 
     "hic.fastq_files": [[
-        "/Users/idan/Desktop/bucket/scatter_test/single_pair/read_1.fastq.gz",
-        "/Users/idan/Desktop/bucket/scatter_test/single_pair/read_2.fastq.gz"]],
-    "hic.chrsz": "/Users/idan/Desktop/bucket/reference_grch38_chr10_chrM/encode-hic-pipeline-Freference_grch38_chr10_chrM-Fhg38_chr19_chrM.chrom.sizes",
-    "hic.restriction_sites": "/Users/idan/Desktop/bucket/reference_grch38_chr10_chrM/encode-hic-pipeline-Freference_grch38_chr10_chrM-FGRCh38_no_alt_analysis_set_GCA_000001405.15.chr19_chrM_MboI.txt",
-    "hic.reference_index": "/Users/idan/Desktop/bucket/genome_reference_index/index.tar.gz"
+        "/Users/anacismaru/Desktop/bucket/original_pair/read_R1.fastq.gz",
+        "/Users/anacismaru/Desktop/bucket/original_pair/read_R2.fastq.gz"]], 
+        
+    "hic.chrsz": "/Users/anacismaru/Desktop/bucket/encode-hic-pipeline-Freference_grch38_chr10_chrM-Fhg38_chr19_chrM.chrom.sizes",
+    "hic.restriction_sites": "/Users/anacismaru/Desktop/bucket/encode-hic-pipeline-Freference_grch38_chr10_chrM-FGRCh38_no_alt_analysis_set_GCA_000001405.15.chr19_chrM_MboI.txt",
+    "hic.reference_index": "/Users/anacismaru/Desktop/bucket/index.tar.gz"
 
 }
+
