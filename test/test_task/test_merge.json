@@ -1,0 +1,12 @@
+{ 
+    "test_merge.bams": [
+        "/Users/anacismaru/Desktop/bucket/test_merge/test_merge_bams/collisions.bam",
+        "/Users/anacismaru/Desktop/bucket/test_merge/test_merge_bams/collisions_low_mapq.bam",
+        "/Users/anacismaru/Desktop/bucket/test_merge/test_merge_bams/unmapped.bam",
+        "/Users/anacismaru/Desktop/bucket/test_merge/test_merge_bams/mapq0.bam",
+        "/Users/anacismaru/Desktop/bucket/test_merge/test_merge_bams/alignable.bam"
+    ], 
+        
+    "test_merge.ref_merged": "/Users/anacismaru/Desktop/bucket/test_merge/test_ref_merged/merged.bam"
+
+}

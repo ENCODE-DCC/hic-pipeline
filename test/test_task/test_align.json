@@ -1,0 +1,19 @@
+{ 
+    "test_align.fastqs": [
+        "/Users/anacismaru/Desktop/bucket/read_pairs/original_pair/read_R1.fastq.gz",
+        "/Users/anacismaru/Desktop/bucket/read_pairs/original_pair/read_R2.fastq.gz"], 
+        
+    "test_align.chrsz": "/Users/anacismaru/Desktop/bucket/encode-hic-pipeline-Freference_grch38_chr10_chrM-Fhg38_chr19_chrM.chrom.sizes",
+    "test_align.restriction": "/Users/anacismaru/Desktop/bucket/encode-hic-pipeline-Freference_grch38_chr10_chrM-FGRCh38_no_alt_analysis_set_GCA_000001405.15.chr19_chrM_MboI.txt",
+    "test_align.idx_tar": "/Users/anacismaru/Desktop/bucket/index.tar.gz",
+    "test_align.ref_bams": [
+        "/Users/anacismaru/Desktop/bucket/tests/test_align/output_0_collisions.bam",
+        "/Users/anacismaru/Desktop/bucket/tests/test_align/output_0_collisions_low_mapq.bam",
+        "/Users/anacismaru/Desktop/bucket/tests/test_align/output_0_unmapped.bam",
+        "/Users/anacismaru/Desktop/bucket/tests/test_align/output_0_mapq0.bam",
+        "/Users/anacismaru/Desktop/bucket/tests/test_align/output_0_alignable.bam"
+    ]
+
+}
+
+

@@ -1,0 +1,7 @@
+{ 
+    "test_create_hic.pe_file": "/Users/anacismaru/Desktop/bucket/test_create_hic/merged_pairs.txt",
+        
+    "test_create_hic.chrsz": "/Users/anacismaru/Desktop/bucket/test_create_hic/chr19_chrM.chrom.sizes",
+    "test_create_hic.ref_hic": "/Users/anacismaru/Desktop/bucket/test_create_hic/inter.hic"
+
+}
