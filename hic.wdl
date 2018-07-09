@@ -128,7 +128,7 @@ task hiccups{
         /opt/scripts/common/juicer_tools hiccups ${hic_file} "loops.txt"
     }
     output{
-        Array[File] out_file = glob("loops.txt")
+        File out_file = glob("loops.txt")[0]
     }
     runtime{
         docker : "quay.io/anacismaru/nvidia_juicer"
