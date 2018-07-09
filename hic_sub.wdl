@@ -59,10 +59,7 @@ workflow hic_sub{
     
     output{
         File out_dedup = dedup.out_file
-        File out_chrsz = sub_chrsz
         #File norm_res_json = align_qc.out_file
-        File merged_nodups = dedup.out_file
-
     }
 }
 

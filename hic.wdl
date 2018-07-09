@@ -17,9 +17,9 @@ workflow hic {
     File reference_index
 
     #determine range of scatter
-    Int lib_length = if (length(fastq) > 0) then length(fastq)
-    else if  (length(input_bams) > 0) then length(input_bams) ##technically the number should be same for bams and sort_files
-    else if (length(input_sort_files) > 0) then length(input_sort_files)
+    Int lib_length = if length(fastq) > 0 then length(fastq)
+    else if length(input_bams) > 0 then length(input_bams) ##technically the number should be same for bams and sort_files
+    else if length(input_sort_files) > 0 then length(input_sort_files)
     else length(input_merged_sort)
 
 
@@ -28,9 +28,9 @@ workflow hic {
         File? sub_ms #to deal with multiple entries
         
         call sub.hic_sub{ input:
-        sub_fastq = if (length(fastq) > 0) then fastq[i] else [],
-        sub_input_bams = if (length(input_bams) > 0) then input_bams[i] else [],
-        sub_input_sort_files = if (length(input_sort_files) > 0) then input_sort_files[i] else [],
+        sub_fastq = if length(fastq) > 0 then fastq[i] else [],
+        sub_input_bams = if length(input_bams) > 0 then input_bams[i] else [],
+        sub_input_sort_files = if length(input_sort_files) > 0 then input_sort_files[i] else [],
         sub_input_merged_sort = if length(input_merged_sort)>0 then input_merged_sort[i] else sub_ms,
 
         sub_restriction_sites = restriction_sites,
@@ -55,9 +55,13 @@ workflow hic {
     #  site_file = restriction_sites
     #  }
     
-    # call call_tads { input:
+    # call tads { input:
     #   hic_file = create_hic.out_file
     # }
+
+    call hiccups{ input:
+        hic_file = create_hic.out_file
+    }
 
    output{
    File out_file = create_hic.out_file 
@@ -82,6 +86,7 @@ task merge_pairs_file{
    }
 }
 
+
 task create_hic {
    File pairs_file
    File chrsz_
@@ -100,7 +105,7 @@ task create_hic {
    }
 }
 
-task call_tads {
+task tads {
    File hic_file
 
    command {
@@ -114,6 +119,20 @@ task call_tads {
   runtime {
        docker : "quay.io/gabdank/juicer:encode05022018"
    }
+}
+
+task hiccups{
+    File hic_file
+    command{
+
+        /opt/scripts/common/juicer_tools hiccups ${hic_file} "loops.txt"
+    }
+    output{
+        Array[File] out_file = glob("loops.txt")
+    }
+    runtime{
+        docker : "quay.io/anacismaru/nvidia_juicer"
+    }
 }
 
 
