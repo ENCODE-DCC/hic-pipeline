@@ -7,9 +7,11 @@ pipeline {
         }
 
         stages {
+               //change this to master for now
+               //TODO: FIX THIS SO IT ISN"T MASTER ANYMORE
                 stage('Tag Non-master'){
                         agent {label 'master-builder'}
-                        when {not {branch 'master'}}
+                        when {branch 'master'}
                         steps{
                         //the tag built here is used for references in other stages
                                 script{

@@ -12,50 +12,49 @@ workflow hic_sub{
     File sub_reference_index
     
 
-        #input: fastqs
-        #output: bam files
-        Int fastqs_len = length(sub_fastq)
-        scatter(i in range(fastqs_len)){
-            call align { input:
-                restriction = sub_restriction_sites,
-                fastqs = sub_fastq[i],
-                chrsz = sub_chrsz,
-                idx_tar = sub_reference_index
-            }
+    #input: fastqs
+    #output: bam files
+    Int fastqs_len = length(sub_fastq)
+    scatter(i in range(fastqs_len)){
+        call align { input:
+            restriction = sub_restriction_sites,
+            fastqs = sub_fastq[i],
+            chrsz = sub_chrsz,
+            idx_tar = sub_reference_index
         }
+    }
       
-        Array[File] collisions = if length(sub_input_bams)>0 then sub_input_bams[0] else align.collisions  #for separate user entry point
-        Array[File] collisions_low = if length(sub_input_bams)>0 then sub_input_bams[1] else align.collisions_low_mapq
-        Array[File] unmapped = if length(sub_input_bams)>0 then sub_input_bams[2] else align.unmapped
-        Array[File] mapq0 = if length(sub_input_bams)>0 then sub_input_bams[3] else align.mapq0
-        Array[File] alignable = if length(sub_input_bams)>0 then sub_input_bams[4] else align.alignable       
+    Array[File] collisions = if length(sub_input_bams)>0 then sub_input_bams[0] else align.collisions  #for separate user entry point
+    Array[File] collisions_low = if length(sub_input_bams)>0 then sub_input_bams[1] else align.collisions_low_mapq
+    Array[File] unmapped = if length(sub_input_bams)>0 then sub_input_bams[2] else align.unmapped
+    Array[File] mapq0 = if length(sub_input_bams)>0 then sub_input_bams[3] else align.mapq0
+    Array[File] alignable = if length(sub_input_bams)>0 then sub_input_bams[4] else align.alignable       
     
-        #input: bam files
-        #output: Array of merged bam files 
-        call merge { input:
+    #input: bam files
+    #output: Array of merged bam files 
+    call merge { input:
         collisions = collisions,
         collisions_low = collisions_low,
         unmapped = unmapped,
         mapq0 = mapq0,
         alignable = alignable
-        }
+    }
         
 
-        #input: sort.txt 
-        #output: Array of merged sort.txt
-        call merge_sort { input:
-         sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else align.sort_file,  
-         } 
+    #input: sort.txt 
+    #output: Array of merged sort.txt
+    call merge_sort { input:
+        sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else align.sort_file,  
+    } 
 
-        # call align_qc { input:
-        #     norm_res = align.norm_res
+    # call align_qc { input:
+    #     norm_res = align.norm_res
+    # }   
 
-        # }   
-
-        # we can collect the alignable.bam using the array merge.out_file
-        call dedup { input:
-         merged_sort = if defined(sub_input_merged_sort) then sub_input_merged_sort else merge_sort.out_file
-         }
+    # we can collect the alignable.bam using the array merge.out_file
+    call dedup { input:
+        merged_sort = if defined(sub_input_merged_sort) then sub_input_merged_sort else merge_sort.out_file
+    }
     
     output{
         File out_dedup = dedup.out_file
@@ -147,69 +146,68 @@ task merge {
     Array[File] alignable
      
     command <<<
-       samtools merge merged_collisions.bam ${sep=' ' collisions} 
-       samtools merge merged_collisions_lowmapq.bam ${sep=' ' collisions_low}
-       samtools merge merged_unmapped.bam ${sep=' ' unmapped}
-       samtools merge merged_mapq0.bam ${sep=' ' mapq0}
-       samtools merge merged_alignable.bam ${sep=' ' alignable} 
+        samtools merge merged_collisions.bam ${sep=' ' collisions} 
+        samtools merge merged_collisions_lowmapq.bam ${sep=' ' collisions_low}
+        samtools merge merged_unmapped.bam ${sep=' ' unmapped}
+        samtools merge merged_mapq0.bam ${sep=' ' mapq0}
+        samtools merge merged_alignable.bam ${sep=' ' alignable} 
     >>>
 
-  output {
-       File m_collisions= glob('merged_collisions.bam')[0]
-       File m_coll_low = glob('merged_collisions_lowmapq.bam')[0]
-       File m_unmap = glob('merged_unmapped.bam')[0]
-       File m_map = glob('merged_mapq0.bam')[0]
-       File m_align = glob('merged_alignable.bam')[0]
-   }
+    output {
+        File m_collisions= glob('merged_collisions.bam')[0]
+        File m_coll_low = glob('merged_collisions_lowmapq.bam')[0]
+        File m_unmap = glob('merged_unmapped.bam')[0]
+        File m_map = glob('merged_mapq0.bam')[0]
+        File m_align = glob('merged_alignable.bam')[0]
+    }
 
-  runtime {
-       docker : "quay.io/gabdank/juicer:encode05022018"
-   }
+    runtime {
+        docker : "quay.io/gabdank/juicer:encode05022018"
+    }
 }
 
 task merge_sort {
    Array[File] sort_files_
 
-   command {
-       sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 10% ${sep=' ' sort_files_}  > merged_sort.txt
-   }
+    command {
+        sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 10% ${sep=' ' sort_files_}  > merged_sort.txt
+    }
 
-  output {
-       File out_file = glob('merged_sort.txt')[0]
-   }
+    output {
+        File out_file = glob('merged_sort.txt')[0]
+    }
 
-  runtime {
-       docker : "quay.io/gabdank/juicer:encode05022018"
-
-       #> 8 processors
-       #> a lot of memory
-   }
+    runtime {
+        docker : "quay.io/gabdank/juicer:encode05022018"
+        #> 8 processors
+        #> a lot of memory
+    }
 }
 
 task dedup {
-   File merged_sort
+    File merged_sort
 
-   command {
-       touch dups.txt
-       touch optdups.txt
-       touch merged_nodups.txt
-       awk -f /opt/scripts/common/dups.awk ${merged_sort}
-   }
+    command {
+        touch dups.txt
+        touch optdups.txt
+        touch merged_nodups.txt
+        awk -f /opt/scripts/common/dups.awk ${merged_sort}
+    }
 
-  output {
-       File out_file = glob('merged_nodups.txt')[0]
-   }
+    output {
+        File out_file = glob('merged_nodups.txt')[0]
+    }
 
-  runtime {
-       docker : "quay.io/gabdank/juicer:encode05022018"
-   }
+    runtime {
+        docker : "quay.io/gabdank/juicer:encode05022018"
+    }
 }
 
 task align_qc {
-	Array[String] norm_res
+    Array[String] norm_res
 	
 
-	command <<<
+    command <<<
 		python <<CODE	
 		import json
   count_total_reads = 0
