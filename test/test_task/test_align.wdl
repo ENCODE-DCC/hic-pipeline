@@ -1,5 +1,7 @@
+##Encode DCC Hi-C pipeline tester
+##Author: Ana Cismaru(anacismaru@gmail.com)
 import "hic_sub.wdl" as sub
-import "hic.wdl" as hic
+import "test/test_utils.wdl" as utils
 
 workflow test_align {
   
@@ -12,22 +14,22 @@ workflow test_align {
 
 
 	call sub.align as test { input:
-	 restriction = restriction,
-			fastqs = fastqs,
-			chrsz = chrsz,
-			idx_tar = idx_tar
+	 	restriction = restriction,
+		fastqs = fastqs,
+		chrsz = chrsz,
+		idx_tar = idx_tar
 	} 
 	Array[File] bams = test.out_file
 
 	scatter(bam in bams){
-		call hic.strip_headers as head { input:
-		bam = bam
+		call utils.strip_headers as head { input:
+			bam = bam
 		} 
 	}
 
 	scatter(bam in ref_bams){
-		call hic.strip_headers as ref_head { input:
-		bam = bam
+		call utils.strip_headers as ref_head { input:
+			bam = bam
 		} 
 	}
 
@@ -35,7 +37,7 @@ workflow test_align {
 	Array[File] ref_strip_sams = ref_head.no_header
 	
 
-    call hic.compare_md5sum { input :
+    call utils.compare_md5sum { input :
 		labels = [
 			'align_collisions',
 			'align_collisions_low_mapq',
@@ -44,7 +46,6 @@ workflow test_align {
 			'align_alignable'
 		],
 
-        #TODO: REMOVE BAM HEADER
 		files = [
 			strip_sams[0],
             strip_sams[1],

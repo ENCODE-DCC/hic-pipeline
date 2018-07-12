@@ -1,3 +1,5 @@
+##Encode DCC Hi-C pipeline tester
+##Author: Ana Cismaru(anacismaru@gmail.com)
 import "hic.wdl" as hic
 
 workflow test_hic{
@@ -28,6 +30,7 @@ workflow test_hic{
     }
     File result = test.out_file
 
+    #TODO: CHECK EVERYTHING DONE IN TEST TASKS
     call md5sum { input:
     labels = ["HiC Files"]
     files = [result]

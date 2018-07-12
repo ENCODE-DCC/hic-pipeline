@@ -1,18 +1,20 @@
+##Encode DCC Hi-C pipeline tester
+##Author: Ana Cismaru(anacismaru@gmail.com)
 import "hic_sub.wdl" as sub
-import "hic.wdl" as hic
+import "test/test_utils.wdl" as utils
 
 workflow test_dedup {
-      File merged_sort
-      File ref_dedup
+    File merged_sort
+    File ref_dedup
      
    
-     call sub.dedup as test { input:
+    call sub.dedup as test { input:
      merged_sort = merged_sort
-     }
+    }
         
 	File result = test.out_file
      
-	 call hic.compare_md5sum { input :
+    call utils.compare_md5sum { input :
 		labels = [
 			'dedups'
 		],

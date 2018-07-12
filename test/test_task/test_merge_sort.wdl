@@ -1,17 +1,19 @@
+##Encode DCC Hi-C pipeline tester
+##Author: Ana Cismaru(anacismaru@gmail.com)
 import "hic_sub.wdl" as sub
-import "hic.wdl" as hic
+import "test/test_utils.wdl" as utils
 
 workflow test_merge_sort {
-     Array[File] sort_file
-      File ref_merged_sort
+    Array[File] sort_file
+    File ref_merged_sort
      
    
-     call sub.merge_sort as test { input:
+    call sub.merge_sort as test { input:
      sort_files_ = sort_file
-     }
+    }
         
 	File result = test.out_file
-     call hic.compare_md5sum { input :
+    call utils.compare_md5sum { input :
 		labels = [
 			'merged_sort'
 		],
@@ -19,7 +21,7 @@ workflow test_merge_sort {
 		files = [
 			result
 		],
-        #TODO FIND REPLACEMENTS FOR THESE
+        
 		ref_files = [
 			ref_merged_sort
 		],
