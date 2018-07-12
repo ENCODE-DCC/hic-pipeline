@@ -57,8 +57,22 @@ workflow hic_sub{
     }
     
     output{
+        Array[File] out_collisions = align.collisions
+        Array[File] out_collisions_low = align.collisions_low_mapq
+        Array[File] out_unmapped = align.unmapped
+        Array[File] out_mapq0 = align.mapq0
+        Array[File] out_alignable = align.alignable
+        Array[File] out_sort_file = align.sort_file
+
+        File out_merged_collisions = merge.m_collisions
+        File out_merged_collisions_low = merge.m_coll_low
+        File out_merged_unmapped = merge.m_unmap
+        File out_merged_mapq0 = merge.m_map
+        File out_merged_align = merge.m_align
+
+        File out_merge_sort = merge_sort.out_file
         File out_dedup = dedup.out_file
-        #File norm_res_json = align_qc.out_file
+        #File out_align_qc = align_qc.out_file
     }
 }
 

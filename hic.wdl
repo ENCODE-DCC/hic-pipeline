@@ -40,40 +40,31 @@ workflow hic {
                 sub_reference_index =reference_index
             }
         }
-    
-        call merge_pairs_file{ input:
-            not_merged_pe = if length(input_dedup_pairs)>0 then input_dedup_pairs else hic_sub.out_dedup
-        }
-
-
-        call create_hic { input:
-            pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
-            chrsz_ = chrsz     
-        }
-        
-        #  call qc_report{ input:
-        #  ligation = ligation,
-        #  merged_nodups = merge_pairs_file.out_file,
-        #  site_file = restriction_sites
-        #  }
     }
     
-    File hic = if defined(input_hic) then input_hic else create_hic.inter_hic
+    call merge_pairs_file{ input:
+        not_merged_pe = if length(input_dedup_pairs)>0 then input_dedup_pairs else hic_sub.out_dedup
+    }
+
+
+    call create_hic { input:
+        pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
+        chrsz_ = chrsz     
+    }
+        
+    #     #  call qc_report{ input:
+    #     #  ligation = ligation,
+    #     #  merged_nodups = merge_pairs_file.out_file,
+    #     #  site_file = restriction_sites
+    #     #  }
+    # }
+    
     call tads { input:
-        hic_file = hic
+        hic_file = if defined(input_hic) then input_hic else create_hic.inter_30
     }
 
     call hiccups{ input:
-        hic_file = hic       
-    }
-
-    call apa{ input:
-        hic_file = hic,
-        peaks_file = hiccups.out_file       
-    }
-    
-    output{
-        #OUTPUT Everything
+        hic_file = if defined(input_hic) then input_hic else create_hic.inter_30      
     }
 
 }
@@ -108,7 +99,7 @@ task create_hic {
         # add inter_30 stuff
         #/opt/scripts/common/juicer_tools pre -s inter.txt -g inter_hists.m -q 1 ${pairs_file} inter.hic ${chrsz_}
         #File inter_hic = glob('inter.hic')[0]
-        File inter_30= glob('inter_30.hic')[0]
+       File inter_30= glob('inter_30.hic')[0]
     }
 
     runtime {
@@ -120,11 +111,11 @@ task tads {
     File hic_file
 
     command {
-        docker run --runtime=nvidia --entrypoint /opt/scripts/common/juicer_tools arrowhead ${hic_file%.*} contact_domains 
+        docker run --runtime=nvidia --entrypoint /opt/scripts/common/juicer_tools arrowhead ${hic_file} contact_domains 
     }
 
     output {
-        Array[File] out_file = glob('contact_domains/*.bedpe')
+        File out_file = glob('contact_domains/*.bedpe')[0]
     }
 }
 
@@ -139,15 +130,3 @@ task hiccups{
         File out_file = glob("loops/*.bedpe")[0]
     }      
 }
-
-# task apa{
-#     File hic_file
-#     File peaks_file
-#     command{
-#         docker run --runtime=nvidia --entrypoint /opt/scripts/common/juicer_tools apa ${hic_file} ${peaks_file} apa_results
-#     }
-#     output{
-#         #THIS IS PROBABLY WRONG
-#         File out_file = glob("apa_results")
-#     }
-# }
