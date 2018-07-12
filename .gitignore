@@ -1,4 +1,3 @@
-*.jar
+
 cromwell-executions/
 cromwell-workflow-logs/
-*.zip
