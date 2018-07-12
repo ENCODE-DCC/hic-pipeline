@@ -10,6 +10,7 @@ workflow hic {
     Array[File] input_merged_sort = []
     Array[File] input_dedup_pairs = []
     File? input_pairs
+    File? input_hic
 
     
     File restriction_sites
@@ -22,50 +23,51 @@ workflow hic {
     else if length(input_sort_files) > 0 then length(input_sort_files)
     else length(input_merged_sort)
 
+    #if statement includes all necesarry for creation of hic files
+    if(!defined(input_hic)){
+        #call sub workflow to support input from multiple different libraries
+        scatter(i in range(lib_length)){
+            File? sub_ms #to deal with multiple entries
+            
+            call sub.hic_sub{ input:
+            sub_fastq = if length(fastq) > 0 then fastq[i] else [],
+            sub_input_bams = if length(input_bams) > 0 then input_bams[i] else [],
+            sub_input_sort_files = if length(input_sort_files) > 0 then input_sort_files[i] else [],
+            sub_input_merged_sort = if length(input_merged_sort)>0 then input_merged_sort[i] else sub_ms,
 
-    #call sub workflow to support input from multiple different libraries
-    scatter(i in range(lib_length)){
-        File? sub_ms #to deal with multiple entries
-        
-        call sub.hic_sub{ input:
-        sub_fastq = if length(fastq) > 0 then fastq[i] else [],
-        sub_input_bams = if length(input_bams) > 0 then input_bams[i] else [],
-        sub_input_sort_files = if length(input_sort_files) > 0 then input_sort_files[i] else [],
-        sub_input_merged_sort = if length(input_merged_sort)>0 then input_merged_sort[i] else sub_ms,
-
-        sub_restriction_sites = restriction_sites,
-        sub_chrsz = chrsz,
-        sub_reference_index =reference_index
+            sub_restriction_sites = restriction_sites,
+            sub_chrsz = chrsz,
+            sub_reference_index =reference_index
+            }
         }
-    }
-   
-    call merge_pairs_file{ input:
-        not_merged_pe = if length(input_dedup_pairs)>0 then input_dedup_pairs else hic_sub.out_dedup
-    }
+    
+        call merge_pairs_file{ input:
+            not_merged_pe = if length(input_dedup_pairs)>0 then input_dedup_pairs else hic_sub.out_dedup
+        }
 
 
-    call create_hic { input:
-        pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
-        chrsz_ = chrsz     
+        call create_hic { input:
+            pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
+            chrsz_ = chrsz     
+        }
+        
+        #  call qc_report{ input:
+        #  ligation = ligation,
+        #  merged_nodups = merge_pairs_file.out_file,
+        #  site_file = restriction_sites
+        #  }
     }
-    
-    #  call qc_report{ input:
-    #  ligation = ligation,
-    #  merged_nodups = merge_pairs_file.out_file,
-    #  site_file = restriction_sites
-    #  }
-    
     # call tads { input:
     #   hic_file = create_hic.out_file
     # }
 
     call hiccups{ input:
-        hic_file = create_hic.out_file
+        hic_file = if defined(input_hic) then input_hic else create_hic.out_file       
     }
 
-   output{
-   File out_file = create_hic.out_file 
- }
+#    output{
+#    File out_file = create_hic.out_file 
+#  }
 
 }
 
@@ -124,14 +126,15 @@ task tads {
 task hiccups{
     File hic_file
     command{
-
-        /opt/scripts/common/juicer_tools hiccups ${hic_file} "loops.txt"
+        DIR=$(dirname "${hic_file}")
+        FILE=$(basename "${hic_file}")
+        docker run --runtime=nvidia --entrypoint /opt/scripts/common/juicer_tools -v $DIR:/input quay.io/anacismaru/nvidia_juicer:test hiccups /input/$FILE loops
     }
     output{
-        File out_file = glob("loops.txt")[0]
+        File out_file = glob("loops/*.bedpe")[0]
     }
     runtime{
-        docker : "quay.io/anacismaru/nvidia_juicer"
+        
     }
 }
 
