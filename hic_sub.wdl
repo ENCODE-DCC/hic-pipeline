@@ -97,10 +97,10 @@ task align {
         reference_index_path=$reference_folder/$reference_fasta
         cd ../..
        
-       # Align reads
+        # Align reads
         echo "Running bwa command"
         bwa mem -SP5M -t ${select_first([cpu,4])} $reference_index_path ${fastqs[0]} ${fastqs[1]} > result.sam
-       #GOOD UNTIL HERE
+        # GOOD UNTIL HERE
         
 	    # chimeric takes in $name$ext
         echo "Running chimeric script"

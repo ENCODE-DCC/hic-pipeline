@@ -80,9 +80,6 @@ task merge_pairs_file{
     }
     runtime {
         docker : "quay.io/gabdank/juicer:encode05022018"
-
-       #> 8 processors
-       #> a lot of memory
     }
 }
 
@@ -99,7 +96,7 @@ task create_hic {
         # add inter_30 stuff
         #/opt/scripts/common/juicer_tools pre -s inter.txt -g inter_hists.m -q 1 ${pairs_file} inter.hic ${chrsz_}
         #File inter_hic = glob('inter.hic')[0]
-       File inter_30= glob('inter_30.hic')[0]
+         File inter_30= glob('inter_30.hic')[0]
     }
 
     runtime {
