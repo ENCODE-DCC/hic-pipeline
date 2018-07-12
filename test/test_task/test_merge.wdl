@@ -45,7 +45,7 @@ workflow test_merge {
 	}
 	  
 
-	Array[File]x result = [coll.no_header, low.no_header, unmap.no_header, map.no_header, align.no_header]
+	Array[File] result = [coll.no_header, low.no_header, unmap.no_header, map.no_header, align.no_header]
     Array[File] ref = ref_head.no_header
 	 
 	call utils.compare_md5sum { input :
