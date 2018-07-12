@@ -1,0 +1,7 @@
+{ 
+    "test_merge_sort.sort_file":[
+        "/Users/anacismaru/ENCODE/bucket/tests/test_merge_sort/unmerged/read.fastq.gz.sort.txt"
+    ], 
+        
+    "test_merge_sort.ref_merged_sort": "/Users/anacismaru/ENCODE/bucket/tests/test_merge_sort/merged/merged_sort.txt"
+}

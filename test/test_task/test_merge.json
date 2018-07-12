@@ -1,0 +1,22 @@
+{ 
+    "test_merge.bams": [[
+        "/Users/anacismaru/ENCODE/bucket/tests/test_merge/unmerged/read.fastq.gz_collisions.bam"],
+        ["/Users/anacismaru/ENCODE/bucket/tests/test_merge/unmerged/read.fastq.gz_collisions_low_mapq.bam"],
+        ["/Users/anacismaru/ENCODE/bucket/tests/test_merge/unmerged/read.fastq.gz_unmapped.bam"],
+        ["/Users/anacismaru/ENCODE/bucket/tests/test_merge/unmerged/read.fastq.gz_mapq0.bam"],
+        ["/Users/anacismaru/ENCODE/bucket/tests/test_merge/unmerged/read.fastq.gz_alignable.bam"]
+    ], 
+        
+    "test_merge.ref_merged": [
+        "/Users/anacismaru/ENCODE/bucket/tests/test_merge/merged/collisions.bam",
+        "/Users/anacismaru/ENCODE/bucket/tests/test_merge/merged/collisions_low_mapq.bam",
+        "/Users/anacismaru/ENCODE/bucket/tests/test_merge/merged/unmapped.bam",
+        "/Users/anacismaru/ENCODE/bucket/tests/test_merge/merged/mapq0.bam",
+        "/Users/anacismaru/ENCODE/bucket/tests/test_merge/merged/alignable.bam"
+        
+    
+    
+    
+    ]
+
+}
