@@ -5,7 +5,7 @@ import "hic_sub.wdl" as sub
 workflow hic {
    #User inputs 
     Array[Array[Array[File]]] fastq = [] #[lib_id][fastq_id][read_end_id]
-    Array[Array[Array[File]]] input_bams = [] #[lib_id[collisions1,collisions2],[collisions_low],[unmapped],[mapq0],[alignable]]
+    Array[Array[Array[File]]] input_bams = [] #[lib_id[[collisions1,collisions2],[collisions_low],[unmapped],[mapq0],[alignable]], 
     Array[Array[File]] input_sort_files = [] #[lib_id] 2d Array [lib[sort1, sirt2]]
     Array[File] input_merged_sort = []
     Array[File] input_dedup_pairs = []
