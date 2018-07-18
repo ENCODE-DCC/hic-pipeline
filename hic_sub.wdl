@@ -142,7 +142,6 @@ task align {
         File alignable = glob("data/alignable.bam")[0]
         File sort_file = glob("data/sort.txt")[0]
         File norm_res = glob("data/result_norm.txt.res.txt")[0]
-        Array[File] out_file = [collisions,collisions_low_mapq,unmapped,mapq0,alignable]
     }
 
     runtime {

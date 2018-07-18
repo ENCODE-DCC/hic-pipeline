@@ -63,8 +63,42 @@ workflow hic {
         hic_file = if defined(input_hic) then input_hic else create_hic.inter_30
     }
 
-    call hiccups{ input:
-        hic_file = if defined(input_hic) then input_hic else create_hic.inter_30      
+    # call hiccups{ input:
+    #     hic_file = if defined(input_hic) then input_hic else create_hic.inter_30      
+    # }
+    
+    output{
+        #Align task outputs
+        # Array[Array[File]] out_collisions = hic_sub.out_collisions
+        # Array[Array[File]] out_collisions_low = hic_sub.out_collisions_low
+        # Array[Array[File]] out_unmapped = hic_sub.out_unmapped
+        # Array[Array[File]] out_mapq0 = hic_sub.out_mapq0
+        # Array[Array[File]] out_alignable = hic_sub.out_alignable
+        # Array[Array[File]] out_sort_file = hic_sub.out_sort_file
+        
+        # # #Merge task outputs
+        # Array[File] out_merged_collisions = hic_sub.out_merged_collisions
+        # Array[File] out_merged_collisions_low = hic_sub.out_merged_collisions_low
+        # Array[File] out_merged_unmapped = hic_sub.out_merged_unmapped
+        # Array[File] out_merged_mapq0 = hic_sub.out_merged_mapq0
+        # Array[File] out_merged_align = hic_sub.out_merged_align
+        
+        # # #Merge sort outputs
+        # Array[File] out_merge_sort = hic_sub.out_merge_sort
+        # # #Dedup outputs
+        # Array[File] out_dedup = hic_sub.out_dedup
+        
+        # # #Merge pairs file outputs
+        # File out_merged_pairs = merge_pairs_file.out_file
+        # # #Create hic outputs
+        # File out_hic = create_hic.out_file
+        # #TADs output
+        # # File out_tads = tads.out_file
+        # HiCCUps output
+        # File out_hiccups = hiccups.out_file
+
+        #QC outputs
+        #Array[File] out_align_qc = hic_sub.out_align_qc
     }
 
 }
