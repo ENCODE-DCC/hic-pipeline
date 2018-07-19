@@ -63,9 +63,9 @@ workflow hic {
         hic_file = if defined(input_hic) then input_hic else create_hic.inter_30
     }
 
-    call hiccups{ input:
-        hic_file = if defined(input_hic) then input_hic else create_hic.inter_30      
-    }
+    # call hiccups{ input:
+    #    hic_file = if defined(input_hic) then input_hic else create_hic.inter_30      
+    #}
 
 }
 
