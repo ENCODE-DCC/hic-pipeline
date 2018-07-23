@@ -1,4 +1,6 @@
 *.jar
 cromwell-executions/
 cromwell-workflow-logs/
+Jenkinsfile
+.DS_Store
 *.zip
