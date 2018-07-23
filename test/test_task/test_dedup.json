@@ -1,0 +1,5 @@
+{ 
+    "test_dedup.merged_sort": "/Users/anacismaru/ENCODE/bucket/tests/test_dedup/merged_sort.txt", 
+        
+    "test_dedup.ref_dedup": "/Users/anacismaru/ENCODE/bucket/tests/test_dedup/merged_nodups.txt"
+}
