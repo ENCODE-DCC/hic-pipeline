@@ -142,11 +142,15 @@ task tads {
     File hic_file
 
     command {
-        docker run --runtime=nvidia --entrypoint /opt/scripts/common/juicer_tools arrowhead ${hic_file} contact_domains 
+        /opt/scripts/common/juicer_tools arrowhead ${hic_file} contact_domains 
     }
 
     output {
         File out_file = glob('contact_domains/*.bedpe')[0]
+    }
+
+    runtime {
+        docker : "quay.io/gabdank/juicer:encode05022018"
     }
 }
 
