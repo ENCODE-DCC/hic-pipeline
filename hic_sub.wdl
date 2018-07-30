@@ -154,7 +154,7 @@ task align {
         docker : "quay.io/gabdank/juicer:encode05232018"
         cpu : "32"
         memory: "64 GB"
-        disks: "local-disk 100 SSD"
+        disks: "local-disk-17181736738851569067"
     }
 }
 
@@ -184,7 +184,7 @@ task merge {
     runtime {
         docker : "quay.io/gabdank/juicer:encode05022018"
         cpu : "32"
-        disks: "local-disk 100 SSD"
+        disks: "local-disk-17181736738851569067"
     }
 }
 
@@ -202,7 +202,7 @@ task merge_sort {
     runtime {
         docker : "quay.io/gabdank/juicer:encode05022018"
         cpu : "32"
-        disks: "local-disk 100 SSD"
+        disks: "local-disk-17181736738851569067"
         #> 8 processors
         #> a lot of memory
     }
@@ -225,7 +225,7 @@ task dedup {
     runtime {
         docker : "quay.io/gabdank/juicer:encode05022018"
         cpu : "32"
-        disks: "local-disk 100 SSD"
+        disks: "local-disk-17181736738851569067"
     }
 }
 
@@ -269,6 +269,6 @@ task align_qc {
     runtime{
         cpu : "32"
 		memory : "4000 MB"
-		disks : "local-disk 50 HDD" 
+		disks : "local-disk-17181736738851569067" 
     }
 }
