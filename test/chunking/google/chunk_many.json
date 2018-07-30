@@ -1,23 +1,19 @@
 { 
     "hic.fastq": [[
         [
-            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R1_1.fastq.gz",
-            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R2_1.fastq.gz"
+            "gs://chunking_test/split_fastq/ENCFF982XTF.part-1.fastq.gz",
+            "gs://chunking_test/split_fastq/ENCFF037PYX.part-1.fastq.gz"
         ],
         [
-            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R1_2.fastq.gz",
-            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R2_2.fastq.gz"
+            "gs://chunking_test/split_fastq/ENCFF982XTF.part-2.fastq.gz",
+            "gs://chunking_test/split_fastq/ENCFF037PYX.part-2.fastq.gz"
         ],
-        [   "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R1_3.fastq.gz",
-            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R2_3.fastq.gz"
+        [   "gs://chunking_test/split_fastq/ENCFF982XTF.part-3.fastq.gz",
+            "gs://chunking_test/split_fastq/ENCFF037PYX.part-3.fastq.gz"
         ],
         [   
-            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R1_4.fastq.gz",
-            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R2_4.fastq.gz"
-        ],
-        [
-            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R1_5.fastq.gz",
-            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R2_5.fastq.gz"
+            "gs://chunking_test/split_fastq/ENCFF982XTF.part-4.fastq.gz",
+            "gs://chunking_test/split_fastq/ENCFF037PYX.part-4.fastq.gz"
         ]
     ]], 
         
