@@ -11,11 +11,11 @@ workflow hic {
     Array[File] input_dedup_pairs = []
     File? input_pairs
     File? input_hic
-
     
     File restriction_sites
     File chrsz
     File reference_index
+    Int? cpu
 
     #determine range of scatter
     Int lib_length = if length(fastq) > 0 then length(fastq)
@@ -24,7 +24,7 @@ workflow hic {
     else length(input_merged_sort)
 
     #if statement includes all necesarry for creation of hic files
-    if(!defined(input_hic)){
+    #if(!defined(input_hic)){
         #call sub workflow to support input from multiple different libraries
         scatter(i in range(lib_length)){
             File? sub_ms #to deal with multiple entries
@@ -37,10 +37,11 @@ workflow hic {
 
                 sub_restriction_sites = restriction_sites,
                 sub_chrsz = chrsz,
-                sub_reference_index =reference_index
+                sub_reference_index =reference_index,
+                sub_cpu = cpu
             }
         }
-    }
+   #}
     
     call merge_pairs_file{ input:
         not_merged_pe = if length(input_dedup_pairs)>0 then input_dedup_pairs else hic_sub.out_dedup
@@ -59,9 +60,9 @@ workflow hic {
     #     #  }
     # }
     
-    call tads { input:
-        hic_file = if defined(input_hic) then input_hic else create_hic.inter_30
-    }
+    # call tads { input:
+    #     hic_file = if defined(input_hic) then input_hic else create_hic.inter_30
+    # }
 
     # call hiccups{ input:
     #     hic_file = if defined(input_hic) then input_hic else create_hic.inter_30      
@@ -114,6 +115,8 @@ task merge_pairs_file{
     }
     runtime {
         docker : "quay.io/gabdank/juicer:encode05022018"
+        cpu : "32"
+        #3disks: "local-disk 100 SSD"
     }
 }
 
@@ -135,6 +138,8 @@ task create_hic {
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05022018"
+        cpu : "32"
+        #disks: "local-disk 100 SSD"
     }
 }
 
@@ -142,7 +147,7 @@ task tads {
     File hic_file
 
     command {
-        docker run --runtime=nvidia --entrypoint /opt/scripts/common/juicer_tools arrowhead ${hic_file} contact_domains 
+        /opt/scripts/common/juicer_tools arrowhead ${hic_file} contact_domains  
     }
 
     output {

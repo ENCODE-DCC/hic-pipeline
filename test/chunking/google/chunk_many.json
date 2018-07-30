@@ -1,0 +1,29 @@
+{ 
+    "hic.fastq": [[
+        [
+            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R1_1.fastq.gz",
+            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R2_1.fastq.gz"
+        ],
+        [
+            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R1_2.fastq.gz",
+            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R2_2.fastq.gz"
+        ],
+        [   "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R1_3.fastq.gz",
+            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R2_3.fastq.gz"
+        ],
+        [   
+            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R1_4.fastq.gz",
+            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R2_4.fastq.gz"
+        ],
+        [
+            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R1_5.fastq.gz",
+            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R2_5.fastq.gz"
+        ]
+    ]], 
+        
+    "hic.chrsz": "gs://hic-reference/GRCh38/chrom.sizes",
+    "hic.restriction_sites": "gs://hic-reference/GRCh38/restriction_enzymes/GRCh38_DpnII.txt",
+    "hic.reference_index": "gs://hic-reference/GRCh38/bwa_index/ENCFF643CGH.tar.gz",
+    "hic.cpu": 32
+}
+

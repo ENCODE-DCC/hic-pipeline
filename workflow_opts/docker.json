@@ -2,6 +2,8 @@
     "default_runtime_attributes": {
         "docker" : "quay.io/gabdank/juicer:encode05022018",
         "zones": "us-west1-a us-west1-b us-west1-c",
-        "preemptible": "0"
+        "preemptible": "0",
+        "bootDiskSizeGb": "10",
+        "noAddress": "false"
     }
 }

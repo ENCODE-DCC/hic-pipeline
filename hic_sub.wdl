@@ -10,6 +10,7 @@ workflow hic_sub{
     File sub_restriction_sites
     File sub_chrsz
     File sub_reference_index
+    Int? sub_cpu
     
 
     #input: fastqs
@@ -20,7 +21,8 @@ workflow hic_sub{
             restriction = sub_restriction_sites,
             fastqs = sub_fastq[i],
             chrsz = sub_chrsz,
-            idx_tar = sub_reference_index
+            idx_tar = sub_reference_index,
+            cpu = sub_cpu 
         }
     }
       
@@ -115,15 +117,15 @@ task align {
         # convert sams to bams and delete the sams
         echo "Converting sam to bam"
 	    samtools view -hb result_collisions.sam > collisions.bam
-        rm result_collisions.sam
+        #rm result_collisions.sam
         samtools view -hb result_collisions_low_mapq.sam > collisions_low_mapq.bam
-        rm result_collisions_low_mapq.sam
+        #rm result_collisions_low_mapq.sam
         samtools view -hb result_unmapped.sam > unmapped.bam
-        rm result_unmapped.sam
+        #rm result_unmapped.sam
         samtools view -hb result_mapq0.sam > mapq0.bam
-        rm result_mapq0.sam
+        #rm result_mapq0.sam
         samtools view -hb result_alignable.sam > alignable.bam
-        rm result_alignable.sam
+        #rm result_alignable.sam
         #removed all sam files
         ##restriction used to be site_file
         
@@ -150,8 +152,9 @@ task align {
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05232018"
-        cpu : 32
+        cpu : "32"
         memory: "64 GB"
+      #  disks: "local-disk 100 SSD"
     }
 }
 
@@ -180,6 +183,8 @@ task merge {
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05022018"
+        cpu : "32"
+        #disks: "local-disk 100 SSD"
     }
 }
 
@@ -196,6 +201,8 @@ task merge_sort {
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05022018"
+        cpu : "32"
+       # disks: "local-disk 100 SSD"
         #> 8 processors
         #> a lot of memory
     }
@@ -217,6 +224,8 @@ task dedup {
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05022018"
+        cpu : "32"
+        #disks: "local-disk 100 SSD"
     }
 }
 
@@ -258,8 +267,8 @@ task align_qc {
         File out_file = glob("align_qc.json")[0]
     }
     runtime{
-        cpu : 1
+        cpu : "32"
 		memory : "4000 MB"
-		disks : "local-disk 50 HDD" 
+		#disks : "local-disk 50 HDD" 
     }
 }
