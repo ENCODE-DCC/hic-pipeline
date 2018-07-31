@@ -116,7 +116,8 @@ task merge_pairs_file{
     runtime {
         docker : "quay.io/gabdank/juicer:encode05022018"
         cpu : "32"
-        disks: "local-disk-17181736738851569067"
+        disks: "local-disk 100 HDD"
+        memory : "4000 MB"
     }
 }
 
@@ -139,7 +140,8 @@ task create_hic {
     runtime {
         docker : "quay.io/gabdank/juicer:encode05022018"
         cpu : "32"
-        disks: "local-disk-17181736738851569067"
+        disks: "local-disk 100 HDD"
+        memory : "4000 MB"
     }
 }
 
