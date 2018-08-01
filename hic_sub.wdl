@@ -117,15 +117,15 @@ task align {
         # convert sams to bams and delete the sams
         echo "Converting sam to bam"
 	    samtools view -hb result_collisions.sam > collisions.bam
-        #rm result_collisions.sam
+        rm result_collisions.sam
         samtools view -hb result_collisions_low_mapq.sam > collisions_low_mapq.bam
-        #rm result_collisions_low_mapq.sam
+        rm result_collisions_low_mapq.sam
         samtools view -hb result_unmapped.sam > unmapped.bam
-        #rm result_unmapped.sam
+        rm result_unmapped.sam
         samtools view -hb result_mapq0.sam > mapq0.bam
-        #rm result_mapq0.sam
+        rm result_mapq0.sam
         samtools view -hb result_alignable.sam > alignable.bam
-        #rm result_alignable.sam
+        rm result_alignable.sam
         #removed all sam files
         ##restriction used to be site_file
         
@@ -154,8 +154,7 @@ task align {
         docker : "quay.io/gabdank/juicer:encode05232018"
         cpu : "32"
         memory: "64 GB"
-        disks: "local-disk 100 HDD"
-        memory : "4000 MB"
+        disks: "local-disk 1000 HDD"
     }
 }
 
@@ -185,8 +184,8 @@ task merge {
     runtime {
         docker : "quay.io/gabdank/juicer:encode05022018"
         cpu : "32"
-        disks: "local-disk 100 HDD"
-        memory : "4000 MB"
+        disks: "local-disk 1000 HDD"
+        memory : "64 GB"
     }
 }
 
@@ -204,8 +203,8 @@ task merge_sort {
     runtime {
         docker : "quay.io/gabdank/juicer:encode05022018"
         cpu : "32"
-        disks: "local-disk 100 HDD"
-        memory : "4000 MB"
+        disks: "local-disk 1000 HDD"
+        memory : "64 GB"
         #> 8 processors
         #> a lot of memory
     }
@@ -228,8 +227,8 @@ task dedup {
     runtime {
         docker : "quay.io/gabdank/juicer:encode05022018"
         cpu : "32"
-        disks: "local-disk 100 HDD"
-        memory : "4000 MB"
+        disks: "local-disk 1000 HDD"
+        memory : "64 GB"
     }
 }
 
@@ -272,7 +271,7 @@ task align_qc {
     }
     runtime{
         cpu : "32"
-		memory : "4000 MB"
-		disks : "local-disk 100 HDD" 
+		memory : "64 GB"
+		disks : "local-disk 1000 HDD" 
     }
 }
