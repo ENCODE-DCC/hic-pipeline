@@ -34,29 +34,29 @@ workflow hic_sub{
     
     #input: bam files
     #output: Array of merged bam files 
-    call merge { input:
-        collisions = collisions,
-        collisions_low = collisions_low,
-        unmapped = unmapped,
-        mapq0 = mapq0,
-        alignable = alignable
-    }
+    # call merge { input:
+    #     collisions = collisions,
+    #     collisions_low = collisions_low,
+    #     unmapped = unmapped,
+    #     mapq0 = mapq0,
+    #     alignable = alignable
+    # }
         
 
-    #input: sort.txt 
-    #output: Array of merged sort.txt
-    call merge_sort { input:
-        sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else align.sort_file,  
-    } 
+    # #input: sort.txt 
+    # #output: Array of merged sort.txt
+    # call merge_sort { input:
+    #     sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else align.sort_file,  
+    # } 
 
     # call align_qc { input:
     #     norm_res = align.norm_res
     # }   
 
     # we can collect the alignable.bam using the array merge.out_file
-    call dedup { input:
-        merged_sort = if defined(sub_input_merged_sort) then sub_input_merged_sort else merge_sort.out_file
-    }
+    # call dedup { input:
+    #     merged_sort = if defined(sub_input_merged_sort) then sub_input_merged_sort else merge_sort.out_file
+    # }
     
     output{
         Array[File] out_collisions = align.collisions

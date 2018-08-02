@@ -1,24 +1,8 @@
 { 
     "hic.fastq": [[
             [
-                "gs://pipeline_challenge_bucket/keenan/ENCSR968KAY/ENCFF194JDI.fastq.gz",
-                "gs://pipeline_challenge_bucket/keenan/ENCSR968KAY/ENCFF955UVZ.fastq.gz"
-            ],
-            [
-                "gs://pipeline_challenge_bucket/keenan/ENCSR968KAY/ENCFF387IXM.fastq.gz",
-                "gs://pipeline_challenge_bucket/keenan/ENCSR968KAY/ENCFF668TPL.fastq.gz"
-            ],
-            [
-                "gs://pipeline_challenge_bucket/keenan/ENCSR968KAY/ENCFF938ACB.fastq.gz",
-                "gs://pipeline_challenge_bucket/keenan/ENCSR968KAY/ENCFF160PIP.fastq.gz"
-            ],
-            [
-                "gs://pipeline_challenge_bucket/keenan/ENCSR968KAY/ENCFF475GWB.fastq.gz",
-                "gs://pipeline_challenge_bucket/keenan/ENCSR968KAY/ENCFF229MEW.fastq.gz"
-            ],
-            [
-                "gs://pipeline_challenge_bucket/keenan/ENCSR968KAY/ENCFF410FUO.fastq.gz",
-                "gs://pipeline_challenge_bucket/keenan/ENCSR968KAY/ENCFF592GYT.fastq.gz"
+                "gs://chunking_test/split_fastq/ENCFF982XTF.part-1.fastq.gz",
+            "gs://chunking_test/split_fastq/ENCFF037PYX.part-1.fastq.gz"
             ]
     ]],     
     "hic.chrsz": "gs://hic-reference/GRCh38/chrom.sizes",

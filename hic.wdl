@@ -43,15 +43,15 @@ workflow hic {
         }
    #}
     
-    call merge_pairs_file{ input:
-        not_merged_pe = if length(input_dedup_pairs)>0 then input_dedup_pairs else hic_sub.out_dedup
-    }
+    # call merge_pairs_file{ input:
+    #     not_merged_pe = if length(input_dedup_pairs)>0 then input_dedup_pairs else hic_sub.out_dedup
+    # }
 
 
-    call create_hic { input:
-        pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
-        chrsz_ = chrsz     
-    }
+    # call create_hic { input:
+    #     pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
+    #     chrsz_ = chrsz     
+    # }
         
     #     #  call qc_report{ input:
     #     #  ligation = ligation,
