@@ -102,6 +102,7 @@ task align {
         # Align reads
         echo "Running bwa command"
         bwa mem -SP5M -t ${select_first([cpu,32])} $reference_index_path ${fastqs[0]} ${fastqs[1]} > result.sam
+        head -5 result.sam
         # GOOD UNTIL HERE
         
 	    # chimeric takes in $name$ext
