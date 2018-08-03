@@ -1,19 +1,19 @@
 { 
     "hic.fastq": [[
         [
-            "gs://chunking_test/split_fastq/ENCFF982XTF.part-1.fastq.gz",
-            "gs://chunking_test/split_fastq/ENCFF037PYX.part-1.fastq.gz"
+            "gs://chunk-test/split_fastq/ENCFF982XTF.part-1.fastq.gz",
+            "gs://chunk-test/split_fastq/ENCFF037PYX.part-1.fastq.gz"
         ],
         [
-            "gs://chunking_test/split_fastq/ENCFF982XTF.part-2.fastq.gz",
-            "gs://chunking_test/split_fastq/ENCFF037PYX.part-2.fastq.gz"
+            "gs://chunk-test/split_fastq/ENCFF982XTF.part-2.fastq.gz",
+            "gs://chunk-test/split_fastq/ENCFF037PYX.part-2.fastq.gz"
         ],
-        [   "gs://chunking_test/split_fastq/ENCFF982XTF.part-3.fastq.gz",
-            "gs://chunking_test/split_fastq/ENCFF037PYX.part-3.fastq.gz"
+        [   "gs://chunk-test/split_fastq/ENCFF982XTF.part-3.fastq.gz",
+            "gs://chunk-test/split_fastq/ENCFF037PYX.part-3.fastq.gz"
         ],
         [   
-            "gs://chunking_test/split_fastq/ENCFF982XTF.part-4.fastq.gz",
-            "gs://chunking_test/split_fastq/ENCFF037PYX.part-4.fastq.gz"
+            "gs://chunk-test/split_fastq/ENCFF982XTF.part-4.fastq.gz",
+            "gs://chunk-test/split_fastq/ENCFF037PYX.part-4.fastq.gz"
         ]
     ]], 
         

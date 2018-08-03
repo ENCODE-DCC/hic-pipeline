@@ -1,8 +1,8 @@
 { 
     "hic.fastq": [[
         [
-            "gs://chunking_test/fastq/ENCFF982XTF.fastq.gz",
-            "gs://chunking_test/fastq/ENCFF037PYX.fastq.gz"
+            "gs://chunk-test/fastq/ENCFF982XTF.fastq.gz",
+            "gs://chunk-test/fastq/ENCFF037PYX.fastq.gz"
         ]
     ]], 
         
