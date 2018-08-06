@@ -101,12 +101,11 @@ task align {
         
         # Align reads
         echo "Running bwa command"
-        bwa mem -SP5M -t ${select_first([cpu,32])} $reference_index_path ${fastqs[0]} ${fastqs[1]} > result.sam
-        head -5 result.sam
+        bwa mem -SP5M -t ${select_first([cpu,32])} $reference_index_path ${fastqs[0]} ${fastqs[1]} | awk -v "fname"=result -f /opt/scripts/common/chimeric_blacklist.awk
         
 	    # chimeric takes in $name$ext
         echo "Running chimeric script"
-	    awk -v "fname"=result -f /opt/scripts/common/chimeric_blacklist.awk result.sam
+	    
 
         # if any normal reads were written, find what fragment they correspond
  	    # to and store that
