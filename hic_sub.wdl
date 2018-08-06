@@ -142,13 +142,13 @@ task align {
     }
 
     output {
-        File collisions = glob("data/collisions.bam")[0]
-        File collisions_low_mapq = glob("data/collisions_low_mapq.bam")[0]
-        File unmapped = glob("data/unmapped.bam")[0]
-        File mapq0 = glob("data/mapq0.bam")[0]
-        File alignable = glob("data/alignable.bam")[0]
-        File sort_file = glob("data/sort.txt")[0]
-        File norm_res = glob("data/result_norm.txt.res.txt")[0]
+        File collisions = glob("collisions.bam")[0]
+        File collisions_low_mapq = glob("collisions_low_mapq.bam")[0]
+        File unmapped = glob("unmapped.bam")[0]
+        File mapq0 = glob("mapq0.bam")[0]
+        File alignable = glob("alignable.bam")[0]
+        File sort_file = glob("sort.txt")[0]
+        File norm_res = glob("result_norm.txt.res.txt")[0]
     }
 
     runtime {
