@@ -89,8 +89,7 @@ task align {
 
     command {     
         echo "Starting align"  
-        mkdir data && cd data && mkdir reference
-        data_path=$(pwd)
+        mkdir reference
         cd reference && tar -xvf ${idx_tar}
         index_folder=$(ls)
         cd $index_folder
