@@ -97,7 +97,6 @@ task align {
         reference_folder=$(pwd)
         reference_index_path=$reference_folder/$reference_fasta
         cd ../..
-        cd cromwell-root
         
         # Align reads
         echo "Running bwa command"
