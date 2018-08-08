@@ -100,7 +100,7 @@ task align {
         
         # Align reads
         echo "Running bwa command"
-        bwa mem -SP5M -t ${select_first([cpu,32])} $reference_index_path ${fastqs[0]} ${fastqs[1]} | awk -v "fname"=result -f /opt/scripts/common/chimeric_blacklist.awk
+        bwa mem -SP5M -t ${select_first([cpu,32])} $reference_index_path ${fastqs[0]} ${fastqs[1]} | awk -f /opt/scripts/common/chimeric_blacklist.awk
         
 	    # chimeric takes in $name$ext
         echo "Running chimeric script"
