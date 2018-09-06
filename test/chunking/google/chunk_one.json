@@ -1,0 +1,14 @@
+{ 
+    "hic.fastq": [[
+        [
+            "gs://chunk-test/fastq/ENCFF982XTF.fastq.gz",
+            "gs://chunk-test/fastq/ENCFF037PYX.fastq.gz"
+        ]
+    ]], 
+        
+    "hic.chrsz": "gs://hic-reference/GRCh38/chrom.sizes",
+    "hic.restriction_sites": "gs://hic-reference/GRCh38/restriction_enzymes/GRCh38_DpnII.txt",
+    "hic.reference_index": "gs://hic-reference/GRCh38/bwa_index/ENCFF643CGH.tar.gz",
+    "hic.cpu": 32
+}
+

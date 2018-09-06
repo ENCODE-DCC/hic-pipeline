@@ -10,6 +10,7 @@ workflow hic_sub{
     File sub_restriction_sites
     File sub_chrsz
     File sub_reference_index
+    Int? sub_cpu
     
 
     #input: fastqs
@@ -20,7 +21,8 @@ workflow hic_sub{
             restriction = sub_restriction_sites,
             fastqs = sub_fastq[i],
             chrsz = sub_chrsz,
-            idx_tar = sub_reference_index
+            idx_tar = sub_reference_index,
+            cpu = sub_cpu 
         }
     }
       
@@ -87,8 +89,7 @@ task align {
 
     command {     
         echo "Starting align"  
-        mkdir data && cd data && mkdir reference
-        data_path=$(pwd)
+        mkdir reference
         cd reference && tar -xvf ${idx_tar}
         index_folder=$(ls)
         cd $index_folder
@@ -96,15 +97,14 @@ task align {
         reference_folder=$(pwd)
         reference_index_path=$reference_folder/$reference_fasta
         cd ../..
-       
+        
         # Align reads
         echo "Running bwa command"
-        bwa mem -SP5M -t ${select_first([cpu,1])} $reference_index_path ${fastqs[0]} ${fastqs[1]} > result.sam
-        # GOOD UNTIL HERE
+        bwa mem -SP5M -t ${select_first([cpu,32])} $reference_index_path ${fastqs[0]} ${fastqs[1]} | awk -f /opt/scripts/common/chimeric_blacklist.awk
         
 	    # chimeric takes in $name$ext
         echo "Running chimeric script"
-	    awk -v "fname"=result -f /opt/scripts/common/chimeric_blacklist.awk result.sam
+	    
 
         # if any normal reads were written, find what fragment they correspond
  	    # to and store that
@@ -115,15 +115,15 @@ task align {
         # convert sams to bams and delete the sams
         echo "Converting sam to bam"
 	    samtools view -hb result_collisions.sam > collisions.bam
-        rm result_collisions.sam
+        #rm result_collisions.sam
         samtools view -hb result_collisions_low_mapq.sam > collisions_low_mapq.bam
-        rm result_collisions_low_mapq.sam
+        #rm result_collisions_low_mapq.sam
         samtools view -hb result_unmapped.sam > unmapped.bam
-        rm result_unmapped.sam
+        #rm result_unmapped.sam
         samtools view -hb result_mapq0.sam > mapq0.bam
-        rm result_mapq0.sam
+        #rm result_mapq0.sam
         samtools view -hb result_alignable.sam > alignable.bam
-        rm result_alignable.sam
+        #rm result_alignable.sam
         #removed all sam files
         ##restriction used to be site_file
         
@@ -139,19 +139,20 @@ task align {
     }
 
     output {
-        File collisions = glob("data/collisions.bam")[0]
-        File collisions_low_mapq = glob("data/collisions_low_mapq.bam")[0]
-        File unmapped = glob("data/unmapped.bam")[0]
-        File mapq0 = glob("data/mapq0.bam")[0]
-        File alignable = glob("data/alignable.bam")[0]
-        File sort_file = glob("data/sort.txt")[0]
-        File norm_res = glob("data/result_norm.txt.res.txt")[0]
+        File collisions = glob("collisions.bam")[0]
+        File collisions_low_mapq = glob("collisions_low_mapq.bam")[0]
+        File unmapped = glob("unmapped.bam")[0]
+        File mapq0 = glob("mapq0.bam")[0]
+        File alignable = glob("alignable.bam")[0]
+        File sort_file = glob("sort.txt")[0]
+        File norm_res = glob("result_norm.txt.res.txt")[0]
     }
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05232018"
-        cpu : 32
+        cpu : "32"
         memory: "64 GB"
+        disks: "local-disk 1000 HDD"
     }
 }
 
@@ -180,6 +181,9 @@ task merge {
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05022018"
+        cpu : "32"
+        disks: "local-disk 1000 HDD"
+        memory : "64 GB"
     }
 }
 
@@ -196,6 +200,9 @@ task merge_sort {
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05022018"
+        cpu : "32"
+        disks: "local-disk 1000 HDD"
+        memory : "64 GB"
         #> 8 processors
         #> a lot of memory
     }
@@ -217,6 +224,9 @@ task dedup {
 
     runtime {
         docker : "quay.io/gabdank/juicer:encode05022018"
+        cpu : "32"
+        disks: "local-disk 1000 HDD"
+        memory : "64 GB"
     }
 }
 
@@ -258,8 +268,8 @@ task align_qc {
         File out_file = glob("align_qc.json")[0]
     }
     runtime{
-        cpu : 1
-		memory : "4000 MB"
-		disks : "local-disk 50 HDD" 
+        cpu : "32"
+		memory : "64 GB"
+		disks : "local-disk 1000 HDD" 
     }
 }

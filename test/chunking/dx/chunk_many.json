@@ -1,0 +1,25 @@
+{ 
+    "hic.fastq": [[
+        [
+            "dx://project-FG6yF5j00ByYzB7Y5yX1Q7BF:file-FJGz7PQ00ByyjP0b49PVJQyz",
+            "dx://project-FG6yF5j00ByYzB7Y5yX1Q7BF:file-FJPYvFQ00ByVygvf89q2Q2f1"
+        ],
+        [
+            "dx://project-FG6yF5j00ByYzB7Y5yX1Q7BF:file-FJGVFY800ByV5Yv46X2YBYQG",
+            "dx://project-FG6yF5j00ByYzB7Y5yX1Q7BF:file-FJJ5YPj00ByYKz5989f81ZY0"
+        ],
+        [   "dx://project-FG6yF5j00ByYzB7Y5yX1Q7BF:file-FJGz7PQ00ByVygvf89q2KGJp",
+            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R2_3.fastq.gz"
+        ],
+        [   
+            "dx://project-FG6yF5j00ByYzB7Y5yX1Q7BF:file-FJGzX5800BybxQZ5078PB0p2",
+            "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R2_4.fastq.gz"
+        ]
+    ]], 
+        
+    "hic.chrsz": "dx://project-FG6yF5j00ByYzB7Y5yX1Q7BF:file-FG8j1xQ00ByVv4Y45g88Jpfq",
+    "hic.restriction_sites": "dx://project-FG6yF5j00ByYzB7Y5yX1Q7BF:file-FJ8J0F800ByzkZY4F6KvyYpQ",
+    "hic.reference_index": "dx://project-FG6yF5j00ByYzB7Y5yX1Q7BF:file-FG88kF800ByQPvFBFP0Kkp9Y",
+    "hic.cpu": 32
+}
+

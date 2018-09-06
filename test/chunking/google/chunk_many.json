@@ -1,0 +1,25 @@
+{ 
+    "hic.fastq": [[
+        [
+            "gs://chunk-test/split_fastq/ENCFF982XTF.part-1.fastq.gz",
+            "gs://chunk-test/split_fastq/ENCFF037PYX.part-1.fastq.gz"
+        ],
+        [
+            "gs://chunk-test/split_fastq/ENCFF982XTF.part-2.fastq.gz",
+            "gs://chunk-test/split_fastq/ENCFF037PYX.part-2.fastq.gz"
+        ],
+        [   "gs://chunk-test/split_fastq/ENCFF982XTF.part-3.fastq.gz",
+            "gs://chunk-test/split_fastq/ENCFF037PYX.part-3.fastq.gz"
+        ],
+        [   
+            "gs://chunk-test/split_fastq/ENCFF982XTF.part-4.fastq.gz",
+            "gs://chunk-test/split_fastq/ENCFF037PYX.part-4.fastq.gz"
+        ]
+    ]], 
+        
+    "hic.chrsz": "gs://hic-reference/GRCh38/chrom.sizes",
+    "hic.restriction_sites": "gs://hic-reference/GRCh38/restriction_enzymes/GRCh38_DpnII.txt",
+    "hic.reference_index": "gs://hic-reference/GRCh38/bwa_index/ENCFF643CGH.tar.gz",
+    "hic.cpu": 32
+}
+
