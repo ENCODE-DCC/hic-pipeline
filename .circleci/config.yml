@@ -5,11 +5,6 @@ defaults: &defaults
     - image: circleci/buildpack-deps:xenial-scm
   working_directory: ~/hic-pipeline
 
-machine_defaults: &machine_defaults
-  machine: 
-    image: circleci/classic:latest
-  working_directory: ~/hic-pipeline
-
 make_tag: &make_tag
   name: make docker image tag
   command: |
@@ -20,23 +15,6 @@ get_cromwell: &get_cromwell
   command: |
     wget -N -c https://github.com/broadinstitute/cromwell/releases/download/35/cromwell-35.jar
 
-install_singularity: &install_singularity
-  name: install singularity
-  command: |
-    sudo apt-get update
-    sudo apt-get install \
-    python \
-    dh-autoreconf \
-    build-essential \
-    libarchive-dev \
-    squashfs-tools
-    wget https://github.com/singularityware/singularity/releases/download/2.6.0/singularity-2.6.0.tar.gz
-    tar xvf singularity-2.6.0.tar.gz
-    cd singularity-2.6.0
-    ./configure --prefix=/usr/local --sysconfdir=/etc
-    make
-    sudo make install
-    singularity --version
 
 # Define jobs here
 version: 2
