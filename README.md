@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/ENCODE-DCC/hic-pipeline.svg?style=svg)](https://circleci.com/gh/ENCODE-DCC/hic-pipeline)
+
 HiC uniform processing pipeline
 ===================================================
 
