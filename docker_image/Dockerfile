@@ -53,13 +53,17 @@ ADD http://hicfiles.tc4ga.com.s3.amazonaws.com/public/juicer/juicer_tools.1.7.6_
 RUN ln -s /opt/juicer/CPU/common/juicer_tools.1.7.6_jcuda.0.8.jar /opt/juicer/CPU/common/juicer_tools.jar
 RUN ln -s juicer/CPU scripts
 
-# Version number contained in image
-# ADD VERSION .
+# Install pairix
+ADD https://github.com/4dn-dcic/pairix/archive/0.3.6.zip .
+RUN mv 0.3.6.zip pairix-0.3.6.zip && unzip pairix-0.3.6.zip 
+RUN cd pairix-0.3.6/ && make
+
+RUN rm pairix-0.3.6.zip && rm samtools-1.6.tar && rm v0.7.17.zip
 
 # For sorting, LC_ALL is C
 ENV LC_ALL C
 ENV PATH=/opt:/opt/scripts:/opt/scripts/common:$PATH
 
-CMD ["-h"]
+#CMD ["-h"]
 
 

@@ -149,7 +149,7 @@ task align {
     }
 
     runtime {
-        docker : "quay.io/gabdank/juicer:encode05232018"
+        docker : "quay.io/encode-dcc/hic-pipeline:template"
         cpu : "32"
         memory: "64 GB"
         disks: "local-disk 1000 HDD"
@@ -180,7 +180,7 @@ task merge {
     }
 
     runtime {
-        docker : "quay.io/gabdank/juicer:encode05022018"
+        docker : "quay.io/encode-dcc/hic-pipeline:template"
         cpu : "32"
         disks: "local-disk 1000 HDD"
         memory : "64 GB"
@@ -199,7 +199,7 @@ task merge_sort {
     }
 
     runtime {
-        docker : "quay.io/gabdank/juicer:encode05022018"
+        docker : "quay.io/encode-dcc/hic-pipeline:template"
         cpu : "32"
         disks: "local-disk 1000 HDD"
         memory : "64 GB"
@@ -223,7 +223,7 @@ task dedup {
     }
 
     runtime {
-        docker : "quay.io/gabdank/juicer:encode05022018"
+        docker : "quay.io/encode-dcc/hic-pipeline:template"
         cpu : "32"
         disks: "local-disk 1000 HDD"
         memory : "64 GB"
