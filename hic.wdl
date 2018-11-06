@@ -114,7 +114,7 @@ task merge_pairs_file{
         File out_file = glob('merged_pairs.txt')[0]
     }
     runtime {
-        docker : "quay.io/gabdank/juicer:encode05022018"
+        docker : "quay.io/encode-dcc/hic-pipeline:template"
         cpu : "32"
         disks: "local-disk 1000 HDD"
         memory : "64 GB"
@@ -138,7 +138,7 @@ task create_hic {
     }
 
     runtime {
-        docker : "quay.io/gabdank/juicer:encode05022018"
+        docker : "quay.io/encode-dcc/hic-pipeline:template"
         cpu : "32"
         disks: "local-disk 1000 HDD"
         memory : "64 GB"
@@ -147,17 +147,18 @@ task create_hic {
 
 task bam2pairs {
     File bam_file
+    File chrsz_ 
 
     command {
-        /opt/scripts/common/juicer_tools arrowhead ${hic_file} contact_domains 
+        /opt/pairix-0.3.6/util/bam2pairs/bam2pairs -c ${chrsz_} ${bam_file} pairix
     }
 
     output {
-        File out_file = glob('contact_domains/*.bedpe')[0]
+        File out_file = glob('pairix.*.pairs')[0]
     }
 
     runtime {
-        docker : "quay.io/gabdank/juicer:encode05022018"
+        docker : "quay.io/encode-dcc/hic-pipeline:template"
     }
 }
 
@@ -174,7 +175,7 @@ task tads {
     }
 
     runtime {
-        docker : "quay.io/gabdank/juicer:encode05022018"
+        docker : "quay.io/encode-dcc/hic-pipeline:template"
     }
 }
 
