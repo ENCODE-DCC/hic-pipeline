@@ -3,14 +3,6 @@ get_cromwell: &get_cromwell
   command: |
     wget -N -c https://github.com/broadinstitute/cromwell/releases/download/35/cromwell-35.jar
 
-# This configuration was automatically generated from a CircleCI 1.0 config.
-# It should include any build commands you had along with commands that CircleCI
-# inferred from your project structure. We strongly recommend you read all the
-# comments in this file to understand the structure of CircleCI 2.0, as the idiom
-# for configuration has changed substantially in 2.0 to allow arbitrary jobs rather
-# than the prescribed lifecycle of 1.0. In general, we recommend using this generated
-# configuration as a reference rather than using it in production, though in most
-# cases it should duplicate the execution of your original 1.0 config.
 version: 2
 jobs:
   build:
@@ -43,9 +35,11 @@ jobs:
     # In many cases you can simplify this from what is generated here.
     # 'See docs on artifact collection here https://circleci.com/docs/2.0/artifacts/'
     - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
-    # Dependencies
-    #   This would typically go in either a build or a build-and-test job when using workflows
-    # Restore the dependency cache
+        name: build image 
+          command: |
+            source ${BASH_ENV}
+            echo "pulling template!"
+            docker pull quay.io/encode-dcc/hic-pipeline:template
     - restore_cache:
         keys:
         # This branch if available
