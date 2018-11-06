@@ -1,3 +1,13 @@
+defaults: &defaults
+  docker:
+    - image: circleci/buildpack-deps:xenial-scm
+  working_directory: ~/ENCODE-DCC/hic-pipeline
+  
+make_tag: &make_tag
+  name: make docker image tag
+  command: |
+    echo "export TAG=quay.io/encode-dcc/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}" > ${BASH_ENV}
+
 get_cromwell: &get_cromwell
   name: get the cromwell 35
   command: |
@@ -35,11 +45,6 @@ jobs:
     # In many cases you can simplify this from what is generated here.
     # 'See docs on artifact collection here https://circleci.com/docs/2.0/artifacts/'
     - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
-        name: build image 
-          command: |
-            source ${BASH_ENV}
-            echo "pulling template!"
-            docker pull quay.io/encode-dcc/hic-pipeline:template
     - restore_cache:
         keys:
         # This branch if available
