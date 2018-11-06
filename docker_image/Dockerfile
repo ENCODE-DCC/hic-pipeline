@@ -4,7 +4,7 @@
 ############################################################
 
 # Set the base image to Ubuntu
-FROM ubuntu
+FROM ubuntu:16.04
 
 # File Author / Maintainer
 MAINTAINER Neva C. Durand 
