@@ -1,3 +1,8 @@
+get_cromwell: &get_cromwell
+  name: get the cromwell 35
+  command: |
+    wget -N -c https://github.com/broadinstitute/cromwell/releases/download/35/cromwell-35.jar
+
 # This configuration was automatically generated from a CircleCI 1.0 config.
 # It should include any build commands you had along with commands that CircleCI
 # inferred from your project structure. We strongly recommend you read all the
