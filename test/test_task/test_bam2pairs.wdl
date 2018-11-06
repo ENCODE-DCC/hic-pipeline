@@ -1,5 +1,4 @@
-import "hic.wdl" as hic
-import "test/test_utils.wdl" as utils
+import "../../hic.wdl" as hic
 
 workflow test_bam2pairs {
 	File bam 		    # bam file to convert into pairs
