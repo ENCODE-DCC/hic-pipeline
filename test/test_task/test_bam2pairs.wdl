@@ -9,12 +9,12 @@ workflow test_bam2pairs {
     	chrsz_ = chrsz
 	}
 
-	call tail_of_pairs as strip_header { input:
+	call tail_of_pairs { input:
 		pairs = test.out_file
 	}
 
  	output {
-        File pairs_no_header = strip_header.no_header
+        File pairs_no_header = tail_of_pairs.no_header
     } 
 }
 
