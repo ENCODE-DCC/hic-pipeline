@@ -23,7 +23,7 @@ task tail_of_pairs{
     File pairs
     
     command{
-        sed 1,5d pairs > no_header.pairs
+        sed 1,5d ${pairs} > no_header.pairs
     } 
 
     output{
