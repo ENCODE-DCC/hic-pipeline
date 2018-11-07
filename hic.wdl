@@ -1,7 +1,7 @@
 ##Encode DCC Hi-C pipeline
 ##Author: Ana Cismaru(anacismaru@gmail.com)
 
-import "hic_sub.wdl" as sub
+import "../../hic_sub.wdl" as sub
 workflow hic {
     #User inputs 
     Array[Array[Array[File]]] fastq = [] #[lib_id][fastq_id][read_end_id]
@@ -114,7 +114,7 @@ task merge_pairs_file{
         File out_file = glob('merged_pairs.txt')[0]
     }
     runtime {
-        docker : "quay.io/gabdank/juicer:encode05022018"
+        docker : "quay.io/encode-dcc/hic-pipeline:template"
         cpu : "32"
         disks: "local-disk 1000 HDD"
         memory : "64 GB"
@@ -138,12 +138,30 @@ task create_hic {
     }
 
     runtime {
-        docker : "quay.io/gabdank/juicer:encode05022018"
+        docker : "quay.io/encode-dcc/hic-pipeline:template"
         cpu : "32"
         disks: "local-disk 1000 HDD"
         memory : "64 GB"
     }
 }
+
+task bam2pairs {
+    File bam_file
+    File chrsz_ 
+
+    command {
+        /opt/pairix-0.3.6/util/bam2pairs/bam2pairs -c ${chrsz_} ${bam_file} pairix
+    }
+
+    output {
+        File out_file = glob('pairix.*.pairs')[0]
+    }
+
+    runtime {
+        docker : "quay.io/encode-dcc/hic-pipeline:template"
+    }
+}
+
 
 task tads {
     File hic_file
@@ -157,7 +175,7 @@ task tads {
     }
 
     runtime {
-        docker : "quay.io/gabdank/juicer:encode05022018"
+        docker : "quay.io/encode-dcc/hic-pipeline:template"
     }
 }
 
