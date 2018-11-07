@@ -1,7 +1,7 @@
 ##Encode DCC Hi-C pipeline
 ##Author: Ana Cismaru(anacismaru@gmail.com)
 
-import "../../hic_sub.wdl" as sub
+import "https://github.com/ENCODE-DCC/hic-pipeline/blob/PIP-406-bam2pairs/hic_sub.wdl" as sub
 workflow hic {
     #User inputs 
     Array[Array[Array[File]]] fastq = [] #[lib_id][fastq_id][read_end_id]
