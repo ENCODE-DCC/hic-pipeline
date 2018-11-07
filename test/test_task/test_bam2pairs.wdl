@@ -9,7 +9,24 @@ workflow test_bam2pairs {
     	chrsz_ = chrsz
 	}
 
+	call tail_of_pairs as strip_header { input:
+		pairs = test.out_file
+	}
+
  	output {
-        File pairs = test.out_file
+        File pairs_no_header = strip_header.no_header
     } 
+}
+
+
+task tail_of_pairs{
+    File pairs
+    
+    command{
+        sed 1,5d pairs > no_header.pairs
+    } 
+
+    output{
+        File no_header = glob("no_header.pairs")[0]
+    }
 }
