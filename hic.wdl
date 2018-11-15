@@ -10,7 +10,8 @@ workflow hic {
     Array[File] input_dedup_pairs = []
     File? input_pairs
     File? input_hic
-    
+    File? sub_ms
+
     File restriction_sites
     File chrsz
     File reference_index
