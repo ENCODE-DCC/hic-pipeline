@@ -1,7 +1,7 @@
 ##Encode DCC Hi-C pipeline tester
 ##Author: Ana Cismaru(anacismaru@gmail.com)
-import "hic_sub.wdl" as sub
-import "test/test_utils.wdl" as utils
+import "../../hic.wdl" as sub
+import "../test_utils.wdl" as utils
 
 workflow test_align {
   
@@ -18,8 +18,15 @@ workflow test_align {
 		fastqs = fastqs,
 		chrsz = chrsz,
 		idx_tar = idx_tar
-	} 
-	Array[File] bams = test.out_file
+	}
+	
+	Array[File] bams = [
+ 		test.collisions,
+        test.collisions_low_mapq,
+        test.unmapped,
+        test.mapq0,
+        test.alignable
+	]
 
 	scatter(bam in bams){
 		call utils.strip_headers as head { input:
@@ -60,7 +67,7 @@ workflow test_align {
 			ref_strip_sams[2],
 			ref_strip_sams[3],
 			ref_strip_sams[4]
-		],
+		]
 	}
     
 }

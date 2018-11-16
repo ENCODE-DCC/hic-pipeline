@@ -156,21 +156,21 @@ task align {
         
         # Align reads
         echo "Running bwa command"
-        bwa mem -SP5M -t ${select_first([cpu,32])} $reference_index_path ${fastqs[0]} ${fastqs[1]} | awk -f /opt/scripts/common/chimeric_blacklist.awk
+        bwa mem -SP5M -t ${select_first([cpu,32])} $reference_index_path ${fastqs[0]} ${fastqs[1]} | awk -v "fname"=result -f /opt/scripts/common/chimeric_blacklist.awk
         
-	    # chimeric takes in $name$ext
+        # chimeric takes in $name$ext
         echo "Running chimeric script"
 	    
 
         # if any normal reads were written, find what fragment they correspond
- 	    # to and store that
- 	    echo "Running fragment"
-        echo $restriction
+        # to and store that
+        echo "Running fragment"
         /opt/scripts/common/fragment.pl result_norm.txt result_frag.txt ${restriction}   
-       	
+        echo $(ls)
+
         # convert sams to bams and delete the sams
         echo "Converting sam to bam"
-	    samtools view -hb result_collisions.sam > collisions.bam
+        samtools view -hb result_collisions.sam > collisions.bam
         #rm result_collisions.sam
         samtools view -hb result_collisions_low_mapq.sam > collisions_low_mapq.bam
         #rm result_collisions_low_mapq.sam
@@ -182,16 +182,14 @@ task align {
         #rm result_alignable.sam
         #removed all sam files
         ##restriction used to be site_file
-        
     
         # sort by chromosome, fragment, strand, and position
-	    sort -T /opt/HIC_tmp -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n result_frag.txt > sort.txt
+        sort -T /opt/HIC_tmp -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n result_frag.txt > sort.txt
         if [ $? -ne 0 ]
-    	then
+        then
             echo "***! Failure during sort"
             exit 1x
-	    fi
-        
+        fi
     }
 
     output {
@@ -205,7 +203,7 @@ task align {
     }
 
     runtime {
-        docker : "quay.io/encode-dcc/hic-pipeline:template"
+        docker : "quay.io/encode-dcc/hic-pipeline:PIP-419-import-wdl_122a7f4a-893f-42c8-9075-7d0d256f6db0"
         cpu : "32"
         memory: "64 GB"
         disks: "local-disk 1000 HDD"
