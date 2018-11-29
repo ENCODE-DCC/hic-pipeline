@@ -24,63 +24,65 @@ workflow hic {
     else length(input_merged_sort)
 
     # scatter over libraries
-    scatter(i in range(lib_length)){
-        
-        Array[Array[File]] sub_fastq = if length(fastq) > 0 then fastq[i] else []
-        Array[Array[File]] sub_input_bams = if length(input_bams) > 0 then input_bams[i] else []
-        Array[File] sub_input_sort_files = if length(input_sort_files) > 0 then input_sort_files[i] else []
-        File? sub_input_merged_sort = if length(input_merged_sort)>0 then input_merged_sort[i] else sub_ms
+    #scatter(i in range(lib_length)){
+    
+    Array[Array[File]] sub_fastq = if length(fastq) > 0 then fastq[0] else []
+    Array[Array[File]] sub_input_bams = if length(input_bams) > 0 then input_bams[0] else []
+    Array[File] sub_input_sort_files = if length(input_sort_files) > 0 then input_sort_files[0] else []
+    File? sub_input_merged_sort = if length(input_merged_sort)>0 then input_merged_sort[0] else sub_ms
 
 
 
-        Int fastqs_len = length(sub_fastq)
-        scatter(j in range(fastqs_len)){
-            call align { input:
-                restriction = restriction_sites,
-                fastqs = sub_fastq[j],
-                chrsz = chrsz,
-                idx_tar = reference_index,
-                cpu = cpu 
-            }
+    Int fastqs_len = length(sub_fastq)
+    scatter(j in range(fastqs_len)){
+        call align { input:
+            restriction = restriction_sites,
+            fastqs = sub_fastq[j],
+            chrsz = chrsz,
+            idx_tar = reference_index,
+            cpu = cpu 
         }
-
-        Array[File] collisions = if length(sub_input_bams)>0 then sub_input_bams[0] else align.collisions  #for separate user entry point
-        Array[File] collisions_low = if length(sub_input_bams)>0 then sub_input_bams[1] else align.collisions_low_mapq
-        Array[File] unmapped = if length(sub_input_bams)>0 then sub_input_bams[2] else align.unmapped
-        Array[File] mapq0 = if length(sub_input_bams)>0 then sub_input_bams[3] else align.mapq0
-        Array[File] alignable = if length(sub_input_bams)>0 then sub_input_bams[4] else align.alignable       
-        
-        call merge { input:
-            collisions = collisions,
-            collisions_low = collisions_low,
-            unmapped = unmapped,
-            mapq0 = mapq0,
-            alignable = alignable
-        }
-            
-        call merge_sort { input:
-            sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else align.sort_file,  
-        } 
-
-        # call align_qc { input:
-        #     norm_res = align.norm_res
-        # }   
-
-        # we can collect the alignable.bam using the array merge.out_file
-        call dedup { input:
-            merged_sort = if defined(sub_input_merged_sort) then sub_input_merged_sort else merge_sort.out_file
-        }
-
     }
+
+    Array[File] collisions = if length(sub_input_bams)>0 then sub_input_bams[0] else align.collisions  #for separate user entry point
+    Array[File] collisions_low = if length(sub_input_bams)>0 then sub_input_bams[1] else align.collisions_low_mapq
+    Array[File] unmapped = if length(sub_input_bams)>0 then sub_input_bams[2] else align.unmapped
+    Array[File] mapq0 = if length(sub_input_bams)>0 then sub_input_bams[3] else align.mapq0
+    Array[File] alignable = if length(sub_input_bams)>0 then sub_input_bams[4] else align.alignable       
+    
+    call merge { input:
+        collisions = collisions,
+        collisions_low = collisions_low,
+        unmapped = unmapped,
+        mapq0 = mapq0,
+        alignable = alignable
+    }
+        
+    call merge_sort { input:
+        sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else align.sort_file 
+    } 
+
+    # call align_qc { input:
+    #     norm_res = align.norm_res
+    # }   
+
+    # we can collect the alignable.bam using the array merge.out_file
+    call dedup { input:
+        merged_sort = if defined(sub_input_merged_sort) then sub_input_merged_sort else merge_sort.out_file
+    }
+
+    #}
   
-    call merge_pairs_file{ input:
-        not_merged_pe = if length(input_dedup_pairs)>0 then input_dedup_pairs else dedup.out_file
-    }
+    # should be used only for multiple libraries - which we are dumping for now due to scatter within scatter limitation
+    #call merge_pairs_file{ input:
+    #    not_merged_pe = if length(input_dedup_pairs)>0 then input_dedup_pairs else dedup.out_file
+    #}
 
 
     call create_hic { input:
-        pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
-        chrsz_ = chrsz     
+        #pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
+        pairs_file = if defined(input_pairs) then input_pairs else dedup.out_file,
+        chrsz_ = chrsz
     }
         
     #     #  call qc_report{ input:
@@ -99,7 +101,7 @@ workflow hic {
     # }
     
     output{
-        Align task outputs
+        # Align task outputs
         # Array[Array[File]] out_collisions = hic_sub.out_collisions
         # Array[Array[File]] out_collisions_low = hic_sub.out_collisions_low
         # Array[Array[File]] out_unmapped = hic_sub.out_unmapped
