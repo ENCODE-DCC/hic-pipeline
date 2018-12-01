@@ -1,0 +1,13 @@
+{ 
+    "hic.fastq": [[
+            [
+            "gs://bucket_hic/bucket/read_pairs/original_pair/read_R1.fastq.gz",
+            "gs://bucket_hic/bucket/read_pairs/original_pair/read_R2.fastq.gz"
+
+            ]
+    ]],     
+    "hic.chrsz": "gs://bucket_hic/hg19_reference/male.hg19.chrom.sizes.tsv",
+    "hic.restriction_sites":  "gs://bucket_hic/hg19_reference/hg19_MboI.txt",
+    "hic.reference_index": "gs://bucket_hic/hg19_reference/ENCFF807MUK.tar.gz"
+}
+

@@ -10,3 +10,4 @@
     "hic.restriction_sites":  "gs://bucket_hic/bucket/encode-hic-pipeline-Freference_grch38_chr10_chrM-FGRCh38_no_alt_analysis_set_GCA_000001405.15.chr19_chrM_MboI.txt",
     "hic.reference_index": "gs://bucket_hic/bucket/index.tar.gz"
 }
+   
