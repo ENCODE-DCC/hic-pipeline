@@ -150,20 +150,12 @@ task align {
         mkdir reference
         cd reference && tar -xvf ${idx_tar}
         index_folder=$(ls)
-        echo "index folder ->" 
-        echo $index_folder
         #cd $index_folder
         reference_fasta=$(ls | head -1) 
-        echo "reference fasta ->" 
-        echo $reference_fasta
-
         reference_folder=$(pwd)
-        echo "reference_folder ->" 
-        echo $reference_folder
         reference_index_path=$reference_folder/$reference_fasta
-        echo "reference_index_path ->" 
-        echo $reference_index_path
-        cd ../..
+        # instead of going two folders up, go only one due to the change 3 lines above
+        cd ..
         
         # Align reads
         echo "Running bwa command"

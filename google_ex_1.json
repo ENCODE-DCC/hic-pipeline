@@ -6,8 +6,8 @@
 
             ]
     ]],     
-    "hic.chrsz": "gs://bucket_hic/hg19_reference/male.hg19.chrom.sizes.tsv",
-    "hic.restriction_sites":  "gs://bucket_hic/hg19_reference/hg19_MboI.txt",
-    "hic.reference_index": "gs://bucket_hic/hg19_reference/ENCFF807MUK.tar.gz"
+    "hic.chrsz": "gs://hic-reference/hg19/chrom.sizes",
+    "hic.restriction_sites":  "gs://hic-reference/hg19/restriction_enzymes/hg19_MboI.txt",
+    "hic.reference_index": "gs://hic-reference/hg19/bwa_index/ENCFF807MUK.tar.gz"
 }
 
