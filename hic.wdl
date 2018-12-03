@@ -174,20 +174,20 @@ task align {
         # convert sams to bams and delete the sams
         echo "Converting sam to bam"
         samtools view -hb result_collisions.sam > collisions.bam
-        #rm result_collisions.sam
+        rm result_collisions.sam
         samtools view -hb result_collisions_low_mapq.sam > collisions_low_mapq.bam
-        #rm result_collisions_low_mapq.sam
+        rm result_collisions_low_mapq.sam
         samtools view -hb result_unmapped.sam > unmapped.bam
-        #rm result_unmapped.sam
+        rm result_unmapped.sam
         samtools view -hb result_mapq0.sam > mapq0.bam
-        #rm result_mapq0.sam
+        rm result_mapq0.sam
         samtools view -hb result_alignable.sam > alignable.bam
-        #rm result_alignable.sam
+        rm result_alignable.sam
         #removed all sam files
         ##restriction used to be site_file
     
         # sort by chromosome, fragment, strand, and position
-        sort -T /opt/HIC_tmp -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n result_frag.txt > sort.txt
+        sort -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n result_frag.txt > sort.txt
         if [ $? -ne 0 ]
         then
             echo "***! Failure during sort"
