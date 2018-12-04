@@ -171,6 +171,9 @@ task align {
         /opt/scripts/common/fragment.pl result_norm.txt result_frag.txt ${restriction}   
         echo $(ls)
 
+        # qc for alignment portion
+        cat *.res.txt | awk -f /opt/scripts/common/stats_sub.awk >> alignment_stats.txt
+
         # convert sams to bams and delete the sams
         echo "Converting sam to bam"
         samtools view -hb result_collisions.sam > collisions.bam
@@ -203,6 +206,7 @@ task align {
         File alignable = glob("alignable.bam")[0]
         File sort_file = glob("sort.txt")[0]
         File norm_res = glob("result_norm.txt.res.txt")[0]
+        File stats_sub_result = glob("alignment_stats.txt")[0]
     }
 
     runtime {

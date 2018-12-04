@@ -7,7 +7,7 @@
             ]
     ]],     
     "hic.chrsz": "gs://hic-reference/hg19/chrom.sizes",
-    "hic.restriction_sites":  "gs://hic-reference/hg19/restriction_enzymes/hg19_MboI.txt",
+    "hic.restriction_sites":  "gs://hic-reference/hg19/restriction_enzymes/hg19_HindIII.txt",
     "hic.reference_index": "gs://hic-reference/hg19/bwa_index/ENCFF807MUK.tar.gz"
 }
 
