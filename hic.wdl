@@ -58,7 +58,12 @@ workflow hic {
         }
     }
 
-        
+    # convert alignable bam to pairs to be consistent with 4DN
+    call bam2pairs { input:
+        bam_file = merge.merged_output[4],
+        chrsz_  = chrsz
+    }  
+  
     call merge_sort { input:
         sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else align.sort_file 
     } 
@@ -222,7 +227,7 @@ task merge {
     >>>
 
     output {
-        File m_collisions= glob('merged_bam_files.bam')[0]
+        File merged_output= glob('merged_bam_files.bam')[0]
     }
 
     runtime {
