@@ -150,21 +150,15 @@ task align {
         mkdir reference
         cd reference && tar -xvf ${idx_tar}
         index_folder=$(ls)
-        #cd $index_folder
         reference_fasta=$(ls | head -1) 
         reference_folder=$(pwd)
         reference_index_path=$reference_folder/$reference_fasta
-        # instead of going two folders up, go only one due to the change 3 lines above
         cd ..
         
         # Align reads
         echo "Running bwa command"
         bwa mem -SP5M -t ${select_first([cpu,32])} $reference_index_path ${fastqs[0]} ${fastqs[1]} | awk -v "fname"=result -f /opt/scripts/common/chimeric_blacklist.awk
-        
-        # chimeric takes in $name$ext
-        echo "Running chimeric script"
-	    
-
+ 
         # if any normal reads were written, find what fragment they correspond
         # to and store that
         echo "Running fragment"
