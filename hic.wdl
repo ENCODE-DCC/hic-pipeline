@@ -54,7 +54,7 @@ workflow hic {
 
     scatter(i in range(5)){
         call merge { input:
-            restriction = bams_to_merge[i]
+            bam_files = bams_to_merge[i]
         }
     }
 
