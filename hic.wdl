@@ -190,7 +190,7 @@ task align {
         ##restriction used to be site_file
     
         # sort by chromosome, fragment, strand, and position
-        sort -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n result_frag.txt > sort.txt
+        sort -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 90% result_frag.txt > sort.txt
         if [ $? -ne 0 ]
         then
             echo "***! Failure during sort"
@@ -223,7 +223,6 @@ task merge {
     
     command <<<
         samtools merge merged_bam_files.bam ${sep=' ' bam_files} 
-
     >>>
 
     output {
@@ -242,7 +241,7 @@ task merge_sort {
    Array[File] sort_files_
 
     command {
-        sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 10% ${sep=' ' sort_files_}  > merged_sort.txt
+        sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 90% ${sep=' ' sort_files_}  > merged_sort.txt
     }
 
     output {
@@ -251,9 +250,9 @@ task merge_sort {
 
     runtime {
         docker : "quay.io/encode-dcc/hic-pipeline:template"
-        cpu : "32"
+        cpu : "16"
         disks: "local-disk 1000 HDD"
-        memory : "64 GB"
+        memory : "104 GB"
         #> 8 processors
         #> a lot of memory
     }
