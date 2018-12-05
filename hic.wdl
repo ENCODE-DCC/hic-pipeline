@@ -50,14 +50,20 @@ workflow hic {
     Array[File] mapq0 = if length(sub_input_bams)>0 then sub_input_bams[3] else align.mapq0
     Array[File] alignable = if length(sub_input_bams)>0 then sub_input_bams[4] else align.alignable       
     
-    call merge { input:
-        collisions = collisions,
-        collisions_low = collisions_low,
-        unmapped = unmapped,
-        mapq0 = mapq0,
-        alignable = alignable
+    Array[Array[File]] bams_to_merge = [collisions, collisions_low, unmapped, mapq0, alignable]
+
+    scatter(i in range(5)){
+        call merge { input:
+            bam_files = bams_to_merge[i]
+        }
     }
-        
+
+    # convert alignable bam to pairs to be consistent with 4DN
+    call bam2pairs { input:
+        bam_file = merge.merged_output[4],
+        chrsz_  = chrsz
+    }  
+  
     call merge_sort { input:
         sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else align.sort_file 
     } 
@@ -150,21 +156,15 @@ task align {
         mkdir reference
         cd reference && tar -xvf ${idx_tar}
         index_folder=$(ls)
-        #cd $index_folder
         reference_fasta=$(ls | head -1) 
         reference_folder=$(pwd)
         reference_index_path=$reference_folder/$reference_fasta
-        # instead of going two folders up, go only one due to the change 3 lines above
         cd ..
         
         # Align reads
         echo "Running bwa command"
         bwa mem -SP5M -t ${select_first([cpu,32])} $reference_index_path ${fastqs[0]} ${fastqs[1]} | awk -v "fname"=result -f /opt/scripts/common/chimeric_blacklist.awk
-        
-        # chimeric takes in $name$ext
-        echo "Running chimeric script"
-	    
-
+ 
         # if any normal reads were written, find what fragment they correspond
         # to and store that
         echo "Running fragment"
@@ -219,26 +219,15 @@ task align {
 
 
 task merge {
-    Array[File] collisions
-    Array[File] collisions_low
-    Array[File] unmapped
-    Array[File] mapq0 
-    Array[File] alignable
-     
+    Array[File] bam_files
+    
     command <<<
-        samtools merge merged_collisions.bam ${sep=' ' collisions} 
-        samtools merge merged_collisions_lowmapq.bam ${sep=' ' collisions_low}
-        samtools merge merged_unmapped.bam ${sep=' ' unmapped}
-        samtools merge merged_mapq0.bam ${sep=' ' mapq0}
-        samtools merge merged_alignable.bam ${sep=' ' alignable} 
+        samtools merge merged_bam_files.bam ${sep=' ' bam_files} 
+
     >>>
 
     output {
-        File m_collisions= glob('merged_collisions.bam')[0]
-        File m_coll_low = glob('merged_collisions_lowmapq.bam')[0]
-        File m_unmap = glob('merged_unmapped.bam')[0]
-        File m_map = glob('merged_mapq0.bam')[0]
-        File m_align = glob('merged_alignable.bam')[0]
+        File merged_output= glob('merged_bam_files.bam')[0]
     }
 
     runtime {
