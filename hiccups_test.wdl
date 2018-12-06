@@ -11,7 +11,7 @@ workflow hiccups_test {
 task hiccups {
     File hic_file
     command {
-        java -jar /opt/scripts/common/juicer_tools.jar hiccups --ignore_sparsity ${hic_file} loops
+        java -jar /opt/scripts/common/juicer_tools.jar hiccups ${hic_file} loops
     }
     output {
         File out_file = glob("loops/*.bedpe")[0]
