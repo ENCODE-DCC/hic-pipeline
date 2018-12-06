@@ -231,9 +231,9 @@ task merge {
 
     runtime {
         docker : "quay.io/encode-dcc/hic-pipeline:template"
-        cpu : "32"
+        cpu : "8"
         disks: "local-disk 1000 HDD"
-        memory : "64 GB"
+        
     }
 }
 
@@ -250,9 +250,9 @@ task merge_sort {
 
     runtime {
         docker : "quay.io/encode-dcc/hic-pipeline:template"
-        cpu : "16"
+        cpu : "8"
         disks: "local-disk 1000 HDD"
-        memory : "104 GB"
+        
         #> 8 processors
         #> a lot of memory
     }
@@ -274,9 +274,8 @@ task dedup {
 
     runtime {
         docker : "quay.io/encode-dcc/hic-pipeline:template"
-        cpu : "32"
+        cpu : "8"
         disks: "local-disk 1000 HDD"
-        memory : "64 GB"
     }
 }
 
@@ -290,9 +289,8 @@ task merge_pairs_file{
     }
     runtime {
         docker : "quay.io/encode-dcc/hic-pipeline:template"
-        cpu : "32"
+        cpu : "8"
         disks: "local-disk 1000 HDD"
-        memory : "64 GB"
     }
 }
 
@@ -334,6 +332,8 @@ task bam2pairs {
 
     runtime {
         docker : "quay.io/encode-dcc/hic-pipeline:template"
+        cpu : "8"
+        disks: "local-disk 1000 HDD"
     }
 }
 
