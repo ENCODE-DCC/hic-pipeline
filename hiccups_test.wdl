@@ -11,13 +11,14 @@ workflow hiccups_test {
 task hiccups {
     File hic_file
     command {
-        java -jar /opt/scripts/common/juicer_tools.jar hiccups ${hic_file} loops
+        java -jar /opt/scripts/common/juicer_tools.jar hiccups --ignore_sparsity ${hic_file} loops
     }
     output {
         File out_file = glob("loops/*.bedpe")[0]
     }
     runtime {
-        docker: "quay.io/anacismaru/nvidia_juicer:test"
+        disks: "local-disk 20 SSD"
+	docker: "quay.io/anacismaru/nvidia_juicer:test"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         zones: ["us-east1-b"]
