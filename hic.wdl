@@ -161,6 +161,12 @@ task align {
         reference_index_path=$reference_folder/$reference_fasta
         cd ..
         
+        usegzip=1
+        curr_ostem="result"
+        #count ligations
+        source /opt/scripts/common/countligations.sh
+        echo $(ls)
+
         # Align reads
         echo "Running bwa command"
         bwa mem -SP5M -t ${select_first([cpu,32])} $reference_index_path ${fastqs[0]} ${fastqs[1]} | awk -v "fname"=result -f /opt/scripts/common/chimeric_blacklist.awk
