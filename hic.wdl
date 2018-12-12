@@ -163,11 +163,11 @@ task align {
         
         usegzip=1
         curr_ostem="result"
+        ligation="AGCTAGCT"
+        file1=${fastqs[0]}
+        file2=${fastqs[1]}
         #count ligations
         source /opt/scripts/common/countligations.sh
-        echo $(ls)
-        cat result_norm.txt.res.txt
-        echo $(ls)
         # Align reads
         echo "Running bwa command"
         bwa mem -SP5M -t ${select_first([cpu,32])} $reference_index_path ${fastqs[0]} ${fastqs[1]} | awk -v "fname"=result -f /opt/scripts/common/chimeric_blacklist.awk
@@ -203,6 +203,7 @@ task align {
             echo "***! Failure during sort"
             exit 1x
         fi
+
     }
 
     output {
