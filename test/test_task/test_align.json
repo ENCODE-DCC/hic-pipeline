@@ -1,19 +1,11 @@
 { 
     "test_align.fastqs": [
-        "/Users/idan/Documents/Repositories/hic-pipeline/test/test_data/read_R1.fastq.gz",
-        "/Users/idan/Documents/Repositories/hic-pipeline/test/test_data/read_R2.fastq.gz"], 
+        "gs://bucket_hic/experiment_1/ENCFF056MSG.fastq.gz",
+        "gs://bucket_hic/experiment_1/ENCFF426WMW.fastq.gz"], 
         
-    "test_align.chrsz": "/Users/idan/Documents/Repositories/hic-pipeline/test/test_data/chrom.sizes",
-    "test_align.restriction": "/Users/idan/Documents/Repositories/hic-pipeline/test/test_data/chr19_chrM_MboI.txt",
-    "test_align.idx_tar": "/Users/idan/Documents/Repositories/hic-pipeline/test/test_data/index.tar.gz",
-    "test_align.ref_bams": [
-        "/Users/idan/Documents/Repositories/hic-pipeline/test/test_data/output_0_collisions.bam",
-        "/Users/idan/Documents/Repositories/hic-pipeline/test/test_data/output_0_collisions_low_mapq.bam",
-        "/Users/idan/Documents/Repositories/hic-pipeline/test/test_data/output_0_unmapped.bam",
-        "/Users/idan/Documents/Repositories/hic-pipeline/test/test_data/output_0_mapq0.bam",
-        "/Users/idan/Documents/Repositories/hic-pipeline/test/test_data/output_0_alignable.bam"
-    ]
-
+    "test_align.chrsz": "gs://hic-reference/hg19/chrom.sizes",
+    "test_align.restriction": "gs://hic-reference/hg19/restriction_enzymes/hg19_MboI.txt",
+    "test_align.idx_tar": "gs://hic-reference/hg19/bwa_index/ENCFF807MUK.tar.gz",
 }
 
 
