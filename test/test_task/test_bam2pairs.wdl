@@ -25,8 +25,3 @@ task tail_of_pairs{
     command{
         sed 1,5d ${pairs} > no_header.pairs
     }
-
-    output{
-        File no_header = glob("no_header.pairs")[0]
-    }
-}
