@@ -1,4 +1,4 @@
 { 
-	"test_bam2pairs.bam": "test/test_data/bam2pairs.bam",
-	"test_bam2pairs.chrsz": "test/test_data/chrom.sizes"
+	"test_bam2pairs.bam": "gs://hic-pipeline-test-execution-bucket/hic/4e4e8ab7-7147-480c-9337-4a1f2c37806d/call-align/shard-0/glob-2e7c3a200921373598d48339a384f8bb/mapq0.bam",
+	"test_bam2pairs.chrsz": "gs://hic-reference/hg19/chrom.sizes"
 }

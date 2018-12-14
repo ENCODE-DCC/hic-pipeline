@@ -1,7 +1,7 @@
 { 
-    "test_merge_sort.sort_file":[
-        "/Users/anacismaru/ENCODE/bucket/tests/test_merge_sort/unmerged/read.fastq.gz.sort.txt"
-    ], 
-        
-    "test_merge_sort.ref_merged_sort": "/Users/anacismaru/ENCODE/bucket/tests/test_merge_sort/merged/merged_sort.txt"
+    "test_merge_sort.sort_file": [
+        "gs://hic-pipeline-test-execution-bucket/hic/4e4e8ab7-7147-480c-9337-4a1f2c37806d/call-align/shard-0/glob-359fa135564406e3848a2c2f21d7c413/sort.txt",
+        "gs://hic-pipeline-test-execution-bucket/hic/4e4e8ab7-7147-480c-9337-4a1f2c37806d/call-align/shard-1/glob-359fa135564406e3848a2c2f21d7c413/sort.txt",
+        "gs://hic-pipeline-test-execution-bucket/hic/4e4e8ab7-7147-480c-9337-4a1f2c37806d/call-align/shard-2/glob-359fa135564406e3848a2c2f21d7c413/sort.txt",
+    ]
 }

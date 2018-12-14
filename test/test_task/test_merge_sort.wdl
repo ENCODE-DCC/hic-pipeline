@@ -5,7 +5,7 @@ import "../../hic.wdl" as hic
 workflow test_merge_sort {
     Array[File] sort_file
    
-    call hic.merge_sort as test { input:
+    call hic.merge_sort as test_merge_sort_task { input:
      sort_files_ = sort_file
     }
 }
