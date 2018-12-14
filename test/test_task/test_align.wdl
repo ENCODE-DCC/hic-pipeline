@@ -13,6 +13,6 @@ workflow test_align {
 	 	restriction = restriction,
 		fastqs = fastqs,
 		chrsz = chrsz,
-		idx_tar = idx_tar,
+		idx_tar = idx_tar
 	}
 }

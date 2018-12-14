@@ -5,7 +5,7 @@
         
     "test_align.chrsz": "gs://hic-reference/hg19/chrom.sizes",
     "test_align.restriction": "gs://hic-reference/hg19/restriction_enzymes/hg19_MboI.txt",
-    "test_align.idx_tar": "gs://hic-reference/hg19/bwa_index/ENCFF807MUK.tar.gz",
+    "test_align.idx_tar": "gs://hic-reference/hg19/bwa_index/ENCFF807MUK.tar.gz"
 }
 
 
