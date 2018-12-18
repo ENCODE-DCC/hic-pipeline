@@ -1,7 +1,7 @@
 { 
     "test_align.fastqs": [
-        "gs://bucket_hic/experiment_1/ENCFF056MSG.fastq.gz",
-        "gs://bucket_hic/experiment_1/ENCFF426WMW.fastq.gz"], 
+        "gs://paul_hiccups/ENCFF363MKK.fastq.gz",
+        "gs://paul_hiccups/ENCFF434MDZ.fastq.gz"], 
         
     "test_align.chrsz": "gs://hic-reference/hg19/chrom.sizes",
     "test_align.restriction": "gs://hic-reference/hg19/restriction_enzymes/hg19_MboI.txt",

@@ -1,3 +1,3 @@
 { 
-    "test_dedup.merged_sort": "gs://hic-pipeline-test-execution-bucket/hic/4e4e8ab7-7147-480c-9337-4a1f2c37806d/call-merge_sort/glob-3fca55958f9e521cf685cb69bb0cba48/merged_sort.txt"
+    "test_dedup.merged_sort": "gs://hic-pipeline-test-execution-bucket/hic/8c92f891-fc7a-48d3-9bf8-fcdad77fa610/call-merge_sort/glob-3fca55958f9e521cf685cb69bb0cba48/merged_sort.txt"
 }
