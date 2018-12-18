@@ -1,7 +1,7 @@
 { 
     "test_merge.bams": [
-        "gs://hic-pipeline-test-execution-bucket/hic/4e4e8ab7-7147-480c-9337-4a1f2c37806d/call-align/shard-0/glob-2e7c3a200921373598d48339a384f8bb/mapq0.bam",
-        "gs://hic-pipeline-test-execution-bucket/hic/4e4e8ab7-7147-480c-9337-4a1f2c37806d/call-align/shard-1/glob-2e7c3a200921373598d48339a384f8bb/mapq0.bam",
-        "gs://hic-pipeline-test-execution-bucket/hic/4e4e8ab7-7147-480c-9337-4a1f2c37806d/call-align/shard-2/glob-2e7c3a200921373598d48339a384f8bb/mapq0.bam"
+        "gs://hic-pipeline-test-execution-bucket/hic/4e4e8ab7-7147-480c-9337-4a1f2c37806d/call-align/shard-0/glob-791552d1112c5d89b7424b5ff9aebde3/alignable.bam",
+        "gs://hic-pipeline-test-execution-bucket/hic/4e4e8ab7-7147-480c-9337-4a1f2c37806d/call-align/shard-1/glob-791552d1112c5d89b7424b5ff9aebde3/alignable.bam",
+        "gs://hic-pipeline-test-execution-bucket/hic/4e4e8ab7-7147-480c-9337-4a1f2c37806d/call-align/shard-2/glob-791552d1112c5d89b7424b5ff9aebde3/alignable.bam"
     ]
 }
