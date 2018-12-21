@@ -318,7 +318,7 @@ task create_hic {
 
     runtime {
         docker : "quay.io/encode-dcc/hic-pipeline:template"
-        cpu : "8"
+        cpu : "1"
         disks: "local-disk 1000 HDD"
         memory : "64 GB"
     }
