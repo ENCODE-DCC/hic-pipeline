@@ -20,6 +20,30 @@ get_cromwell: &get_cromwell
 
 version: 2
 jobs:
+  test_task:
+    <<: *machine_defaults
+    description: Generic testing protocol for wdl tasks
+    parameters:
+      task_name:
+        description: "The name of the task being tested, like align, merge, etc."
+        type: enum
+        enum: ["align", "arrowhead", "bam2pairs", "create_hic,", "dedup", "hiccups", "merge", "merge_sort"]
+      keys_to_inspect:
+        description: "The key(s) of the output(s) in metadata.json for which md5sum is to be computed, space delimited"
+        type: string  
+    steps:
+      - checkout
+      - run: *make_tag
+      - run: *get_cromwell
+      - run:
+          command: |
+            pyenv global 3.5.2
+            source ${BASH_ENV}
+            java -Dconfig.file=backends/backend.conf -Dbackend.default=Local -jar cromwell-35.jar run test/test_task/test_<< parameters.task_name >>.wdl -i test/test_task/test_<< parameters.task_name >>.json -m metadata.json
+            python3 src/compare_md5.py --keys_to_inspect << parameters.keys_to_inspect >> --metadata_json metadata.json --reference_json test/test_task/ref_output/test_<< parameters.task_name >>_output_md5.json --outfile result.json
+            cat result.json
+            python3 -c "import sys; import json; data=json.loads(sys.stdin.read()); sys.exit(int(not data['match_overall']))" < result.json
+
   build:
     <<: *defaults
     steps:
@@ -49,7 +73,7 @@ jobs:
             pyenv global 3.5.2
             source ${BASH_ENV}
             java -Dconfig.file=backends/backend.conf -Dbackend.default=Local -jar cromwell-35.jar run test/test_task/test_bam2pairs.wdl -i test/test_task/test_bam2pairs.json -m metadata.json
-            python3 src/compare_md5.py --keys_to_inspect test_bam2pairs.pairs_no_header --metadata_json metadata.json --reference_json test/test_task/ref_output/test_bam2pairs_output_md5.json --outfile result.json            
+            python3 src/compare_md5.py --keys_to_inspect test_bam2pairs.pairs_no_header --metadata_json metadata.json --reference_json test/test_task/ref_output/test_bam2pairs_output_md5.json --outfile result.json
             cat result.json
             python3 -c "import sys; import json; data=json.loads(sys.stdin.read()); sys.exit(int(not data['match_overall']))" < result.json
 
@@ -62,3 +86,8 @@ workflows:
       - test_bam2pairs_task:
           requires:
             - build
+      - test_task:
+          requires:
+            - build
+          task_name: "align"
+          keys_to_inspect: "test_align.test_align_task.sort_file"
