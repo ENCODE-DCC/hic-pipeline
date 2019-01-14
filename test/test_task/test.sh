@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 set -e # exit on error
 
 if [ $# -lt 2 ]; then
@@ -12,7 +12,7 @@ INPUT=$2
 if [ $# -gt 2 ]; then
   DOCKER_IMAGE=$3
 else
-  DOCKER_IMAGE=quay.io/gabdank/juicer:encode05022018
+  DOCKER_IMAGE=quay.io/encode-dcc/hic-pipeline:template
 fi
 if [ -f "cromwell-35.jar" ]; then
   echo "Skip downloading cromwell."
