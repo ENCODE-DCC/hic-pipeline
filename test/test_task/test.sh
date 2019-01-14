@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 set -e # exit on error
 
 if [ $# -lt 2 ]; then
