@@ -1,11 +1,11 @@
 { 
     "test_align.fastqs": [
-        "gs://paul_hiccups/ENCFF363MKK.fastq.gz",
-        "gs://paul_hiccups/ENCFF434MDZ.fastq.gz"], 
-        
-    "test_align.chrsz": "gs://hic-reference/hg19/chrom.sizes",
-    "test_align.restriction": "gs://hic-reference/hg19/restriction_enzymes/hg19_MboI.txt",
-    "test_align.idx_tar": "gs://hic-reference/hg19/bwa_index/ENCFF807MUK.tar.gz"
+        "test/test_data/SRR1665089_1.subsampled.400.fastq.gz",
+        "test/test_data/SRR1665089_2.subsampled.400.fastq.gz"],
+
+    "test_align.chrsz": "test/test_data/ce10_selected.chrom.sizes",
+    "test_align.restriction": "test/test_data/ce10_selected_MboI.txt",
+    "test_align.idx_tar": "test/test_data/ce10_selected.tar.gz"
 }
 
 
