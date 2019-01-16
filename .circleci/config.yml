@@ -18,7 +18,7 @@ get_cromwell: &get_cromwell
   command: |
     wget -N -c https://github.com/broadinstitute/cromwell/releases/download/35/cromwell-35.jar
 
-version: 2
+version: 2.1
 jobs:
   test_task:
     <<: *machine_defaults
@@ -80,14 +80,15 @@ jobs:
 # Define workflow here
 workflows:
   version: 2
-  filters:
-    branches:
-      only:
-        - master
-        - dev-1
   build_workflow:
     jobs:
-      - build
+      - build:
+        filters:
+          branches:
+            only:
+              - master
+              - dev-1
+              - PIP-464-circle-align-test
       - test_bam2pairs_task:
           requires:
             - build
