@@ -40,7 +40,7 @@ jobs:
             pyenv global 3.5.2
             source ${BASH_ENV}
             test/test_task/test.sh test/test_task/test_<< parameters.task_name >>.wdl test/test_task/test_<< parameters.task_name >>.json $TAG docker
-            python3 src/compare_md5.py --keys_to_inspect << parameters.keys_to_inspect >> --metadata_json metadata.json --reference_json test/test_task/ref_output/test_<< parameters.task_name >>_output_md5.json --outfile result.json
+            python3 src/compare_md5.py --keys_to_inspect << parameters.keys_to_inspect >> --metadata_json test_<< parameters.task_name >>.metadata.json --reference_json test/test_task/ref_output/test_<< parameters.task_name >>_output_md5.json --outfile result.json
             cat result.json
             python3 -c "import sys; import json; data=json.loads(sys.stdin.read()); sys.exit(int(not data['match_overall']))" < result.json
 
