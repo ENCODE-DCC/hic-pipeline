@@ -80,6 +80,11 @@ jobs:
 # Define workflow here
 workflows:
   version: 2
+  filters:
+    branches:
+      only:
+        - master
+        - dev-1
   build_workflow:
     jobs:
       - build
@@ -91,3 +96,8 @@ workflows:
             - build
           task_name: "align"
           keys_to_inspect: "test_align.test_align_task.sort_file"
+      - test_task:
+          requires:
+            - build
+          task_name: "bam2pairs"
+          keys_to_inspect: "test_bam2pairs.pairs_no_header"
