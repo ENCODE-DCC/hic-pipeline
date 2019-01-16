@@ -80,6 +80,11 @@ jobs:
 # Define workflow here
 workflows:
   version: 2
+  filters:
+    branches:
+      only:
+        - master
+        - dev-1
   build_workflow:
     jobs:
       - build:
