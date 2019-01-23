@@ -1,0 +1,7 @@
+{
+    "test_align.alignable" : "568ba7767031aed1079b1b6f0eb44864",
+    "test_align.collisions" : "d41d8cd98f00b204e9800998ecf8427e",
+    "test_align.collisions_low_mapq" : "d41d8cd98f00b204e9800998ecf8427e",
+    "test_align.unmapped" : "eb446eaef1dbf410a01e656ab21f5143",
+    "test_align.mapq0" : "27249836015852c5283f44bfbec26b28"
+}
