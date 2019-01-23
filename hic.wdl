@@ -91,20 +91,14 @@ workflow hic {
         chrsz_ = chrsz
     }
         
-    #     #  call qc_report{ input:
-    #     #  ligation = ligation,
-    #     #  merged_nodups = merge_pairs_file.out_file,
-    #     #  site_file = restriction_sites
-    #     #  }
-    # }
-    
-    # call tads { input:
-    #     hic_file = if defined(input_hic) then input_hic else create_hic.inter_30
-    # }
+   
+    call arrowhead { input:
+        hic_file = if defined(input_hic) then input_hic else create_hic.inter_30
+    }
 
-    # call hiccups{ input:
-    #     hic_file = if defined(input_hic) then input_hic else create_hic.inter_30      
-    # }
+    call hiccups{ input:
+        hic_file = if defined(input_hic) then input_hic else create_hic.inter_30      
+    }
     
     output{
         # Align task outputs
@@ -260,9 +254,6 @@ task merge_sort {
         docker : "quay.io/encode-dcc/hic-pipeline:template"
         cpu : "8"
         disks: "local-disk 1000 HDD"
-        
-        #> 8 processors
-        #> a lot of memory
     }
 }
 
@@ -289,12 +280,15 @@ task dedup {
 
 task merge_pairs_file{
     Array[File] not_merged_pe
-    command{
+    
+    command {
         sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 10% ${sep=' ' not_merged_pe}  > merged_pairs.txt
     }
-    output{
+    
+    output {
         File out_file = glob('merged_pairs.txt')[0]
     }
+
     runtime {
         docker : "quay.io/encode-dcc/hic-pipeline:template"
         cpu : "8"
@@ -312,10 +306,9 @@ task create_hic {
     }
 
     output {
-        # add inter_30 stuff
         #/opt/scripts/common/juicer_tools pre -s inter.txt -g inter_hists.m -q 1 ${pairs_file} inter.hic ${chrsz_}
-        #File inter_hic = glob('inter.hic')[0]
-         File inter_30= glob('inter_30.hic')[0]
+        # File inter_hic = glob('inter.hic')[0]
+        File inter_30= glob('inter_30.hic')[0]
     }
 
     runtime {
@@ -346,7 +339,7 @@ task bam2pairs {
 }
 
 
-task tads {
+task arrowhead {
     File hic_file
 
     command {
@@ -364,12 +357,19 @@ task tads {
 
 task hiccups{
     File hic_file
-    command{
-        DIR=$(dirname "${hic_file}")
-        FILE=$(basename "${hic_file}")
-        docker run --runtime=nvidia --entrypoint /opt/scripts/common/juicer_tools -v $DIR:/input quay.io/anacismaru/nvidia_juicer:test hiccups /input/$FILE loops
+    
+    command {
+        java -jar /opt/scripts/common/juicer_tools.jar hiccups --ignore_sparsity ${hic_file} loops
     }
-    output{
+    
+    output {
         File out_file = glob("loops/*.bedpe")[0]
-    }      
+    }
+    
+    runtime {
+        docker: "quay.io/anacismaru/nvidia_juicer:test"
+        gpuType: "nvidia-tesla-p100"
+        gpuCount: 1
+        zones: ["us-east1-b"]
+    }     
 }
