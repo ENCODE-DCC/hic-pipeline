@@ -157,6 +157,7 @@ task align {
         
         usegzip=1
         curr_ostem="result"
+        #HindIII site
         ligation="AGCTAGCT"
         file1=${fastqs[0]}
         file2=${fastqs[1]}
