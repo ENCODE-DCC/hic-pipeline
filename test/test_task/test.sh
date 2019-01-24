@@ -20,7 +20,7 @@ else
   wget -N -c https://github.com/broadinstitute/cromwell/releases/download/35/cromwell-35.jar
 fi
 CROMWELL_JAR=cromwell-35.jar
-BACKEND_CONF=/backends/backend.conf
+BACKEND_CONF=backends/backend.conf
 BACKEND=Local
 PREFIX=$(basename ${WDL} .wdl)
 METADATA=${PREFIX}.metadata.json # metadata
