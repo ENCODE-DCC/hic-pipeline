@@ -89,6 +89,7 @@ workflows:
               - master
               - dev-1
               - PIP-464-circle-align-test
+              - PPIP-464-2-idan
       - test_bam2pairs_task:
           requires:
             - build
