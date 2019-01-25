@@ -102,7 +102,9 @@ def main(args):
             md5_match_by_file[key] = match
             match_overall &= match
     except KeyError:
-        print('key not found')
+        print('key not found ' + str(key))
+        print (files_to_inspect_md5)
+        print (reference)
         match_overall = False
         md5_match_by_file['match_overall'] = False
     else:
