@@ -1,5 +1,3 @@
-##Encode DCC Hi-C pipeline tester
-##Author: Ana Cismaru(anacismaru@gmail.com)
 import "../../hic.wdl" as hic
 
 workflow test_dedup {
