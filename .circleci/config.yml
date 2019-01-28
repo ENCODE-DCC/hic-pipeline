@@ -80,10 +80,16 @@ workflows:
           requires:
             - build
           task_name: "align"
-          keys_to_inspect: "test_align.collisions test_align.collisions_low_mapq test_align.unmapped test_align.mapq0 test_align.alignable"
+          keys_to_inspect: "test_align.collisions test_align.collisions_low_mapq test_align.unmapped test_align.mapq0 test_align.alignable test_align.sort_file test_align.norm_res test_align.stats_sub_result"
       - test_task:
           name: test_bam2pairs
           requires:
             - build
           task_name: "bam2pairs"
           keys_to_inspect: "test_bam2pairs.pairs_no_header"
+      - test_task:
+          name: test_dedup
+          requires:
+            - build
+          task_name: "dedup"
+          keys_to_inspect: "test_dedup.deduped"

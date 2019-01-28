@@ -35,6 +35,10 @@ workflow test_align {
         File unmapped = strip_headers.no_header[2]
         File mapq0 = strip_headers.no_header[3]
         File alignable = strip_headers.no_header[4]
+        
+        File sort_file = test_align_task.sort_file
+        File norm_res = test_align_task.norm_res
+        File stats_sub_result = test_align_task.stats_sub_result
     }
 }
 
