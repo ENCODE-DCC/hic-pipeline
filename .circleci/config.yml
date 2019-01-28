@@ -62,21 +62,6 @@ jobs:
             docker push quay.io/encode-dcc/hic-pipeline:template
             docker logout
 
-  test_bam2pairs_task:
-    <<: *machine_defaults
-    steps:
-      - checkout
-      - run: *make_tag
-      - run: *get_cromwell
-      - run:
-          command: |
-            pyenv global 3.5.2
-            source ${BASH_ENV}
-            java -Dconfig.file=backends/backend.conf -Dbackend.default=Local -jar cromwell-35.jar run test/test_task/test_bam2pairs.wdl -i test/test_task/test_bam2pairs.json -m metadata.json
-            python3 src/compare_md5.py --keys_to_inspect test_bam2pairs.pairs_no_header --metadata_json metadata.json --reference_json test/test_task/ref_output/test_bam2pairs_output_md5.json --outfile result.json
-            cat result.json
-            python3 -c "import sys; import json; data=json.loads(sys.stdin.read()); sys.exit(int(not data['match_overall']))" < result.json
-
 # Define workflow here
 workflows:
   version: 2
@@ -90,9 +75,6 @@ workflows:
               - dev-1
               - PIP-464-circle-align-test
               - PPIP-464-2-idan
-      - test_bam2pairs_task:
-          requires:
-            - build
       - test_task:
           name: test_align
           requires:
