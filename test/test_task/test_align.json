@@ -1,7 +1,7 @@
 { 
     "test_align.fastqs": [
-        "test/test_data/SRR1665089_1.subsampled.400.fastq.gz",
-        "test/test_data/SRR1665089_2.subsampled.400.fastq.gz"],
+        "test/test_data/SRR1665089_1.subsampled.200.fastq.gz",
+        "test/test_data/SRR1665089_2.subsampled.200.fastq.gz"],
 
     "test_align.chrsz": "test/test_data/ce10_selected.chrom.sizes.tsv",
     "test_align.restriction": "test/test_data/ce10_selected_MboI.txt",
