@@ -48,7 +48,7 @@ task strip_headers{
     }
     
     output{
-        File no_header = glob("*_no_header.sam")[0]
+        File no_header = glob("*.no_header.sam")[0]
     }
 
     runtime {
