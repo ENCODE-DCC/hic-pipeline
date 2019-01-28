@@ -3,5 +3,8 @@
     "collisions.no_header.sam" : "d41d8cd98f00b204e9800998ecf8427e",
     "collisions_low_mapq.no_header.sam" : "d41d8cd98f00b204e9800998ecf8427e",
     "unmapped.no_header.sam" : "612c89ba5dd1fcf89ef92353abf09020",
-    "mapq0.no_header.sam" : "921da4d3b2bb36563d13b90680f58767"
+    "mapq0.no_header.sam" : "921da4d3b2bb36563d13b90680f58767",
+    "sort.txt" : "6b4fd0b6d62a8f1c0a81169370d2add0",
+    "result_norm.txt.res.txt" : "d1124db77d6692daa94e0b3190ccc4d6",
+    "alignment_stats.txt" : "286df8db4e5cbab8637ac929fb0d9e08"
 }

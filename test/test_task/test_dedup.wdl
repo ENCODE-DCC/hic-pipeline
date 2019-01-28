@@ -10,5 +10,4 @@ workflow test_dedup {
     output{
         File deduped = test_dedup_task.out_file
     }
-
 }
