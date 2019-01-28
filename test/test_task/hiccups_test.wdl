@@ -1,3 +1,4 @@
+
 workflow hiccups_test {
     File input_hic
     call hiccups { input:

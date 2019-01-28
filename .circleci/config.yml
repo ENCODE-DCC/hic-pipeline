@@ -93,11 +93,13 @@ workflows:
           requires:
             - build
       - test_task:
+          name: test_align
           requires:
             - build
           task_name: "align"
           keys_to_inspect: "test_align.test_align_task.sort_file"
       - test_task:
+          name: test_bam2pairs
           requires:
             - build
           task_name: "bam2pairs"
