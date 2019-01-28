@@ -1,7 +1,7 @@
 {
-    "test_align.alignable" : "098a457a0d789cf6adf025fc496bccff",
-    "test_align.collisions" : "d41d8cd98f00b204e9800998ecf8427e",
-    "test_align.collisions_low_mapq" : "d41d8cd98f00b204e9800998ecf8427e",
-    "test_align.unmapped" : "612c89ba5dd1fcf89ef92353abf09020",
-    "test_align.mapq0" : "921da4d3b2bb36563d13b90680f58767"
+    "alignable.no_header.sam" : "098a457a0d789cf6adf025fc496bccff",
+    "collisions.no_header.sam" : "d41d8cd98f00b204e9800998ecf8427e",
+    "collisions_low_mapq.no_header.sam" : "d41d8cd98f00b204e9800998ecf8427e",
+    "unmapped.no_header.sam" : "612c89ba5dd1fcf89ef92353abf09020",
+    "mapq0.no_header.sam" : "921da4d3b2bb36563d13b90680f58767"
 }

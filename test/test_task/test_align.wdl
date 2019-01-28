@@ -44,7 +44,7 @@ task strip_headers{
     #it messes up with compare_md5.py since all the files with stripped header are having the same name
     command {
         FILE=$(basename "${bam}" ".bam")
-        samtools view -h ${bam} | samtools view - > $FILE_no_header.sam
+        samtools view -h ${bam} | samtools view - > $FILE.no_header.sam
     }
     
     output{
