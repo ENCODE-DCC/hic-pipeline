@@ -41,6 +41,7 @@ workflow test_align {
 task strip_headers{
     File bam
     
+    #it messes up with compare_md5.py since all the files with stripped header are having the same name
     command{
         samtools view -h ${bam} | samtools view - > no_header.sam
     }

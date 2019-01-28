@@ -98,7 +98,7 @@ workflows:
           requires:
             - build
           task_name: "align"
-          keys_to_inspect: "test_align.alignable test_align.collisions test_align.collisions_low_mapq test_align.unmapped test_align.mapq0"
+          keys_to_inspect: "test_align.collisions test_align.collisions_low_mapq test_align.unmapped test_align.mapq0 test_align.alignable"
       - test_task:
           name: test_bam2pairs
           requires:

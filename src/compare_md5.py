@@ -90,10 +90,14 @@ def main(args):
             sys.exit(-1)
 
     files_to_inspect = [get_file_with_md5(file) for file in input_files]
+    print ('files to inspect')
+    print (files_to_inspect)
     files_to_inspect_md5 = {
         file.basename: file.md5
         for file in files_to_inspect
     }
+    print ('files_to_inspect_md5')
+    print (files_to_inspect_md5)
     md5_match_by_file = dict()
     match_overall = True
     try:
