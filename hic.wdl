@@ -170,7 +170,7 @@ task align {
         source /opt/scripts/common/countligations.sh
         # Align reads
         echo "Running bwa command"
-        bwa mem -SP5M -t ${select_first([cpu,32])} $reference_index_path ${fastqs[0]} ${fastqs[1]} | samtools view -bS - > result.bam
+        bwa mem -SP5M -t ${select_first([cpu,32])} $reference_index_path ${fastqs[0]} ${fastqs[1]} | samtools view -hbS - > result.bam
     }
 
     output {
@@ -192,7 +192,7 @@ task fragment {
     File restriction    # restriction enzyme sites in the reference genome
 
     command {
-        samtools view ${bam_file} | awk -v "fname"=result -f /opt/scripts/common/chimeric_blacklist.awk
+        samtools view -h ${bam_file} | awk -v "fname"=result -f /opt/scripts/common/chimeric_blacklist.awk
  
         # if any normal reads were written, find what fragment they correspond
         # to and store that
