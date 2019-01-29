@@ -12,6 +12,7 @@ workflow hic {
     File? input_hic
     File? sub_ms
 
+    String ligation_site
     File restriction_sites
     File chrsz
     File reference_index
@@ -40,6 +41,7 @@ workflow hic {
             fastqs = sub_fastq[j],
             chrsz = chrsz,
             idx_tar = reference_index,
+            ligation_site = ligation_site,
             cpu = cpu 
         }
     }
@@ -141,7 +143,7 @@ task align {
 	Array[File] fastqs 	# [read_end_id]
     File chrsz          # chromosome sizes file
     File restriction    # restriction enzyme sites in the reference genome
-
+    String ligation_site
     Int? cpu
   
 
@@ -158,7 +160,8 @@ task align {
         usegzip=1
         curr_ostem="result"
         #HindIII site
-        ligation="GATCGATC"
+        #ligation="GATCGATC"
+        ligation=${ligation_site}
         file1=${fastqs[0]}
         file2=${fastqs[1]}
         #count ligations

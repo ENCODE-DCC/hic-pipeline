@@ -6,12 +6,14 @@ workflow test_align {
 	Array[File] fastqs 	# [read_end_id]
     File chrsz          # chromosome sizes file
     File restriction    # restriction enzyme sites in the reference genome
+    String ligation_site
 
 	call hic.align as test_align_task { input:
 	 	restriction = restriction,
 		fastqs = fastqs,
 		chrsz = chrsz,
-		idx_tar = idx_tar
+		idx_tar = idx_tar,
+        ligation_site = ligation_site
 	}
     
     Array[File] bams = [

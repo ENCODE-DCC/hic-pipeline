@@ -1,0 +1,10 @@
+{ 
+    "hic.fastq": [[[
+        "test/test_data/SRR1665089_1.subsampled.400.fastq.gz",
+        "test/test_data/SRR1665089_2.subsampled.400.fastq.gz"]]],
+
+    "hic.chrsz": "test/test_data/ce10_selected.chrom.sizes.tsv",
+    "hic.restriction_sites": "test/test_data/ce10_selected_MboI.txt",
+    "hic.reference_index": "test/test_data/ce10_selected.tar.gz",
+    "hic.ligation_site": "GATCGATC"
+}
