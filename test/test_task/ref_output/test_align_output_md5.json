@@ -1,10 +1,10 @@
 {
-    "alignable.no_header.sam" : "098a457a0d789cf6adf025fc496bccff",
-    "collisions.no_header.sam" : "d41d8cd98f00b204e9800998ecf8427e",
-    "collisions_low_mapq.no_header.sam" : "d41d8cd98f00b204e9800998ecf8427e",
-    "unmapped.no_header.sam" : "612c89ba5dd1fcf89ef92353abf09020",
-    "mapq0.no_header.sam" : "921da4d3b2bb36563d13b90680f58767",
-    "sort.txt" : "6b4fd0b6d62a8f1c0a81169370d2add0",
-    "result_norm.txt.res.txt" : "d1124db77d6692daa94e0b3190ccc4d6",
-    "alignment_stats.txt" : "286df8db4e5cbab8637ac929fb0d9e08"
+    "alignable.no_header.sam" : "565766fa63d2eb402b14db117d63e105",
+    "collisions.no_header.sam" : "cb22daea9a4dba2cda0c6e875db51174",
+    "collisions_low_mapq.no_header.sam" : "63f7d3fa0b818e7d74accc10ef37ddae",
+    "unmapped.no_header.sam" : "e24ff1e0d5e6471fec6976d0aeaa1061",
+    "mapq0.no_header.sam" : "a9df472b6579d7762600408efe023d77",
+    "sort.txt" : "f2df3edfbd1d165c3639bae687e20b25",
+    "result_norm.txt.res.txt" : "672be91363a851385a8a0a6f9292688d",
+    "alignment_stats.txt" : "88d7181a19b758a5a6b828a8a4e20082"
 }
