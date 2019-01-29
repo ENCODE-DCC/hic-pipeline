@@ -88,6 +88,12 @@ workflows:
           task_name: "bam2pairs"
           keys_to_inspect: "test_bam2pairs.pairs_no_header"
       - test_task:
+          name: test_merge_sort
+          requires:
+            - build
+          task_name: "merge_sort"
+          keys_to_inspect: "test_merge_sort.merged"
+      - test_task:
           name: test_dedup
           requires:
             - build

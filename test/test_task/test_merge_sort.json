@@ -1,12 +1,6 @@
 { 
-    "test_merge_sort.sort_file": [
-        "gs://hic-pipeline-test-execution-bucket/hic/8c92f891-fc7a-48d3-9bf8-fcdad77fa610/call-align/shard-0/glob-359fa135564406e3848a2c2f21d7c413/sort.txt",
-        "gs://hic-pipeline-test-execution-bucket/hic/8c92f891-fc7a-48d3-9bf8-fcdad77fa610/call-align/shard-1/glob-359fa135564406e3848a2c2f21d7c413/sort.txt",
-        "gs://hic-pipeline-test-execution-bucket/hic/8c92f891-fc7a-48d3-9bf8-fcdad77fa610/call-align/shard-2/glob-359fa135564406e3848a2c2f21d7c413/sort.txt",
-        "gs://hic-pipeline-test-execution-bucket/hic/8c92f891-fc7a-48d3-9bf8-fcdad77fa610/call-align/shard-3/glob-359fa135564406e3848a2c2f21d7c413/sort.txt",
-        "gs://hic-pipeline-test-execution-bucket/hic/8c92f891-fc7a-48d3-9bf8-fcdad77fa610/call-align/shard-4/glob-359fa135564406e3848a2c2f21d7c413/sort.txt",
-        "gs://hic-pipeline-test-execution-bucket/hic/8c92f891-fc7a-48d3-9bf8-fcdad77fa610/call-align/shard-5/glob-359fa135564406e3848a2c2f21d7c413/sort.txt",
-        "gs://hic-pipeline-test-execution-bucket/hic/8c92f891-fc7a-48d3-9bf8-fcdad77fa610/call-align/shard-6/glob-359fa135564406e3848a2c2f21d7c413/sort.txt",
-        "gs://hic-pipeline-test-execution-bucket/hic/8c92f891-fc7a-48d3-9bf8-fcdad77fa610/call-align/shard-7/glob-359fa135564406e3848a2c2f21d7c413/sort.txt"
+    "test_merge_sort.sort_files": [
+        "test/test_data/sort_200.txt",
+        "test/test_data/sort_400.txt"
     ]
 }
