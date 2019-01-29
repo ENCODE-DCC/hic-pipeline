@@ -18,7 +18,7 @@ task hiccups {
         File out_file = glob("loops/*.bedpe")[0]
     }
     runtime {
-        docker: "quay.io/anacismaru/nvidia_juicer:test"
+        docker: "quay.io/encode-dcc/hiccups:stripped_down"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         zones: ["us-east1-b"]
