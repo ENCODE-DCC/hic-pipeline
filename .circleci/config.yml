@@ -99,3 +99,9 @@ workflows:
             - build
           task_name: "dedup"
           keys_to_inspect: "test_dedup.deduped"
+      - test_task:
+          name: test_merge
+          requires:
+            - build
+          task_name: "dedup"
+          keys_to_inspect: "test_merge.merged_no_header"
