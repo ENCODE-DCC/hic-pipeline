@@ -9,19 +9,25 @@ workflow test_align {
     String ligation_site
 
 	call hic.align as test_align_task { input:
-	 	restriction = restriction,
+	 	
 		fastqs = fastqs,
 		chrsz = chrsz,
 		idx_tar = idx_tar,
         ligation_site = ligation_site
 	}
     
+    call hic.fragment as test_fragment { input:
+        restriction = restriction,
+        bam_file = test_align_task.result,
+        norm_res_input = test_align_task.norm_res
+    }
+
     Array[File] bams = [
-        test_align_task.collisions,
-        test_align_task.collisions_low_mapq,
-        test_align_task.unmapped,
-        test_align_task.mapq0,
-        test_align_task.alignable
+        test_fragment.collisions,
+        test_fragment.collisions_low_mapq,
+        test_fragment.unmapped,
+        test_fragment.mapq0,
+        test_fragment.alignable
     ]
 
     Int bams_len = length(bams)
@@ -38,9 +44,9 @@ workflow test_align {
         File mapq0 = strip_headers.no_header[3]
         File alignable = strip_headers.no_header[4]
         
-        File sort_file = test_align_task.sort_file
-        File norm_res = test_align_task.norm_res
-        File stats_sub_result = test_align_task.stats_sub_result
+        File sort_file = test_fragment.sort_file
+        File norm_res = test_fragment.norm_res
+        File stats_sub_result = test_fragment.stats_sub_result
     }
 }
 
