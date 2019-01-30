@@ -311,10 +311,10 @@ task dedup {
 task merge_pairs_file{
     Array[File] not_merged_pe
     
-    command {
+    command <<<
         sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 10% ${sep=' ' not_merged_pe}  > merged_pairs.txt
         #${juiceDir}/scripts/common/statistics.pl -s $site_file -l $ligation -o $outputdir/stats_dups.txt $outputdir/dups.txt
-    }
+    >>>
     
     output {
         File out_file = glob('merged_pairs.txt')[0]
