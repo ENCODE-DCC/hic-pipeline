@@ -373,7 +373,7 @@ task arrowhead {
     File hic_file
 
     command {
-        /opt/scripts/common/juicer_tools arrowhead ${hic_file} contact_domains 
+        /opt/scripts/common/juicer_tools arrowhead ${hic_file} contact_domains --ignore_sparsity -r 500000
     }
 
     output {
