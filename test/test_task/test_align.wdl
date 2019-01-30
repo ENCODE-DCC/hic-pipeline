@@ -1,4 +1,4 @@
-import "https://github.com/ENCODE-DCC/hic-pipeline/blob/PPIP-464-2-idan/hic.wdl" as hic
+import https://github.com/ENCODE-DCC/hic-pipeline/blob/PPIP-464-2-idan/hic.wdl as hic
 
 workflow test_align {
   
