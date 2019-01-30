@@ -206,7 +206,8 @@ task fragment {
        
         # qc for alignment portion
         cat ${norm_res_input} *.res.txt | awk -f /opt/scripts/common/stats_sub.awk >> alignment_stats.txt
-        
+        paste -d "" ${norm_res_input} *.res.txt > result.res.txt
+
         # convert sams to bams and delete the sams
         echo "Converting sam to bam"
         samtools view -hb result_collisions.sam > collisions.bam
@@ -238,7 +239,7 @@ task fragment {
         File mapq0 = glob("mapq0.bam")[0]
         File alignable = glob("alignable.bam")[0]
         File sort_file = glob("sort.txt")[0]
-        File norm_res = glob("result_norm.txt.res.txt")[0]
+        File norm_res = glob("result.res.txt")[0]
         File stats_sub_result = glob("alignment_stats.txt")[0]
     }
 
