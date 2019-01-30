@@ -12,6 +12,7 @@ workflow hic {
     File? input_hic
     File? sub_ms
 
+    String ligation_site
     File restriction_sites
     File chrsz
     File reference_index
@@ -36,19 +37,25 @@ workflow hic {
     Int fastqs_len = length(sub_fastq)
     scatter(j in range(fastqs_len)){
         call align { input:
-            restriction = restriction_sites,
             fastqs = sub_fastq[j],
             chrsz = chrsz,
             idx_tar = reference_index,
+            ligation_site = ligation_site,
             cpu = cpu 
+        }
+
+        call fragment { input:
+            bam_file = align.result,
+            norm_res_input = align.norm_res,
+            restriction = restriction_sites
         }
     }
 
-    Array[File] collisions = if length(sub_input_bams)>0 then sub_input_bams[0] else align.collisions  #for separate user entry point
-    Array[File] collisions_low = if length(sub_input_bams)>0 then sub_input_bams[1] else align.collisions_low_mapq
-    Array[File] unmapped = if length(sub_input_bams)>0 then sub_input_bams[2] else align.unmapped
-    Array[File] mapq0 = if length(sub_input_bams)>0 then sub_input_bams[3] else align.mapq0
-    Array[File] alignable = if length(sub_input_bams)>0 then sub_input_bams[4] else align.alignable       
+    Array[File] collisions = if length(sub_input_bams)>0 then sub_input_bams[0] else fragment.collisions  #for separate user entry point
+    Array[File] collisions_low = if length(sub_input_bams)>0 then sub_input_bams[1] else fragment.collisions_low_mapq
+    Array[File] unmapped = if length(sub_input_bams)>0 then sub_input_bams[2] else fragment.unmapped
+    Array[File] mapq0 = if length(sub_input_bams)>0 then sub_input_bams[3] else fragment.mapq0
+    Array[File] alignable = if length(sub_input_bams)>0 then sub_input_bams[4] else fragment.alignable       
     
     Array[Array[File]] bams_to_merge = [collisions, collisions_low, unmapped, mapq0, alignable]
 
@@ -65,7 +72,7 @@ workflow hic {
     }  
   
     call merge_sort { input:
-        sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else align.sort_file 
+        sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else fragment.sort_file 
     } 
 
     # call align_qc { input:
@@ -140,8 +147,7 @@ task align {
     File idx_tar 		# reference bwa index tar
 	Array[File] fastqs 	# [read_end_id]
     File chrsz          # chromosome sizes file
-    File restriction    # restriction enzyme sites in the reference genome
-
+    String ligation_site
     Int? cpu
   
 
@@ -157,24 +163,50 @@ task align {
         
         usegzip=1
         curr_ostem="result"
-        #HindIII site
-        ligation="AGCTAGCT"
+        ligation=${ligation_site}
         file1=${fastqs[0]}
         file2=${fastqs[1]}
         #count ligations
         source /opt/scripts/common/countligations.sh
         # Align reads
         echo "Running bwa command"
-        bwa mem -SP5M -t ${select_first([cpu,32])} $reference_index_path ${fastqs[0]} ${fastqs[1]} | awk -v "fname"=result -f /opt/scripts/common/chimeric_blacklist.awk
+        bwa mem -SP5M -t ${select_first([cpu,32])} $reference_index_path ${fastqs[0]} ${fastqs[1]} | samtools view -hbS - > result.bam
+    }
+
+    output {
+        File result = glob("result.bam")[0]
+        File norm_res = glob("result_norm.txt.res.txt")[0]
+     }
+
+    runtime {
+        docker : "quay.io/encode-dcc/hic-pipeline:template"
+        cpu : "32"
+        memory: "64 GB"
+        disks: "local-disk 1000 HDD"
+    }
+}
+
+task fragment {
+    File bam_file
+    File norm_res_input
+    File restriction    # restriction enzyme sites in the reference genome
+
+    command {
+        samtools view -h ${bam_file} | awk -v "fname"=result -f /opt/scripts/common/chimeric_blacklist.awk
  
         # if any normal reads were written, find what fragment they correspond
         # to and store that
+        
         echo "Running fragment"
         /opt/scripts/common/fragment.pl result_norm.txt result_frag.txt ${restriction}   
         echo $(ls)
 
+        # no restriction site !!!!
+        # need to add support
+       
         # qc for alignment portion
-        cat *.res.txt | awk -f /opt/scripts/common/stats_sub.awk >> alignment_stats.txt
+        cat ${norm_res_input} *.res.txt | awk -f /opt/scripts/common/stats_sub.awk >> alignment_stats.txt
+        paste -d "" ${norm_res_input} *.res.txt > result.res.txt
 
         # convert sams to bams and delete the sams
         echo "Converting sam to bam"
@@ -198,7 +230,6 @@ task align {
             echo "***! Failure during sort"
             exit 1x
         fi
-
     }
 
     output {
@@ -208,18 +239,16 @@ task align {
         File mapq0 = glob("mapq0.bam")[0]
         File alignable = glob("alignable.bam")[0]
         File sort_file = glob("sort.txt")[0]
-        File norm_res = glob("result_norm.txt.res.txt")[0]
+        File norm_res = glob("result.res.txt")[0]
         File stats_sub_result = glob("alignment_stats.txt")[0]
     }
 
     runtime {
-        docker : "quay.io/encode-dcc/hic-pipeline:PIP-419-import-wdl_122a7f4a-893f-42c8-9075-7d0d256f6db0"
-        cpu : "32"
-        memory: "64 GB"
+        docker : "quay.io/encode-dcc/hic-pipeline:template"
+        cpu : "1"
         disks: "local-disk 1000 HDD"
     }
 }
-
 
 task merge {
     Array[File] bam_files
@@ -284,6 +313,7 @@ task merge_pairs_file{
     
     command {
         sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 10% ${sep=' ' not_merged_pe}  > merged_pairs.txt
+        #${juiceDir}/scripts/common/statistics.pl -s $site_file -l $ligation -o $outputdir/stats_dups.txt $outputdir/dups.txt
     }
     
     output {
@@ -314,7 +344,7 @@ task create_hic {
 
     runtime {
         docker : "quay.io/encode-dcc/hic-pipeline:template"
-        cpu : "32"
+        cpu : "1"
         disks: "local-disk 1000 HDD"
         memory : "64 GB"
     }
@@ -344,7 +374,7 @@ task arrowhead {
     File hic_file
 
     command {
-        /opt/scripts/common/juicer_tools arrowhead ${hic_file} contact_domains 
+        /opt/scripts/common/juicer_tools arrowhead ${hic_file} contact_domains --ignore_sparsity -r 500000
     }
 
     output {
@@ -368,7 +398,7 @@ task hiccups{
     }
     
     runtime {
-        docker: "quay.io/anacismaru/nvidia_juicer:test"
+        docker: "quay.io/encode-dcc/hiccups:stripped_down"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         zones: ["us-east1-b"]

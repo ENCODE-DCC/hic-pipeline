@@ -1,61 +1,34 @@
 ##Encode DCC Hi-C pipeline tester
 ##Author: Ana Cismaru(anacismaru@gmail.com)
-import "hic_sub.wdl" as sub
-import "test/test_utils.wdl" as utils
+import "../../hic.wdl" as hic
 
 workflow test_merge {
-    Array[Array[File]] bams
-    Array[File] ref_merged
-     
-     
-	call sub.merge as test { input:
-	    collisions = bams[0],
-	    collisions_low = bams[1],
-	    unmapped = bams[2],
-	    mapq0 = bams[3],
-	    alignable = bams[4]
+    Array[File] bams
+
+	call hic.merge as test_merge_task { input:
+		bam_files = bams
+    }
+    File merged = test_merge_task.merged_output
+    call strip_headers {input: bam = merged}
+    output {
+        File merged_no_header = strip_headers.no_header
+    }
+}
+
+task strip_headers{
+    File bam
+    
+    #it messes up with compare_md5.py since all the files with stripped header are having the same name
+    command {
+        FILE=$(basename "${bam}" ".bam")
+        samtools view -h ${bam} | samtools view - > $FILE.no_header.sam
+    }
+    
+    output{
+        File no_header = glob("*.no_header.sam")[0]
     }
 
-	File collisions = test.m_collisions
-	File collisions_low = test.m_coll_low
-	File unmapped = test.m_unmap
-	File mapq0 = test.m_map
-	File aligned = test.m_align
-
-	call utils.strip_headers as coll { input:
-		bam = collisions
-	}
-	call utils.strip_headers as low { input:
-		bam = collisions_low
-	}  
-	call utils.strip_headers as unmap { input:
-		bam = unmapped
-	}  
-	call utils.strip_headers as map { input:
-		bam = mapq0
-	}  
-	call utils.strip_headers as align { input:
-		bam = aligned
-	}    
-	
-	scatter(ref in ref_merged){
-	    call utils.strip_headers as ref_head { input:
-	 		bam = ref
-	    } 
-	}
-	  
-
-	Array[File] result = [coll.no_header, low.no_header, unmap.no_header, map.no_header, align.no_header]
-    Array[File] ref = ref_head.no_header
-	 
-	call utils.compare_md5sum { input :
-		labels = [
-			'merged_bams'
-		],
-       
-		files = result,
-
-		ref_files = ref
-	}
-
+    runtime {
+        docker : "quay.io/encode-dcc/hic-pipeline:template"
+    }
 }
