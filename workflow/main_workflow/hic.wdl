@@ -1,5 +1,5 @@
 ##Encode DCC Hi-C pipeline
-##Author: Ana Cismaru(anacismaru@gmail.com)
+import "../../workflow/sub_workflow/process_library.wdl" as sub
 
 workflow hic {
     #User inputs 
@@ -26,7 +26,15 @@ workflow hic {
 
     # scatter over libraries
     #scatter(i in range(lib_length)){
-    
+    #call sub.process_library { input:
+    #        fastqs = sub_fastq[j],
+    #        chrsz = chrsz,
+    #        idx_tar = reference_index,
+    #        ligation_site = ligation_site,
+    #        cpu = cpu 
+    #}
+    # output can be accessed from here as process_library.library_dedup
+
     Array[Array[File]] sub_fastq = if length(fastq) > 0 then fastq[0] else []
     Array[Array[File]] sub_input_bams = if length(input_bams) > 0 then input_bams[0] else []
     Array[File] sub_input_sort_files = if length(input_sort_files) > 0 then input_sort_files[0] else []
