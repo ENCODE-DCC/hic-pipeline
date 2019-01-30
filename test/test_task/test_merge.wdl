@@ -1,6 +1,6 @@
 ##Encode DCC Hi-C pipeline tester
 ##Author: Ana Cismaru(anacismaru@gmail.com)
-import "../../hic.wdl" as hic
+import "../../workflow/main_workflow/hic.wdl" as hic
 
 workflow test_merge {
     Array[File] bams

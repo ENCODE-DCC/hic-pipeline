@@ -1,4 +1,4 @@
-import "../../hic.wdl" as hic
+import "../../workflow/main_workflow/hic.wdl" as hic
 
 workflow test_dedup {
     File merged_sort
