@@ -1,15 +1,13 @@
-import https://github.com/ENCODE-DCC/hic-pipeline/blob/PPIP-464-2-idan/hic.wdl as hic
+import "../../hic.wdl" as hic
 
 workflow test_align {
-  
-	File idx_tar 		# reference bwa index tar
-	Array[File] fastqs 	# [read_end_id]
+    File idx_tar 		# reference bwa index tar
+    Array[File] fastqs = []	# [read_end_id]
     File chrsz          # chromosome sizes file
     File restriction    # restriction enzyme sites in the reference genome
     String ligation_site
 
 	call hic.align as test_align_task { input:
-	 	
 		fastqs = fastqs,
 		chrsz = chrsz,
 		idx_tar = idx_tar,
@@ -52,7 +50,7 @@ workflow test_align {
 
 task strip_headers{
     File bam
-    
+
     #it messes up with compare_md5.py since all the files with stripped header are having the same name
     command {
         FILE=$(basename "${bam}" ".bam")
