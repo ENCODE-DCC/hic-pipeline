@@ -1,5 +1,5 @@
 ##Encode DCC Hi-C pipeline
-##Author: Ana Cismaru(anacismaru@gmail.com)
+import "../../workflow/sub_workflow/process_library.wdl" as sub
 
 workflow hic {
     #User inputs 
@@ -25,76 +25,86 @@ workflow hic {
     else length(input_merged_sort)
 
     # scatter over libraries
-    #scatter(i in range(lib_length)){
-    
-    Array[Array[File]] sub_fastq = if length(fastq) > 0 then fastq[0] else []
-    Array[Array[File]] sub_input_bams = if length(input_bams) > 0 then input_bams[0] else []
-    Array[File] sub_input_sort_files = if length(input_sort_files) > 0 then input_sort_files[0] else []
-    File? sub_input_merged_sort = if length(input_merged_sort)>0 then input_merged_sort[0] else sub_ms
-
-
-
-    Int fastqs_len = length(sub_fastq)
-    scatter(j in range(fastqs_len)){
-        call align { input:
-            fastqs = sub_fastq[j],
+    scatter(i in range(lib_length)) {
+        call sub.process_library { input:
+            sub_fastq = fastq[i],
             chrsz = chrsz,
-            idx_tar = reference_index,
+            reference_index = reference_index,
             ligation_site = ligation_site,
-            cpu = cpu 
-        }
-
-        call fragment { input:
-            bam_file = align.result,
-            norm_res_input = align.norm_res,
-            restriction = restriction_sites
+            cpu = cpu,
+            restriction_sites = restriction_sites
         }
     }
+    # subworkflow output can be accessed from here as sub.library_dedup
 
-    Array[File] collisions = if length(sub_input_bams)>0 then sub_input_bams[0] else fragment.collisions  #for separate user entry point
-    Array[File] collisions_low = if length(sub_input_bams)>0 then sub_input_bams[1] else fragment.collisions_low_mapq
-    Array[File] unmapped = if length(sub_input_bams)>0 then sub_input_bams[2] else fragment.unmapped
-    Array[File] mapq0 = if length(sub_input_bams)>0 then sub_input_bams[3] else fragment.mapq0
-    Array[File] alignable = if length(sub_input_bams)>0 then sub_input_bams[4] else fragment.alignable       
-    
-    Array[Array[File]] bams_to_merge = [collisions, collisions_low, unmapped, mapq0, alignable]
-
-    scatter(i in range(5)){
-        call merge { input:
-            bam_files = bams_to_merge[i]
-        }
-    }
-
-    # convert alignable bam to pairs to be consistent with 4DN
-    call bam2pairs { input:
-        bam_file = merge.merged_output[4],
-        chrsz_  = chrsz
-    }  
-  
-    call merge_sort { input:
-        sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else fragment.sort_file 
-    } 
-
-    # call align_qc { input:
-    #     norm_res = align.norm_res
-    # }   
-
-    # we can collect the alignable.bam using the array merge.out_file
-    call dedup { input:
-        merged_sort = if defined(sub_input_merged_sort) then sub_input_merged_sort else merge_sort.out_file
-    }
-
-    #}
+#    Array[Array[File]] sub_fastq = if length(fastq) > 0 then fastq[0] else []
+#    Array[Array[File]] sub_input_bams = if length(input_bams) > 0 then input_bams[0] else []
+#    Array[File] sub_input_sort_files = if length(input_sort_files) > 0 then input_sort_files[0] else []
+#    File? sub_input_merged_sort = if length(input_merged_sort)>0 then input_merged_sort[0] else sub_ms
+#
+#
+#
+#    Int fastqs_len = length(sub_fastq)
+#    scatter(j in range(fastqs_len)){
+#        call align { input:
+#            fastqs = sub_fastq[j],
+#            chrsz = chrsz,
+#            idx_tar = reference_index,
+#            ligation_site = ligation_site,
+#            cpu = cpu 
+#        }
+#
+#        call fragment { input:
+#            bam_file = align.result,
+#            norm_res_input = align.norm_res,
+#            restriction = restriction_sites
+#        }
+#    }
+#
+#    Array[File] collisions = if length(sub_input_bams)>0 then sub_input_bams[0] else fragment.collisions  #for separate user entry point
+#    Array[File] collisions_low = if length(sub_input_bams)>0 then sub_input_bams[1] else fragment.collisions_low_mapq
+#    Array[File] unmapped = if length(sub_input_bams)>0 then sub_input_bams[2] else fragment.unmapped
+#    Array[File] mapq0 = if length(sub_input_bams)>0 then sub_input_bams[3] else fragment.mapq0
+#    Array[File] alignable = if length(sub_input_bams)>0 then sub_input_bams[4] else fragment.alignable       
+#    
+#    Array[Array[File]] bams_to_merge = [collisions, collisions_low, unmapped, mapq0, alignable]
+#
+#    scatter(i in range(5)){
+#        call merge { input:
+#            bam_files = bams_to_merge[i]
+#        }
+#    }
+#
+#    # convert alignable bam to pairs to be consistent with 4DN
+#    call bam2pairs { input:
+#        bam_file = merge.merged_output[4],
+#        chrsz_  = chrsz
+#    }  
+#  
+#    call merge_sort { input:
+#        sort_files_ = if length(sub_input_sort_files)>0 then sub_input_sort_files else fragment.sort_file 
+#    } 
+#
+#    # call align_qc { input:
+#    #     norm_res = align.norm_res
+#    # }   
+#
+#    # we can collect the alignable.bam using the array merge.out_file
+#    call dedup { input:
+#        merged_sort = if defined(sub_input_merged_sort) then sub_input_merged_sort else merge_sort.out_file
+#    }
+#
+#    #}
   
     # should be used only for multiple libraries - which we are dumping for now due to scatter within scatter limitation
-    #call merge_pairs_file{ input:
-    #    not_merged_pe = if length(input_dedup_pairs)>0 then input_dedup_pairs else dedup.out_file
-    #}
+    call merge_pairs_file { input:
+        not_merged_pe = if length(input_dedup_pairs)>0 then input_dedup_pairs else process_library.library_dedup
+    }
 
 
     call create_hic { input:
-        #pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
-        pairs_file = if defined(input_pairs) then input_pairs else dedup.out_file,
+        pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
+        #pairs_file = if defined(input_pairs) then input_pairs else dedup.out_file,
         chrsz_ = chrsz
     }
         
@@ -310,10 +320,11 @@ task dedup {
 
 task merge_pairs_file{
     Array[File] not_merged_pe
+    # Need to add following line back under sort command
+    # ${juiceDir}/scripts/common/statistics.pl -s $site_file -l $ligation -o $outputdir/stats_dups.txt $outputdir/dups.txt
     
     command {
         sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 10% ${sep=' ' not_merged_pe}  > merged_pairs.txt
-        #${juiceDir}/scripts/common/statistics.pl -s $site_file -l $ligation -o $outputdir/stats_dups.txt $outputdir/dups.txt
     }
     
     output {

@@ -1,4 +1,4 @@
-import "../../hic.wdl" as hic
+import "../../workflow/sub_workflow/process_library.wdl" as hic
 
 workflow test_merge_sort {
     Array[File] sort_files

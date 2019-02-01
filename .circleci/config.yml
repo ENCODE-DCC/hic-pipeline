@@ -73,8 +73,7 @@ workflows:
             only:
               - master
               - dev-1
-              - PIP-464-circle-align-test
-              - PPIP-464-2-idan
+              - PIP-493-subworkflow-for-libraries
       - test_task:
           name: test_align
           requires:

@@ -1,4 +1,4 @@
-import "../../hic.wdl" as hic
+import "../../workflow/sub_workflow/process_library.wdl" as hic
 
 workflow test_align {
     File idx_tar 		# reference bwa index tar
