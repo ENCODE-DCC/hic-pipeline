@@ -206,15 +206,20 @@ task merge_sort {
 task dedup {
     File merged_sort
 
-    command {
+    command <<<
         touch dups.txt
         touch optdups.txt
         touch merged_nodups.txt
         awk -f /opt/scripts/common/dups.awk ${merged_sort}
-    }
+        pcr=$(wc -l dups.txt | awk '{print $1}')
+        unique=$(wc -l merged_nodups.txt | awk '{print $1}')
+        opt=$(wc -l optdups.txt | awk '{print $1}')
+        java -jar /opt/scripts/common/juicer_tools.jar LibraryComplexity $unique $pcr $opt > library_complexity.txt
+    >>>
 
     output {
         File out_file = glob('merged_nodups.txt')[0]
+        File library_complexity = glob('library_complexity.txt')[0]
     }
 
     runtime {
