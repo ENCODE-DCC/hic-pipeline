@@ -53,7 +53,9 @@ workflow process_library {
 
     # we can collect the alignable.bam using the array merge.out_file
     call dedup { input:
-        merged_sort = merge_sort.out_file
+        merged_sort = merge_sort.out_file,
+        ligation_site = ligation_site,
+        restriction_sites = restriction_sites
     }
     output {
         File library_dedup = dedup.out_file
@@ -205,6 +207,8 @@ task merge_sort {
 
 task dedup {
     File merged_sort
+    String ligation_site
+    File restriction_sites
 
     command <<<
         touch dups.txt
@@ -215,11 +219,14 @@ task dedup {
         unique=$(wc -l merged_nodups.txt | awk '{print $1}')
         opt=$(wc -l optdups.txt | awk '{print $1}')
         java -jar /opt/scripts/common/juicer_tools.jar LibraryComplexity $unique $pcr $opt > library_complexity.txt
+        /opt/scripts/common/statistics.pl -s ${restriction_sites} -l ${ligation_site} merged_nodups.txt
     >>>
 
     output {
         File out_file = glob('merged_nodups.txt')[0]
         File library_complexity = glob('library_complexity.txt')[0]
+        File stats = glob('stats.txt')[0]
+        File stats_hists = glob('stats_hists.m')[0]
     }
 
     runtime {
