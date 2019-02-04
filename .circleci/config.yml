@@ -73,7 +73,7 @@ workflows:
             only:
               - master
               - dev-1
-              - PIP-493-subworkflow-for-libraries
+              - PIP-495-add-loops-tads-tests
       - test_task:
           name: test_align
           requires:
@@ -104,3 +104,9 @@ workflows:
             - build
           task_name: "merge"
           keys_to_inspect: "test_merge.merged_no_header"
+      - test_task:
+          name: arrowhead
+          requires:
+            - build
+          task_name: "arrowhead"
+          keys_to_inspect: "test_arrowhead.arrowhead_out"
