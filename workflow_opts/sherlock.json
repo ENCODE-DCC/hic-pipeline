@@ -1,0 +1,6 @@
+{
+    "default_runtime_attributes" : {
+        "singularity_container" : "~/hic-pipeline/hic-pipeline_template.sif",
+        "singularity_command_options" : "--bind /scratch,/lscratch,/oak/stanford"
+    }
+}
