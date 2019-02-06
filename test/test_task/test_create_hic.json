@@ -1,4 +1,4 @@
 {
-	"test_create_hic.pairs_file": "gs://hic-pipeline-test-execution-bucket/hic/4e4e8ab7-7147-480c-9337-4a1f2c37806d/call-dedup/glob-4597e8834cf225f807c30b0caec03863/merged_nodups.txt",
-	"test_create_hic.chrsz_": "gs://hic-reference/hg19/chrom.sizes"
+    "test_create_hic.pairs_file": "test/test_data/merged_nodups.txt",
+    "test_create_hic.chrsz_": "test/test_data/ce10_selected.chrom.sizes.tsv"
 }
