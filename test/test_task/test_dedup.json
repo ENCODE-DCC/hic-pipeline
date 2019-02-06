@@ -1,3 +1,5 @@
-{ 
-    "test_dedup.merged_sort": "test/test_data/merged_sort.txt"
+{
+    "test_dedup.merged_sort": "test/test_data/merged_sort.txt",
+    "test_dedup.ligation_site": "AGCTAGCT",
+    "test_dedup.restriction_sites": "test/test_data/ce10_selected_MboI.txt"
 }
