@@ -16,12 +16,10 @@ HiC uniform processing pipeline
 
 This pipeline supports many cloud platforms and cluster engines. It supports `docker` and `singularity` to resolve complicated software dependencies for the pipeline. A tutorial-based instruction for each platform will be helpful to understand how to run pipelines.
 
-* Cloud platforms
-  * Web interface
-    * [DNAnexus Platform](docs/tutorial_dx_web.md)
+* Cloud platform (CLI)
   * CLI (command line interface)
     * [Google Cloud Platform](docs/tutorial_google.md)
-* Stanford HPC servers (CLI)
+* Stanford HPC server (CLI)
   * [Stanford Sherlock 2.0](docs/tutorial_sherlock.md)
 * Local Linux computers (CLI)
   * [Local system with `singularity`](docs/tutorial_local_singularity.md)
