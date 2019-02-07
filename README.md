@@ -11,6 +11,23 @@ HiC uniform processing pipeline
 * `nvidia_docker_image/` : Dockerfile for Nvidia Docker: to use pipeline with GPU
 * `test/` : test scripts for developers
 
-# Installation and usage
 
-See [here](https://encode-dcc.github.io/wdl-pipelines/).
+# Installation and tutorial
+
+This pipeline supports many cloud platforms and cluster engines. It supports `docker` and `singularity` to resolve complicated software dependencies for the pipeline. A tutorial-based instruction for each platform will be helpful to understand how to run pipelines.
+
+* Cloud platforms
+  * Web interface
+    * [DNAnexus Platform](docs/tutorial_dx_web.md)
+  * CLI (command line interface)
+    * [Google Cloud Platform](docs/tutorial_google.md)
+* Stanford HPC servers (CLI)
+  * [Stanford Sherlock 2.0](docs/tutorial_sherlock.md)
+* Local Linux computers (CLI)
+  * [Local system with `singularity`](docs/tutorial_local_singularity.md)
+  * [Local system with `docker`](docs/tutorial_local_docker.md)
+
+
+## Input JSON file
+
+[Input JSON file specification](docs/input.md)
