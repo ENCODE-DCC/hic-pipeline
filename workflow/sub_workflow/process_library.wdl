@@ -97,7 +97,6 @@ task align {
      }
 
     runtime {
-        docker : "quay.io/encode-dcc/hic-pipeline:template"
         cpu : "32"
         memory: "64 GB"
         disks: "local-disk 1000 HDD"
@@ -162,7 +161,6 @@ task fragment {
     }
 
     runtime {
-        docker : "quay.io/encode-dcc/hic-pipeline:template"
         cpu : "1"
         disks: "local-disk 1000 HDD"
     }
@@ -180,7 +178,6 @@ task merge {
     }
 
     runtime {
-        docker : "quay.io/encode-dcc/hic-pipeline:template"
         cpu : "8"
         disks: "local-disk 1000 HDD"
         
@@ -199,7 +196,6 @@ task merge_sort {
     }
 
     runtime {
-        docker : "quay.io/encode-dcc/hic-pipeline:template"
         cpu : "8"
         disks: "local-disk 1000 HDD"
     }
@@ -230,7 +226,6 @@ task dedup {
     }
 
     runtime {
-        docker : "quay.io/encode-dcc/hic-pipeline:template"
         cpu : "8"
         disks: "local-disk 1000 HDD"
     }
@@ -249,7 +244,6 @@ task bam2pairs {
     }
 
     runtime {
-        docker : "quay.io/encode-dcc/hic-pipeline:template"
         cpu : "8"
         disks: "local-disk 1000 HDD"
     }
