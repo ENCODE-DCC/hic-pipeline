@@ -1,19 +1,18 @@
 # Input JSON
 
-An input JSON file includes all input parameters and metadata for running pipelines. Items 1), 2) and 3) are mandatory. Items 4) and 5) are optional so that our pipeline will use default values if they are not defined. However, 
+An input JSON file includes all input parameters and metadata for running pipelines. Items 1), 2), 3), 4) and 5) are mandatory. Item 6) is optional so that our pipeline will use default values if it is not defined.
 
 * Mandatory
 
-1. Reference genome.
-2. Input data file paths/URIs.
-3. Adapters to be trimmed.
+1. Input FASTQ file pairs.
+2. Reference genome bwa index.
+3. Reference genome chromosome sizes.
+4. Restriction site locations in the reference genome sequence.
+5. Sequence of the ligation site
 
 * Optional
 
-4. Pipeline parameters.
-5. Resource settings for jobs.
-
-
+6. Pipeline parameters.
 
 ## Templates
 
