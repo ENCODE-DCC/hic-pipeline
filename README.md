@@ -29,3 +29,7 @@ This pipeline supports many cloud platforms and cluster engines. It supports `do
 ## Input JSON file
 
 [Input JSON file specification](docs/input.md)
+
+## Output directories
+
+[Output directory specification](docs/output.md)
