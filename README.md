@@ -23,7 +23,8 @@ This pipeline supports many cloud platforms and cluster engines. It supports `do
 * Local Linux computers (CLI)
   * [Local system with `singularity`](docs/tutorial_local_singularity.md)
   * [Local system with `docker`](docs/tutorial_local_docker.md)
-
+* Cluster engines (CLI)
+  * [SLURM](docs/tutorial_slurm_singularity.md)
 
 ## Input JSON file
 
