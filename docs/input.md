@@ -19,32 +19,30 @@ An input JSON file includes all input parameters and metadata for running pipeli
 
 We provide two template JSON files for both single ended and paired-end samples. We recommend to use one of these input JSON files instead of that used in the tutorial section. These template JSON files include all parameters of the pipeline with default values defined.
 
-* [template](../examples/template_se.json) for single ended sample
-* [template](../examples/template_pe.json) for paired-end sample
+* [template](../examples/template_one.json) for a single library sample
+
 
 Let us take a close look at the following template JSON. Comments are not allowed in a JSON file but we added some comments to help you understand each parameter.
 ```javascript
 {
-    ////////// 1) Reference genome //////////
-    // Stanford servers: [GENOME]=hg38,hg19,mm10,mm9
-    //   Sherlock: /home/groups/cherry/encode/pipeline_genome_data/[GENOME]_sherlock.tsv
-    //   SCG4: /reference/ENCODE/pipeline_genome_data/[GENOME]_scg.tsv
+    ////////// 1) Input FASTQ files //////////
+    "hic.fastq": [[[
+        "test/test_data/merged_read1.fastq.gz",
+        "test/test_data/merged_read2.fastq.gz"
+    ]]],
 
-    // Cloud platforms (Google Cloud, DNAnexus): [GENOME]=hg38,hg19,mm10,mm9
-    //   Google Cloud: gs://encode-pipeline-genome-data/[GENOME]_google.tsv
-    //   DNAnexus: dx://project-BKpvFg00VBPV975PgJ6Q03v6:data/pipeline-genome-data/[GENOME]_dx.tsv
-    //   DNAnexus(Azure): dx://project-F6K911Q9xyfgJ36JFzv03Z5J:data/pipeline-genome-data/[GENOME]_dx_azure.tsv
+    ////////// 2) Reference genome chromosome sizes//////////
+    "hic.chrsz": "test/test_data/ce10_selected.chrom.sizes.tsv",
+    
+    ////////// 3) Restriction sites locations in the reference genome sequence //////////
+    "hic.restriction_sites": "test/test_data/ce10_selected_MboI.txt",
 
-    // On other computers download or build reference genome database and pick a TSV from [DEST_DIR].
-    //   Downloader: ./genome/download_genome_data.sh [GENOME] [DEST_DIR]
-    //   Builder (Conda required): ./conda/build_genome_data.sh [GENOME] [DEST_DIR]
+    ////////// 4) Reference genome index //////////
+    "thic.reference_index": "test/test_data/ce10_selected.tar.gz",
+    
+    ////////// 5) Ligation site sequence //////////
+    "hic.ligation_site": "AGCTAGCT"
 
-    "atac.genome_tsv" : "/path_to_genome_data/hg38/hg38.tsv",
-
-    ////////// 2) Input data files paths/URIs //////////
-
-    // Read endedness
-    "atac.paired_end" : true
 }
 ```
 
@@ -59,6 +57,5 @@ In order to run the HiC pipeline you will need to specify the bwa index file pre
 |chromosome sizes|hg19|[link](https://www.encodeproject.org/files/male.hg19.chrom.sizes/)|
 |bwa index|GRCh38|[link](https://www.encodeproject.org/files/ENCFF643CGH/)|
 |genome fasta|GRCh38|[link](https://www.encodeproject.org/files/GRCh38_no_alt_analysis_set_GCA_000001405.15/)|
-|chromosome sizes|GRCh38|[link](https://www.encodeproject.org/files/GRCh38_EBV.chrom.sizes/
-)|
+|chromosome sizes|GRCh38|[link](https://www.encodeproject.org/files/GRCh38_EBV.chrom.sizes/)|
 

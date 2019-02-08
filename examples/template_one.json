@@ -1,0 +1,10 @@
+{ 
+    "hic.fastq": [[[
+        "test/test_data/merged_read1.fastq.gz",
+        "test/test_data/merged_read2.fastq.gz"
+    ]]],
+    "hic.chrsz": "test/test_data/ce10_selected.chrom.sizes.tsv",
+    "hic.restriction_sites": "test/test_data/ce10_selected_MboI.txt",
+    "thic.reference_index": "test/test_data/ce10_selected.tar.gz",
+    "hic.ligation_site": "AGCTAGCT"
+}
