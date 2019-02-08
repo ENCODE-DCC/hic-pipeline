@@ -2,7 +2,7 @@
 
 Using a generic SLURM cluster should be quite similar to Stanford Sherlock, which is a SLURM machine of a specific kind). The main differences are that Singularity installation may be different, please check with your cluster provider for installation instructions. You also will need to edit `workflow_opts/slurm.json` to include your information and the directories that contain your input data.
 
-**Prerequisites**
+## Prerequisites
 
 * Singularity version has to be `>=2.5.2`
 
@@ -23,42 +23,9 @@ Using a generic SLURM cluster should be quite similar to Stanford Sherlock, whic
 
 * Ensure your input data is located on the cluster
 
-* Create an input JSON file specifying the paths to your input data and save it with a descriptive name, using a `.json` extension, to a memorable location, as you will need the path to this file to actually run the pipeline. The template for this file looks like this:
+* Create an input JSON file specifying the paths to your input data and save it with a descriptive name, using a `.json` extension, to a memorable location, as you will need the path to this file to actually run the pipeline. You can find detailed specifications for this input file in the [input documentation](./input.md).
 
-```
-{
-    "hic.fastq": [
-        [
-            [
-                "/my/file/path/A_read_1.fastq.gz",
-                "/my/file/path/A_read_2.fastq.gz"
-            ],
-            [
-                "/my/file/path/B_read_1.fastq.gz",
-                "/my/file/path/B_read_2.fastq.gz"
-            ]
-        ],
-        [
-            [
-                "/my/file/path/C_read_1.fastq.gz",
-                "/my/file/path/C_read_2.fastq.gz"
-            ],
-            [
-                "/my/file/path/D_read_1.fastq.gz",
-                "/my/file/path/D_read_2.fastq.gz"
-            ]
-        ]
-    ],
-    "hic.reference_index": "/my/file/path/assembly_reference_index.tar.gz",
-    "hic.ligation_site": "AACCTTGG",
-    "hic.restriction_sites": "/my/file/path/assembly_RestrictionEnzyme_restriction_sites.txt",
-    "hic.chrsz": "/my/file/path/assembly_chrom.sizes"
-}
-```
-
-Note that hic.fastq is a three dimensional array, where reads are grouped with their pair and the pairs are grouped by the library they belong to. Replace the sequence of hic.ligation site with the ligation site sequence of your experiment. You will also need to provide a gzipped tarball containing a BWA reference index, a restriction map for the enzyme used in the experiment, and a chrom.sizes file consisting of a tab-delimited list of (chromosome, size) pairs, e.g. (chr1, 123456)
-
-**Steps**
+## Steps
 
 1. Setup your partition, account and data:
 
