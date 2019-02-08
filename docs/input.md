@@ -50,9 +50,15 @@ Let us take a close look at the following template JSON. Comments are not allowe
 
 ## Reference genome
 
-We currently support 4 genomes. You can [download](../genome/download_genome_data.sh) following supported genomes from our repo. You can also [build a genome database for your own genome](build_genome_database.md).
+In order to run the HiC pipeline you will need to specify the bwa index file prepared using a referemnce genome sequence. We recommend using reference files from the ENCODE portal to enasure comparability of the analysis results.
 
-|genome|source|built from|
+|reference file description|assembly|ENCODE portal link|
 |-|-|-|
-|hg38|ENCODE|[GRCh38_no_alt_analysis_set_GCA_000001405](https://www.encodeproject.org/files/GRCh38_no_alt_analysis_set_GCA_000001405.15/@@download/GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta.gz)|
+|bwa index|hg19|[link](https://www.encodeproject.org/files/ENCFF807MUK/)|
+|genome fasta|hg19|[link](https://www.encodeproject.org/files/male.hg19/)|
+|chromosome sizes|hg19|[link](https://www.encodeproject.org/files/male.hg19.chrom.sizes/)|
+|bwa index|GRCh38|[link](https://www.encodeproject.org/files/ENCFF643CGH/)|
+|genome fasta|GRCh38|[link](https://www.encodeproject.org/files/GRCh38_no_alt_analysis_set_GCA_000001405.15/)|
+|chromosome sizes|GRCh38|[link](https://www.encodeproject.org/files/GRCh38_EBV.chrom.sizes/
+)|
 
