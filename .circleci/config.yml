@@ -68,12 +68,11 @@ workflows:
   build_workflow:
     jobs:
       - build:
-        filters:
-          branches:
-            only:
-              - master
-              - dev-1
-              - PIP-495-add-loops-tads-tests
+          filters:
+            branches:
+              only:
+                - master
+                - dev-1
       - test_task:
           name: test_align
           requires:
