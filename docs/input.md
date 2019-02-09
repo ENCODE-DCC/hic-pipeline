@@ -18,8 +18,9 @@ An input JSON file includes all input parameters and metadata for running pipeli
 
 We provide two template JSON files for both single ended and paired-end samples. We recommend to use one of these input JSON files instead of that used in the tutorial section. These template JSON files include all parameters of the pipeline with default values defined.
 
-* [template](../examples/template_one.json) for a single library sample
-
+* [template](../examples/template_one.json) for a single sequencing run from a single library
+* [template](../examples/template_two.json) for two sequencing runs from a single library
+* [template](../examples/template_three.json) for two libraries, each having a single sequencing run
 
 Let us take a close look at the following template JSON. Comments are not allowed in a JSON file but we added some comments to help you understand each parameter.
 ```javascript
