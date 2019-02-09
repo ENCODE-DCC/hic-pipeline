@@ -17,12 +17,12 @@ HiC uniform processing pipeline
 This pipeline supports many cloud platforms and cluster engines. It supports `docker` and `singularity` to resolve complicated software dependencies for the pipeline. A tutorial-based instruction for each platform will be helpful to understand how to run pipelines.
 
 * Cloud platform (CLI)
-  * [Google Cloud Platform](docs/tutorial_google.md)
+  * [Google Cloud Platform](docs/tutorial_google.md) soon to be added
 * Stanford HPC server (CLI)
-  * [Stanford Sherlock 2.0](docs/tutorial_sherlock.md)
+  * [Stanford Sherlock 2.0](docs/tutorial_sherlock.md)  soon to be added
 * Local Linux computers (CLI)
-  * [Local system with `singularity`](docs/tutorial_local_singularity.md)
-  * [Local system with `docker`](docs/tutorial_local_docker.md)
+  * [Local system with `singularity`](docs/tutorial_local_singularity.md)  soon to be added
+  * [Local system with `docker`](docs/tutorial_local_docker.md)  soon to be added
 * Cluster engines (CLI)
   * [SLURM](docs/tutorial_slurm_singularity.md)
 
