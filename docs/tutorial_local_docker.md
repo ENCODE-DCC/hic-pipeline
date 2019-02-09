@@ -1,17 +1,15 @@
 # Tutorial for general UNIX computers with docker
 
-1. Download [cromwell](https://github.com/broadinstitute/cromwell).
+1. Git clone this pipeline and move into it.
     ```bash
-    $ cd
-    $ wget https://github.com/broadinstitute/cromwell/releases/download/37/cromwell-37.jar
-    $ chmod +rx cromwell-37.jar
-    ```
-
-2. Git clone this pipeline and move into it.
-    ```bash
-    $ cd
     $ git clone https://github.com/ENCODE-DCC/hic-pipeline
     $ cd hic-pipeline
+    ```
+
+2. Download [cromwell](https://github.com/broadinstitute/cromwell).
+    ```bash
+    $ wget https://github.com/broadinstitute/cromwell/releases/download/37/cromwell-37.jar
+    $ chmod +rx cromwell-37.jar
     ```
     
 3. Run a pipeline for the test sample. TO MODIFY

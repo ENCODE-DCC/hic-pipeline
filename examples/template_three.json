@@ -5,6 +5,6 @@
     ],
     "hic.chrsz": "test/test_data/ce10_selected.chrom.sizes.tsv",
     "hic.restriction_sites": "test/test_data/ce10_selected_MboI.txt",
-    "thic.reference_index": "test/test_data/ce10_selected.tar.gz",
+    "hic.reference_index": "test/test_data/ce10_selected.tar.gz",
     "hic.ligation_site": "AGCTAGCT"
 }
