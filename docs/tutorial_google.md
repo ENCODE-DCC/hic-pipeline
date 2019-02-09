@@ -32,8 +32,8 @@ All testing data is included in the repository. You won't have to download any d
 8. Download [cromwell](https://github.com/broadinstitute/cromwell).
     ```bash
     $ cd
-    $ wget https://github.com/broadinstitute/cromwell/releases/download/35/cromwell-35.jar
-    $ chmod +rx cromwell-34.jar
+    $ wget https://github.com/broadinstitute/cromwell/releases/download/37/cromwell-37.jar
+    $ chmod +rx cromwell-37.jar
     ```
 
 9. Git clone this pipeline and move into it.

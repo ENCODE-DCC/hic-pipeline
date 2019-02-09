@@ -1,0 +1,26 @@
+# Tutorial for general UNIX computers with docker
+
+1. Download [cromwell](https://github.com/broadinstitute/cromwell).
+    ```bash
+    $ cd
+    $ wget https://github.com/broadinstitute/cromwell/releases/download/37/cromwell-37.jar
+    $ chmod +rx cromwell-37.jar
+    ```
+
+2. Git clone this pipeline and move into it.
+    ```bash
+    $ cd
+    $ git clone https://github.com/ENCODE-DCC/hic-pipeline
+    $ cd hic-pipeline
+    ```
+    
+3. Run a pipeline for the test sample. TO MODIFY
+    ```bash
+    $ INPUT=>>>> path to input jsonjson
+    $ PIPELINE_METADATA=metadata.json
+    $ java -jar -Dconfig.file=backends/backend.conf cromwell-37.jar run atac.wdl -i ${INPUT} -o workflow_opts/docker.json -m ${PIPELINE_METADATA}
+    ```
+
+4. It will take about an hour. You will be able to find all outputs on `cromwell-executions/atac/[RANDOM_HASH_STRING]/`. See [output directory structure](output.md) for details.
+
+5. See full specification for [input JSON file](input.md).
