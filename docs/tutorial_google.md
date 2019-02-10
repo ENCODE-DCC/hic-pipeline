@@ -29,18 +29,28 @@ All testing data is included in the repository. You won't have to download any d
     $ gcloud config set project [YOUR_PROJECT_NAME]
     ```
 
-8. Download [cromwell](https://github.com/broadinstitute/cromwell).
+8. Git clone this pipeline and move into it.
     ```bash
-    $ cd
-    $ wget https://github.com/broadinstitute/cromwell/releases/download/37/cromwell-37.jar
-    $ chmod +rx cromwell-37.jar
-    ```
-
-9. Git clone this pipeline and move into it.
-    ```bash
-    $ cd
     $ git clone https://github.com/ENCODE-DCC/hic-pipeline
     $ cd hic-pipeline
     ```
 
-10. Running pipeline section will be added soon
+9. Download [cromwell](https://github.com/broadinstitute/cromwell). The pipeline has been tested with cromwell version 37.
+    ```bash
+    $ wget https://github.com/broadinstitute/cromwell/releases/download/37/cromwell-37.jar
+    $ chmod +rx cromwell-37.jar
+    ```
+
+10. Run a pipeline using test dataset.
+    ```bash
+    $ PROJECT=[YOUR_PROJECT_NAME]
+    $ BUCKET=gs://hic-pipeline-test-execution-bucket
+    $ INPUT=examples/template_one.json 
+    $ PIPELINE_METADATA=metadata.json
+
+    $ java -jar -Dconfig.file=backends/backend.conf -Dbackend.default=google -Dbackend.providers.google.config.project=${PROJECT} -Dbackend.providers.google.config.root=${BUCKET} cromwell-37.jar run workflow/main_workflow/hic.wdl -i ${INPUT} -o workflow_opts/docker.json -m ${PIPELINE_METADATA}
+    ```
+
+11. It will take about an hour. You will be able to find all outputs on your Google Cloud bucket. Final QC report/JSON will be written on `gs://[YOUR_BUCKET_NAME]/ENCSR356KRQ_subsampled/atac/[SOME_HASH_STRING]/call-qc_report/execution/glob*/qc.html` or `qc.json`. See [output directory structure](output.md) for details.
+
+12. See full specification for [input JSON file](input.md).

@@ -6,13 +6,13 @@
     $ cd hic-pipeline
     ```
 
-2. Download [cromwell](https://github.com/broadinstitute/cromwell).
+2. Download [cromwell](https://github.com/broadinstitute/cromwell). The pipeline has been tested with cromwell version 37.
     ```bash
     $ wget https://github.com/broadinstitute/cromwell/releases/download/37/cromwell-37.jar
     $ chmod +rx cromwell-37.jar
     ```
     
-3. Run a pipeline for the test sample. TO MODIFY
+3. Run a pipeline for the test sample.
     ```bash
     $ INPUT=examples/template_one.json 
     $ PIPELINE_METADATA=metadata.json
