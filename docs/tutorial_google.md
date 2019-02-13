@@ -24,24 +24,24 @@ All testing data is included in the repository. You won't have to download any d
       unset GOOGLE_APPLICATION_CREDENTIALS
     ```
 
-7. Set your default Google Cloud Project. Pipeline will provision instances on this project.
+9. Set your default Google Cloud Project. Pipeline will provision instances on this project.
     ```bash
     $ gcloud config set project [YOUR_PROJECT_NAME]
     ```
 
-8. Git clone this pipeline and move into it.
+10. Git clone this pipeline and move into it.
     ```bash
     $ git clone https://github.com/ENCODE-DCC/hic-pipeline
     $ cd hic-pipeline
     ```
 
-9. Download [cromwell](https://github.com/broadinstitute/cromwell). The pipeline has been tested with cromwell version 37.
+11. Download [cromwell](https://github.com/broadinstitute/cromwell). The pipeline has been tested with cromwell version 37.
     ```bash
     $ wget https://github.com/broadinstitute/cromwell/releases/download/37/cromwell-37.jar
     $ chmod +rx cromwell-37.jar
     ```
 
-10. Run a pipeline using test dataset.
+12. Run a pipeline using test dataset.
     ```bash
     $ PROJECT=[YOUR_PROJECT_NAME]
     $ BUCKET=gs://hic-pipeline-test-execution-bucket
@@ -51,6 +51,6 @@ All testing data is included in the repository. You won't have to download any d
     $ java -jar -Dconfig.file=backends/backend.conf -Dbackend.default=google -Dbackend.providers.google.config.project=${PROJECT} -Dbackend.providers.google.config.root=${BUCKET} cromwell-37.jar run workflow/main_workflow/hic.wdl -i ${INPUT} -o workflow_opts/docker.json -m ${PIPELINE_METADATA}
     ```
 
-11. You will be able to find all outputs on your Google Cloud bucket. `gs://[YOUR_BUCKET_NAME] cromwell-executions/hic/[RANDOM_HASH_STRING]/`. See [output directory structure](output.md) for details.
+13. You will be able to find all outputs on your Google Cloud bucket. `gs://[YOUR_BUCKET_NAME] cromwell-executions/hic/[RANDOM_HASH_STRING]/`. See [output directory structure](output.md) for details.
 
-12. See full specification for [input JSON file](input.md).
+14. See full specification for [input JSON file](input.md).
