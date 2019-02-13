@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y \
     make \
     unzip \
     bzip2 \
-    libbz2-dev \	
+    libbz2-dev \
 && rm -rf /var/lib/apt/lists/*
 
 # GAWK has the 'and' function, needed for chimeric_blacklist
@@ -52,6 +52,9 @@ RUN cd juicer && chmod +x CPU/* CPU/common/*
 ADD http://hicfiles.tc4ga.com.s3.amazonaws.com/public/juicer/juicer_tools.1.9.9_jcuda.0.8.jar /opt/juicer/CPU/common
 RUN ln -s /opt/juicer/CPU/common/juicer_tools.1.9.9_jcuda.0.8.jar /opt/juicer/CPU/common/juicer_tools.jar
 RUN ln -s juicer/CPU scripts
+
+# Install Straw for removal of hic header in create_hic test
+RUN git clone --branch master https://github.com/aidenlab/straw.git
 
 # Install pairix
 ADD https://github.com/4dn-dcic/pairix/archive/0.3.6.zip .
