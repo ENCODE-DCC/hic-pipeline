@@ -45,12 +45,14 @@ All testing data is included in the repository. You won't have to download any d
     ```bash
     $ PROJECT=[YOUR_PROJECT_NAME]
     $ BUCKET=gs://hic-pipeline-test-execution-bucket
-    $ INPUT=examples/template_one.json 
+    $ INPUT=examples/google_template.json 
     $ PIPELINE_METADATA=metadata.json
 
     $ java -jar -Dconfig.file=backends/backend.conf -Dbackend.default=google -Dbackend.providers.google.config.project=${PROJECT} -Dbackend.providers.google.config.root=${BUCKET} cromwell-37.jar run workflow/main_workflow/hic.wdl -i ${INPUT} -o workflow_opts/docker.json -m ${PIPELINE_METADATA}
     ```
 
-11. It will take about an hour. You will be able to find all outputs on your Google Cloud bucket. Final QC report/JSON will be written on `gs://[YOUR_BUCKET_NAME]/ENCSR356KRQ_subsampled/atac/[SOME_HASH_STRING]/call-qc_report/execution/glob*/qc.html` or `qc.json`. See [output directory structure](output.md) for details.
+11. You will be able to find all outputs on your Google Cloud bucket. `gs://[YOUR_BUCKET_NAME] cromwell-executions/hic/[RANDOM_HASH_STRING]/`. See [output directory structure](output.md) for details.
+11. It will take about an hour. You will be able to find all outputs on your Google Cloud bucket. Final QC report/JSON will be written on `gs://[YOUR_BUCKET_NAME]/hic/[SOME_HASH_STRING]`. See [output directory structure](output.md) for details.
+Due to the minimal size of the input files, the last two steps of the pipeline (HiCCUPs and Arrowhead) will fail to detect any loops or domains. 
 
 12. See full specification for [input JSON file](input.md).
