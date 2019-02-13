@@ -52,7 +52,5 @@ All testing data is included in the repository. You won't have to download any d
     ```
 
 11. You will be able to find all outputs on your Google Cloud bucket. `gs://[YOUR_BUCKET_NAME] cromwell-executions/hic/[RANDOM_HASH_STRING]/`. See [output directory structure](output.md) for details.
-11. It will take about an hour. You will be able to find all outputs on your Google Cloud bucket. Final QC report/JSON will be written on `gs://[YOUR_BUCKET_NAME]/hic/[SOME_HASH_STRING]`. See [output directory structure](output.md) for details.
-Due to the minimal size of the input files, the last two steps of the pipeline (HiCCUPs and Arrowhead) will fail to detect any loops or domains. 
 
 12. See full specification for [input JSON file](input.md).
