@@ -56,4 +56,3 @@ All testing data is included in the repository. You won't have to download any d
 Due to the minimal size of the input files, the last two steps of the pipeline (HiCCUPs and Arrowhead) will fail to detect any loops or domains. 
 
 12. See full specification for [input JSON file](input.md).
-
