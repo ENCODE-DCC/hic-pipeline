@@ -124,6 +124,7 @@ task fragment {
         # qc for alignment portion
         cat ${norm_res_input} *.res.txt | awk -f /opt/scripts/common/stats_sub.awk >> alignment_stats.txt
         paste -d "" ${norm_res_input} *.res.txt > result.res.txt
+        python3 $(which jsonify_stats.py) --alignment-stats alignment_stats.txt
 
         # convert sams to bams and delete the sams
         echo "Converting sam to bam"
@@ -158,6 +159,7 @@ task fragment {
         File sort_file = glob("sort.txt")[0]
         File norm_res = glob("result.res.txt")[0]
         File stats_sub_result = glob("alignment_stats.txt")[0]
+        File stats_sub_result_json = glob("alignment_stats.json")[0]
     }
 
     runtime {
@@ -216,12 +218,16 @@ task dedup {
         opt=$(wc -l optdups.txt | awk '{print $1}')
         java -jar /opt/scripts/common/juicer_tools.jar LibraryComplexity $unique $pcr $opt > library_complexity.txt
         /opt/scripts/common/statistics.pl -s ${restriction_sites} -l ${ligation_site} merged_nodups.txt
+        python3 $(which jsonify_stats.py) --library-complexity library_complexity.txt
+        python3 $(which jsonify_stats.py) --library-stats stats.txt
     >>>
 
     output {
         File out_file = glob('merged_nodups.txt')[0]
         File library_complexity = glob('library_complexity.txt')[0]
+        File library_complexity_json = glob('library_complexity.json')[0]
         File stats = glob('stats.txt')[0]
+        File stats_json = glob('stats.json')[0]
         File stats_hists = glob('stats_hists.m')[0]
     }
 

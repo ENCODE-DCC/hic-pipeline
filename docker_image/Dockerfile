@@ -68,6 +68,16 @@ RUN rm pairix-0.3.6.zip && rm samtools-1.6.tar && rm v0.7.17.zip
 ENV LC_ALL C
 ENV PATH=/opt:/opt/scripts:/opt/scripts/common:$PATH
 
+# Largely copied from https://github.com/ENCODE-DCC/atac-seq-pipeline/blob/master/docker_image/Dockerfile
+# Get scripts from hic-pipeline repo
+# This COPY assumes the build context is the root of the hic-pipeline repo
+# and it gets whatever is checked out plus local modifications
+# so the buildling command should:
+# cd [GIT_REPO_DIR] && docker build -f docker_image/Dockerfile .
+RUN mkdir -p hic-pipeline/src
+COPY src hic-pipeline/src/
+ENV PATH="/opt/hic-pipeline/src:${PATH}"
+
 #CMD ["-h"]
 
 
