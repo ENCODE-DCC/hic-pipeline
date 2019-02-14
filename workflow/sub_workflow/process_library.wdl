@@ -124,7 +124,7 @@ task fragment {
         # qc for alignment portion
         cat ${norm_res_input} *.res.txt | awk -f /opt/scripts/common/stats_sub.awk >> alignment_stats.txt
         paste -d "" ${norm_res_input} *.res.txt > result.res.txt
-        python3 $(which jsonify_stats.py) --alignment-stats alignment_stats.txt
+        python3 /opt/hic-pipeline/src/jsonify_stats.py --alignment-stats alignment_stats.txt
 
         # convert sams to bams and delete the sams
         echo "Converting sam to bam"
@@ -218,8 +218,8 @@ task dedup {
         opt=$(wc -l optdups.txt | awk '{print $1}')
         java -jar /opt/scripts/common/juicer_tools.jar LibraryComplexity $unique $pcr $opt > library_complexity.txt
         /opt/scripts/common/statistics.pl -s ${restriction_sites} -l ${ligation_site} merged_nodups.txt
-        python3 $(which jsonify_stats.py) --library-complexity library_complexity.txt
-        python3 $(which jsonify_stats.py) --library-stats stats.txt
+        python3 /opt/hic-pipeline/src/jsonify_stats.py --library-complexity library_complexity.txt
+        python3 /opt/hic-pipeline/src/jsonify_stats.py --library-stats stats.txt
     >>>
 
     output {

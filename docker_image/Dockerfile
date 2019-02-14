@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     bzip2 \
     libbz2-dev \
+    python3 \
 && rm -rf /var/lib/apt/lists/*
 
 # GAWK has the 'and' function, needed for chimeric_blacklist
