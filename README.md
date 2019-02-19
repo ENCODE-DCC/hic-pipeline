@@ -21,7 +21,7 @@ This pipeline supports many cloud platforms and cluster engines. It supports `do
 * Stanford HPC server (CLI)
   * [Stanford Sherlock 2.0](docs/tutorial_sherlock.md)  *soon to be added*
 * Local Linux computers (CLI)
-  * [Local system with `singularity`](docs/tutorial_local_singularity.md)  *soon to be added*
+  * [Local system with `singularity`](docs/tutorial_local_singularity.md)
   * [Local system with `docker`](docs/tutorial_local_docker.md)
 * Cluster engines (CLI)
   * [SLURM](docs/tutorial_slurm_singularity.md) *[partial documentation]*

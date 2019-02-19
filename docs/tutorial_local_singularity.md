@@ -1,32 +1,3 @@
-sudo apt-get update
-    sudo apt-get install \
-    python \
-    dh-autoreconf \
-    build-essential \
-    libarchive-dev \
-    squashfs-tools
-    wget https://github.com/singularityware/singularity/releases/download/2.6.0/singularity-2.6.0.tar.gz
-    tar xvf singularity-2.6.0.tar.gz
-    cd singularity-2.6.0
-    ./configure --prefix=/usr/local --sysconfdir=/etc
-    make
-    sudo make install
-    singularity --version
-
-
-Under workflow_opts/singularity.json
-{
-    "default_runtime_attributes" : {
-        "singularity_container" : "~/.singularity/hic-pipeline-template.simg"
-    }
-}
-
-java -jar  -Dconfig.file=backends/backend.conf -Dbackend.default=singularity cromwell-36.jar run workflow/main_workflow/hic.wdl -o workflow_opts/singularity.json -i examples/template_one.json -m sing-meta.json
-
-
-/////
-
-
 # Tutorial for general UNIX computers with singularity
 
 1. Git clone this pipeline and move into it.
