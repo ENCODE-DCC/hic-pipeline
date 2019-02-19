@@ -1,88 +1,67 @@
-##Encode DCC Hi-C pipeline tester
-##Author: Ana Cismaru(anacismaru@gmail.com)
-import "hic.wdl" as hic
-import "test/test_utils.wdl" as utils
+import "../../workflow/sub_workflow/process_library.wdl" as hic
 
-workflow test_hic{
-    #Used in pipeline
-    Array[Array[Array[File]]] fastq = [] #[lib_id][fastq_id][read_end_id]
-    
-    File restriction_sites
-    File chrsz
-    File reference_index
+workflow test_align {
+    File idx_tar 		# reference bwa index tar
+    Array[File] fastqs = []	# [read_end_id]
+    File chrsz          # chromosome sizes file
+    File restriction    # restriction enzyme sites in the reference genome
+    String ligation_site
 
-    #Reference items
-    Array[Array[File]] ref_collisions 
-    Array[Array[File]] ref_collisions_low
-    Array[Array[File]] ref_unmapped 
-    Array[Array[File]] ref_mapq0 
-    Array[Array[File]] ref_alignable 
-    Array[Array[File]] ref_sort_file 
+	call hic.align as test_align_task { input:
+		fastqs = fastqs,
+		chrsz = chrsz,
+		idx_tar = idx_tar,
+        ligation_site = ligation_site
+	}
     
-    Array[File]ref_merged_collisions
-    Array[File] ref_merged_collisions_low 
-    Array[File] ref_merged_unmapped
-    Array[File] ref_merged_mapq0 
-    Array[File] ref_merged_alignable
-    
-    #Merge sort refputs
-    Array[File] ref_merged_sort_file 
-    #Dedup refputs
-    Array[File] ref_dedup 
-    
-    #Merge pairs file refputs
-    File ref_merged_pairs
-    #Create hic refputs
-    File ref_hic
-    #TADs output
-    File ref_tads
-    #HiCCUps output
-    File ref_hiccups
+    call hic.fragment as test_fragment { input:
+        restriction = restriction,
+        bam_file = test_align_task.result,
+        norm_res_input = test_align_task.norm_res
+    }
 
-    #QC refputs
-    #File ref_align_qc
-    
-    call hic.hic as test{ input:
-        fastq = fastq
+    Array[File] bams = [
+        test_fragment.collisions,
+        test_fragment.collisions_low_mapq,
+        test_fragment.unmapped,
+        test_fragment.mapq0,
+        test_fragment.alignable
+    ]
+
+    Int bams_len = length(bams)
+    scatter(i in range(bams_len)){
+        call strip_headers { input:
+            bam = bams[i]
+        }
+    }
+
+    output {
+        File collisions = strip_headers.no_header[0]
+        File collisions_low_mapq = strip_headers.no_header[1]
+        File unmapped = strip_headers.no_header[2]
+        File mapq0 = strip_headers.no_header[3]
+        File alignable = strip_headers.no_header[4]
+        
+        File sort_file = test_fragment.sort_file
+        File norm_res = test_fragment.norm_res
+        File stats_sub_result = test_fragment.stats_sub_result
+    }
+}
+
+task strip_headers{
+    File bam
+
+    #it messes up with compare_md5.py since all the files with stripped header are having the same name
+    command {
+        FILE=$(basename "${bam}" ".bam")
+        samtools view -h ${bam} | samtools view - > $FILE.no_header.sam
     }
     
-    #Align task outputs
-    Array[Array[File]] collisions = test.out_collisions
-    Array[Array[File]] collisions_low = test.out_collisions_low
-    Array[Array[File]] unmapped = test.out_unmapped
-    Array[Array[File]] mapq0 = test.out_mapq0
-    Array[Array[File]] alignable = test.out_alignable
-    Array[Array[File]] sort_file = test.out_sort_file
-    
-    #Merge task outputs
-    Array[File] merged_collisions = test.out_merged_collisions
-    Array[File] merged_collisions_low = test.out_merged_collisions_low
-    Array[File] merged_unmapped = test.out_merged_unmapped
-    Array[File] merged_mapq0 = test.out_merged_mapq0
-    Array[File] merged_align = test.out_merged_align
-    
-    #Merge sort outputs
-    Array[File] merge_sort = test.out_merge_sort
-    #Dedup outputs
-    Array[File] dedup = test.out_dedup
-    
-    #TODO FIGURE OUT HOW TO COMPARE THESE
-    #Merge pairs file outputs
-    #File merged_pairs = test.out_merged_pairs
-    #Create hic outputs
-    #File hic = test.out_hic
-    #TADs output
-    #File tads = test.out_tads
-    #HiCCUps output
-    #File hiccups = test.out_hiccups
+    output{
+        File no_header = glob("*.no_header.sam")[0]
+    }
 
-    #QC outputs
-    #Array[File] align_qc = test.out_align_qc
-
-    #TODO: CHECK EVERYTHING DONE IN TEST TASKS
-    # call utils.compare_md5sum as one_dimension { input:
-    #     labels = ["HiC Files"]   #Array[String]
-    #     files = flatten([merged_collisions,merged_collisions_low,merged_unmapped,merged_mapq0,merged_align,merge_sort,dedup])         #Array[File]
-    #     ref_files = flatten([ref_merged_collisions,ref_merged_collisions_low,ref_merged_unmapped,ref_merged_mapq0,ref_merged_align,ref_merge_sort,ref_dedup])    #Array[File]
-    # }
+    runtime {
+        docker : "quay.io/encode-dcc/hic-pipeline:template"
+	}
 }
