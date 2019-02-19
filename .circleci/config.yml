@@ -14,9 +14,9 @@ make_tag: &make_tag
     echo "export TAG=quay.io/encode-dcc/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}" > ${BASH_ENV}
 
 get_cromwell: &get_cromwell
-  name: get the cromwell 35
+  name: get the cromwell 36
   command: |
-    wget -N -c https://github.com/broadinstitute/cromwell/releases/download/35/cromwell-35.jar
+    wget -N -c https://github.com/broadinstitute/cromwell/releases/download/36/cromwell-36.jar
 
 version: 2.1
 jobs:
@@ -48,6 +48,31 @@ jobs:
             python3 src/compare_md5.py --keys_to_inspect << parameters.keys_to_inspect >> --metadata_json test_<< parameters.test_name >>.metadata.json --reference_json test/test_<< parameters.test_type >>/ref_output/test_<< parameters.test_name >>_output_md5.json --outfile result.json
             cat result.json
             python3 -c "import sys; import json; data=json.loads(sys.stdin.read()); sys.exit(int(not data['match_overall']))" < result.json
+  test_workflow:
+      <<: *machine_defaults
+      description: Generic testing protocol for wdl workflow
+      parameters:
+        workflow_name:
+          description: "The name of the workflow being tested, like hic, etc."
+          type: enum
+          enum: ["hic"]
+        keys_to_inspect:
+          description: "The key(s) of the output(s) in metadata.json for which md5sum is to be computed, space delimited"
+          type: string  
+      steps:
+        - checkout
+        - run: *make_tag
+        - run: *get_cromwell
+        - run:
+            command: |
+              pyenv global 3.5.2
+              source ${BASH_ENV}
+              test/test_task/test.sh test/test_workflow/test_<< parameters.workflow_name >>.wdl test/test_workflow/test_<< parameters.workflow_name >>.json $TAG docker
+              python3 src/compare_md5.py --keys_to_inspect << parameters.keys_to_inspect >> --metadata_json test_<< parameters.workflow_name >>.metadata.json --reference_json test/test_workflow/ref_output/test_<< parameters.workflow_name >>_output_md5.json --outfile result.json
+              cat result.json
+              python3 -c "import sys; import json; data=json.loads(sys.stdin.read()); sys.exit(int(not data['match_overall']))" < result.json
+
+
 
   build:
     <<: *defaults
@@ -121,3 +146,9 @@ workflows:
             - build
           test_name: "create_hic"
           keys_to_inspect: "test_create_hic.no_header"
+      - test_workflow:
+          name: hic
+          requires:
+            - build
+          workflow_name: "hic"
+          keys_to_inspect: "test_hic.blah"
