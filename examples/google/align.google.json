@@ -1,8 +1,0 @@
-{
-    "hic.fastq": [[[
-        "gs://encode-pipeline-test-samples/encode-hic-pipeline/subsampled_fastqs/HIC003_S2_L001_R1_001.fastq.gz",
-        "gs://encode-pipeline-test-samples/encode-hic-pipeline/subsampled_fastqs/HIC003_S2_L001_R2_001.fastq.gz"]]],
-    "hic.chrsz": "gs://encode-pipeline-test-samples/encode-hic-pipeline/reference_grch38_chr10_chrM/hg38_chr19_chrM.chrom.sizes",
-    "hic.restriction_sites": "gs://encode-pipeline-test-samples/encode-hic-pipeline/reference_grch38_chr10_chrM/GRCh38_no_alt_analysis_set_GCA_000001405.15.chr19_chrM_MboI.txt",
-    "hic.reference_index": "gs://encode-pipeline-test-samples/encode-hic-pipeline/genome_reference_index/index.tar.gz"
-}
