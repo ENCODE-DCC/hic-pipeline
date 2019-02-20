@@ -106,7 +106,6 @@ task merge_pairs_file{
     }
 
     runtime {
-        docker : "quay.io/encode-dcc/hic-pipeline:template"
         cpu : "8"
         disks: "local-disk 1000 HDD"
     }
@@ -128,7 +127,6 @@ task create_hic {
     }
 
     runtime {
-        docker : "quay.io/encode-dcc/hic-pipeline:template"
         cpu : "1"
         disks: "local-disk 1000 HDD"
         memory : "64 GB"

@@ -73,7 +73,6 @@ workflows:
               only:
                 - master
                 - dev-1
-                - PIP-510-add-create-hic-test
       - test_task:
           name: test_align
           requires:
