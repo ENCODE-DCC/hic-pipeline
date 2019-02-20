@@ -1,10 +1,7 @@
 {
-    "alignable.no_header.sam" : "565766fa63d2eb402b14db117d63e105",
-    "collisions.no_header.sam" : "cb22daea9a4dba2cda0c6e875db51174",
-    "collisions_low_mapq.no_header.sam" : "63f7d3fa0b818e7d74accc10ef37ddae",
-    "unmapped.no_header.sam" : "e24ff1e0d5e6471fec6976d0aeaa1061",
-    "mapq0.no_header.sam" : "a9df472b6579d7762600408efe023d77",
-    "sort.txt" : "f2df3edfbd1d165c3639bae687e20b25",
-    "result.res.txt" : "672be91363a851385a8a0a6f9292688d",
-    "alignment_stats.txt" : "88d7181a19b758a5a6b828a8a4e20082"
+    "alignable.bam" : "a9df472b6579d7762600408efe023d77",
+    "merge_nodupes.txt" : "f2df3edfbd1d165c3639bae687e20b25",
+    "pairix.bsorted.pairs" : "672be91363a851385a8a0a6f9292688d",
+    "inter_30.hic" : "88d7181a19b758a5a6b828a8a4e20082"
 }
+

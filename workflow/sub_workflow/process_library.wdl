@@ -47,17 +47,16 @@ workflow process_library {
         sort_files_ = fragment.sort_file
     } 
 
-    # call align_qc { input:
-    #     norm_res = align.norm_res
-    # }   
-
     # we can collect the alignable.bam using the array merge.out_file
     call dedup { input:
         merged_sort = merge_sort.out_file,
         ligation_site = ligation_site,
         restriction_sites = restriction_sites
     }
+    
     output {
+        File alignable_bam = merge.merged_output[4]
+        File pairs_file = bam2pairs.out_file
         File library_dedup = dedup.out_file
         File library_stats = dedup.stats
         File library_stats_hists = dedup.stats_hists
