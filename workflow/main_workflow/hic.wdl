@@ -53,9 +53,9 @@ workflow hic {
         hic_file = if defined(input_hic) then input_hic else create_hic.inter_30
     }
 
-    call hiccups{ input:
-        hic_file = if defined(input_hic) then input_hic else create_hic.inter_30
-    }
+    #call hiccups{ input:
+    #    hic_file = if defined(input_hic) then input_hic else create_hic.inter_30
+    #}
 
     output{
         # Sub-workflow processing a library outputs
@@ -69,7 +69,7 @@ workflow hic {
         # TADs output
         File out_tads = arrowhead.out_file
         # HiCCUps output
-        File out_hiccups = hiccups.out_file
+        #File out_hiccups = hiccups.out_file
 
         #QC outputs
         #Array[File] out_align_qc = hic_sub.out_align_qc

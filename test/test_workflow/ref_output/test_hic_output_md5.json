@@ -1,7 +1,7 @@
 {
-    "alignable.bam" : "a9df472b6579d7762600408efe023d77",
-    "merge_nodupes.txt" : "f2df3edfbd1d165c3639bae687e20b25",
-    "pairix.bsorted.pairs" : "672be91363a851385a8a0a6f9292688d",
-    "inter_30.hic" : "88d7181a19b758a5a6b828a8a4e20082"
+    "merged_bam_files.no_header.sam" : "565766fa63d2eb402b14db117d63e105",
+    "merge_nodupes.txt" : "d16174d16848c3efa477d3d54ab6a117",
+    "pairix.bsorted.pairs" : "02633653e4fca2eab4f5d398b5ff57eb",
+    "no_header.hic" : "7a331fdc77e7c46bd5fd2303e34b95c2"
 }
 
