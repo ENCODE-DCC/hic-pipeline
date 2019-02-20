@@ -78,7 +78,6 @@ workflows:
               only:
                 - master
                 - dev-1
-                - PIP-533-generalize-config
       - test:
           name: test_align
           requires:
