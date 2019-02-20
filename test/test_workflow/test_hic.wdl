@@ -64,11 +64,11 @@ workflow test_hic {
         File no_header_hic = strip_header.no_header
 
         #QC outputs
-        #Array[File] out_align_qc = hic_sub.out_align_qc
+        File library_complexity = process_library.library_stats[0]
+        File stats = process_library.stats[0]
+        File alignments_stats = process_library.alignments_stats[0][0]
     }
-
 }
-
 
 task merge_pairs_file{
     Array[File] not_merged_pe
