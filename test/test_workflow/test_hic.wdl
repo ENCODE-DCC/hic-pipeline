@@ -48,7 +48,6 @@ workflow test_hic {
         not_merged_pe = if length(input_dedup_pairs)>0 then input_dedup_pairs else process_library.library_dedup
     }
 
-
     call create_hic { input:
         pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
         chrsz_ = chrsz
@@ -59,7 +58,6 @@ workflow test_hic {
     }
 
     output{
-
         File no_header_alignable_sam = strip_headers.no_header
         File out_pairs = tail_of_pairs.no_header
         File out_dedup = process_library.library_dedup[0]
