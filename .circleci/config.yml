@@ -20,17 +20,22 @@ get_cromwell: &get_cromwell
 
 version: 2.1
 jobs:
-  test_task:
+  test:
     <<: *machine_defaults
     description: Generic testing protocol for wdl tasks
     parameters:
-      task_name:
-        description: "The name of the task being tested, like align, merge, etc."
+      test_name:
+        description: "The name of the test being performed, like hic, align, merge, etc."
         type: enum
-        enum: ["align", "arrowhead", "bam2pairs", "create_hic", "dedup", "hiccups", "merge", "merge_sort"]
+        enum: ["align", "arrowhead", "bam2pairs", "create_hic", "dedup", "hiccups", "merge", "merge_sort", "hic"]
+      test_type:
+        default: "task"
+        description: "Describes if the test is for a task or for a workflow"
+        type: enum
+        enum: ["task", "workflow"]
       keys_to_inspect:
         description: "The key(s) of the output(s) in metadata.json for which md5sum is to be computed, space delimited"
-        type: string  
+        type: string
     steps:
       - checkout
       - run: *make_tag
@@ -39,8 +44,8 @@ jobs:
           command: |
             pyenv global 3.5.2
             source ${BASH_ENV}
-            test/test_task/test.sh test/test_task/test_<< parameters.task_name >>.wdl test/test_task/test_<< parameters.task_name >>.json $TAG docker
-            python3 src/compare_md5.py --keys_to_inspect << parameters.keys_to_inspect >> --metadata_json test_<< parameters.task_name >>.metadata.json --reference_json test/test_task/ref_output/test_<< parameters.task_name >>_output_md5.json --outfile result.json
+            test/test_task/test.sh test/<< parameters.test_type >>/test_<< parameters.test_name >>.wdl test/<< parameters.test_type >>/test_<< parameters.test_name >>.json $TAG docker
+            python3 src/compare_md5.py --keys_to_inspect << parameters.keys_to_inspect >> --metadata_json test_<< parameters.test_name >>.metadata.json --reference_json test/<< parameters.test_type >>/ref_output/test_<< parameters.test_name >>_output_md5.json --outfile result.json
             cat result.json
             python3 -c "import sys; import json; data=json.loads(sys.stdin.read()); sys.exit(int(not data['match_overall']))" < result.json
 
@@ -73,45 +78,46 @@ workflows:
               only:
                 - master
                 - dev-1
-      - test_task:
+                - PIP-533-generalize-config
+      - test:
           name: test_align
           requires:
             - build
-          task_name: "align"
+          test_name: "align"
           keys_to_inspect: "test_align.collisions test_align.collisions_low_mapq test_align.unmapped test_align.mapq0 test_align.alignable test_align.sort_file test_align.norm_res test_align.stats_sub_result"
-      - test_task:
+      - test:
           name: test_bam2pairs
           requires:
             - build
-          task_name: "bam2pairs"
+          test_name: "bam2pairs"
           keys_to_inspect: "test_bam2pairs.pairs_no_header"
-      - test_task:
+      - test:
           name: test_merge_sort
           requires:
             - build
-          task_name: "merge_sort"
+          test_name: "merge_sort"
           keys_to_inspect: "test_merge_sort.merged"
-      - test_task:
+      - test:
           name: test_dedup
           requires:
             - build
-          task_name: "dedup"
+          test_name: "dedup"
           keys_to_inspect: "test_dedup.deduped"
-      - test_task:
+      - test:
           name: test_merge
           requires:
             - build
-          task_name: "merge"
+          test_name: "merge"
           keys_to_inspect: "test_merge.merged_no_header"
-      - test_task:
+      - test:
           name: arrowhead
           requires:
             - build
-          task_name: "arrowhead"
+          test_name: "arrowhead"
           keys_to_inspect: "test_arrowhead.arrowhead_out"
-      - test_task:
+      - test:
           name: create_hic
           requires:
             - build
-          task_name: "create_hic"
+          test_name: "create_hic"
           keys_to_inspect: "test_create_hic.no_header"
