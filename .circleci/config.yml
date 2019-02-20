@@ -151,4 +151,4 @@ workflows:
           requires:
             - build
           workflow_name: "hic"
-          keys_to_inspect: "test_hic.blah"
+          keys_to_inspect: "test_hic.no_header_alignable_sam test_hic.out_pairs test_hic.out_dedup test_hic.no_header_hic"
