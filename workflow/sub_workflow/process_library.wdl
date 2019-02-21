@@ -59,6 +59,8 @@ workflow process_library {
     }
     output {
         File library_dedup = dedup.out_file
+        File library_stats = dedup.stats
+        File library_stats_hists = dedup.stats_hists
     }
 }
 
