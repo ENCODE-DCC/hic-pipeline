@@ -1,0 +1,9 @@
+Intra-fragment Reads: 6,969(57.59%)
+Hi-C Contacts: 5,132(42.41%)
+ Ligation Motif Present: 3 (0.02%)
+ 3' Bias (Long Range): 65% - 35%
+ Pair Type %(L-I-O-R): 25% - 23% - 27% - 25%
+Inter-chromosomal: 6 (0.05%)
+Intra-chromosomal: 5,126 (42.36%)
+Short Range (<20Kb): 4,537 (37.49%)
+Long Range (>20Kb): 589 (4.87%)

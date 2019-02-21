@@ -43,6 +43,8 @@ workflow hic {
 
     call create_hic { input:
         pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
+        stats = process_library.library_stats,
+        stats_hists = process_library.library_stats_hists,
         #pairs_file = if defined(input_pairs) then input_pairs else dedup.out_file,
         chrsz_ = chrsz
     }
@@ -114,16 +116,16 @@ task merge_pairs_file{
 
 task create_hic {
     File pairs_file
+    File stats
+    File stats_hists
     File chrsz_
 
     command {
-        /opt/scripts/common/juicer_tools pre -s inter_30.txt -g inter_30_hists.m -q 30 ${pairs_file} inter_30.hic ${chrsz_}
+        /opt/scripts/common/juicer_tools pre -s ${stats} -g ${stats_hists} -q 30 ${pairs_file} inter_30.hic ${chrsz_}
     }
 
     output {
-        #/opt/scripts/common/juicer_tools pre -s inter.txt -g inter_hists.m -q 1 ${pairs_file} inter.hic ${chrsz_}
-        # File inter_hic = glob('inter.hic')[0]
-        File inter_30= glob('inter_30.hic')[0]
+        File inter_30 = glob('inter_30.hic')[0]
     }
 
     runtime {
