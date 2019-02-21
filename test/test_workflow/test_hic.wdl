@@ -1,4 +1,5 @@
 ##Encode DCC Hi-C pipeline
+import "../../workflow/main_workflow/hic.wdl" as hic
 import "../../workflow/sub_workflow/process_library.wdl" as sub
 
 workflow test_hic {
@@ -44,11 +45,11 @@ workflow test_hic {
         bam = process_library.alignable_bam[0]
     }
 
-    call merge_pairs_file { input:
+    call hic.merge_pairs_file as merge_pairs_file { input:
         not_merged_pe = if length(input_dedup_pairs)>0 then input_dedup_pairs else process_library.library_dedup
     }
 
-    call create_hic { input:
+    call hic.create_hic as create_hic { input:
         pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
         chrsz_ = chrsz
     }
@@ -68,34 +69,6 @@ workflow test_hic {
         File stats = process_library.stats[0]
         File alignments_stats = process_library.alignments_stats[0][0]
     }
-}
-
-task merge_pairs_file{
-    Array[File] not_merged_pe
-
-    command {
-        sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 10% ${sep=' ' not_merged_pe}  > merged_pairs.txt
-    }
-    
-    output {
-        File out_file = glob('merged_pairs.txt')[0]
-    }
-}
-
-
-task create_hic {
-    File pairs_file
-    File chrsz_
-
-    command {
-        /opt/scripts/common/juicer_tools pre -s inter_30.txt -g inter_30_hists.m -q 30 ${pairs_file} inter_30.hic ${chrsz_}
-    }
-
-    output {
-        File inter_30= glob('inter_30.hic')[0]
-    }
-
-   
 }
 
 task tail_of_pairs{
