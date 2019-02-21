@@ -27,7 +27,8 @@ task strip_header {
         hic_file=${hic_file}
         matrix_start=$(python3 /opt/straw/python/get_matrix_start.py $hic_file)
         matrix_start=$((matrix_start + 1))
-        tail -c +$matrix_start $hic_file > no_header.hic
+        # tail -c +$matrix_start $hic_file > no_header.hic
+        tail -c 10000 $hic_file > no_header.hic
     }
     output {
         File no_header = glob("no_header.hic")[0]
