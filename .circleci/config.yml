@@ -78,7 +78,7 @@ workflows:
               only:
                 - master
                 - dev-1
-                - PIP-530-workflow-test
+                - PIP-535-inter-zero
       - test:
           name: test_align
           requires:
