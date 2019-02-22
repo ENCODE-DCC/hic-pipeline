@@ -127,4 +127,4 @@ workflows:
             - build
           test_name: "hic"
           test_type: "workflow"
-          keys_to_inspect: "test_hic.library_complexity test_hic.stats test_hic.alignments_stats test_hic.no_header_alignable_sam test_hic.out_pairs test_hic.out_dedup test_hic.no_header_hic"
+          keys_to_inspect: "test_hic.library_complexity test_hic.stats test_hic.alignments_stats test_hic.no_header_alignable_sam test_hic.out_pairs test_hic.out_dedup test_hic.no_header_hic_1 test_hic.no_header_hic_30"

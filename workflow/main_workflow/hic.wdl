@@ -44,8 +44,8 @@ workflow hic {
     scatter(i in range(length(qualities))) {
         call create_hic { input:
             pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
-            stats = process_library.library_stats[0],
-            stats_hists = process_library.library_stats_hists[0],
+            stats = process_library.stats[0],
+            stats_hists = process_library.stats_hists[0],
             chrsz_ = chrsz,
             quality = qualities[i]
         }
@@ -66,7 +66,8 @@ workflow hic {
         Array[File] out_dedup = process_library.library_dedup
 
         # Create hic outputs
-        File out_hic = create_hic.inter_30
+        File out_hic_1 = create_hic.inter[0]
+        File out_hic_30 = create_hic.inter[1]
         
         # TADs output
         File out_tads = arrowhead.out_file
