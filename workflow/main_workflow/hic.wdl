@@ -43,8 +43,8 @@ workflow hic {
 
     call create_hic { input:
         pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
-        stats = process_library.library_stats,
-        stats_hists = process_library.library_stats_hists,
+        stats = process_library.stats[0],
+        stats_hists = process_library.stats_hists[0],
         #pairs_file = if defined(input_pairs) then input_pairs else dedup.out_file,
         chrsz_ = chrsz
     }
@@ -58,34 +58,18 @@ workflow hic {
     }
 
     output{
-        # Align task outputs
-        # Array[Array[File]] out_collisions = hic_sub.out_collisions
-        # Array[Array[File]] out_collisions_low = hic_sub.out_collisions_low
-        # Array[Array[File]] out_unmapped = hic_sub.out_unmapped
-        # Array[Array[File]] out_mapq0 = hic_sub.out_mapq0
-        # Array[Array[File]] out_alignable = hic_sub.out_alignable
-        # Array[Array[File]] out_sort_file = hic_sub.out_sort_file
+        # Sub-workflow processing a library outputs
+        Array[File] out_merged_align = process_library.alignable_bam
+        Array[File] out_pairs = process_library.pairs_file
+        Array[File] out_dedup = process_library.library_dedup
+
+        # Create hic outputs
+        File out_hic = create_hic.inter_30
         
-        # # #Merge task outputs
-        # Array[File] out_merged_collisions = hic_sub.out_merged_collisions
-        # Array[File] out_merged_collisions_low = hic_sub.out_merged_collisions_low
-        # Array[File] out_merged_unmapped = hic_sub.out_merged_unmapped
-        # Array[File] out_merged_mapq0 = hic_sub.out_merged_mapq0
-        # Array[File] out_merged_align = hic_sub.out_merged_align
-        
-        # # #Merge sort outputs
-        # Array[File] out_merge_sort = hic_sub.out_merge_sort
-        # # #Dedup outputs
-        # Array[File] out_dedup = hic_sub.out_dedup
-        
-        # # #Merge pairs file outputs
-        # File out_merged_pairs = merge_pairs_file.out_file
-        # # #Create hic outputs
-        # File out_hic = create_hic.out_file
-        # #TADs output
-        # # File out_tads = tads.out_file
+        # TADs output
+        File out_tads = arrowhead.out_file
         # HiCCUps output
-        # File out_hiccups = hiccups.out_file
+        File out_hiccups = hiccups.out_file
 
         #QC outputs
         #Array[File] out_align_qc = hic_sub.out_align_qc

@@ -1,71 +1,10 @@
 { 
-    "test_hic.fastq": [
-        "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R1.fastq.gz",
-        "/Users/anacismaru/ENCODE/bucket/read_pairs/original_pair/read_R2.fastq.gz"], 
-        
-    "test_hic.chrsz": "/Users/anacismaru/ENCODE/bucket/encode-hic-pipeline-Freference_grch38_chr10_chrM-Fhg38_chr19_chrM.chrom.sizes",
-    "test_hic.restriction": "/Users/anacismaru/ENCODE/bucket/encode-hic-pipeline-Freference_grch38_chr10_chrM-FGRCh38_no_alt_analysis_set_GCA_000001405.15.chr19_chrM_MboI.txt",
-    "test_hic.idx_tar": "/Users/anacismaru/ENCODE/bucket/index.tar.gz",
-    
-    "test_hic.ref_collisions": [
-        [
-            "/Users/anacismaru/ENCODE/bucket/"
-        ]
-    ],
-    "test_hic.ref_collisions_low": [
-        [
-            "/Users/anacismaru/ENCODE/bucket/"
-        ]
-    ],
-    "test_hic.ref_unmapped": [
-        [
-            "/Users/anacismaru/ENCODE/bucket/"
-        ]
-    ],
-    "test_hic.ref_mapq0":[
-        [
-            "/Users/anacismaru/ENCODE/bucket/"
-        ]
-    ],
-    "test_hic.ref_alignable":[
-        [
-            "/Users/anacismaru/ENCODE/bucket/"
-        ]
-    ],
-    "test_hic.ref_sort_file":[
-        [
-            "/Users/anacismaru/ENCODE/bucket/"
-        ]
-    ],
+    "test_hic.fastq": [[[
+        "test/test_data/merged_read1.fastq.gz",
+        "test/test_data/merged_read2.fastq.gz"]]],
 
-    "test_hic.ref_merged_collisions":[
-        "/Users/anacismaru/ENCODE/bucket/"
-    ],
-    "test_hic.ref_merged_collisions_low":[
-        "/Users/anacismaru/ENCODE/bucket/"
-    ],
-    "test_hic.ref_merged_unmapped":[
-        "/Users/anacismaru/ENCODE/bucket/"
-    ],
-    "test_hic.ref_merged_mapq0":[
-        "/Users/anacismaru/ENCODE/bucket/"
-    ],
-    "test_hic.ref_merged_alignable":[
-        "/Users/anacismaru/ENCODE/bucket/"
-    ],
-   
-    "test_hic.ref_merged_sort_file":[
-        "/Users/anacismaru/ENCODE/bucket/"
-    ],
-    "test_hic.ref_dedup":[
-        "/Users/anacismaru/ENCODE/bucket/"
-    ],
-
-    "test_hic.ref_merged_pairs":"/Users/anacismaru/ENCODE/bucket/",
-    "test_hic.ref_hic":"/Users/anacismaru/ENCODE/bucket/",
-    "test_hic.ref_tads":"",
-    "test_hic.ref_hiccups":""
-
-
-
+    "test_hic.chrsz": "test/test_data/ce10_selected.chrom.sizes.tsv",
+    "test_hic.restriction_sites": "test/test_data/ce10_selected_MboI.txt",
+    "test_hic.reference_index": "test/test_data/ce10_selected.tar.gz",
+    "test_hic.ligation_site": "AGCTAGCT"
 }

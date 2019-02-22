@@ -14,9 +14,9 @@ make_tag: &make_tag
     echo "export TAG=quay.io/encode-dcc/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}" > ${BASH_ENV}
 
 get_cromwell: &get_cromwell
-  name: get the cromwell 35
+  name: get the cromwell 36
   command: |
-    wget -N -c https://github.com/broadinstitute/cromwell/releases/download/35/cromwell-35.jar
+    wget -N -c https://github.com/broadinstitute/cromwell/releases/download/36/cromwell-36.jar
 
 version: 2.1
 jobs:
@@ -78,7 +78,7 @@ workflows:
               only:
                 - master
                 - dev-1
-                - PIP-526-fix-create-hic-test
+                - PIP-530-workflow-test
       - test:
           name: test_align
           requires:
@@ -121,3 +121,10 @@ workflows:
             - build
           test_name: "create_hic"
           keys_to_inspect: "test_create_hic.no_header"
+      - test:
+          name: test_hic
+          requires:
+            - build
+          test_name: "hic"
+          test_type: "workflow"
+          keys_to_inspect: "test_hic.library_complexity test_hic.stats test_hic.alignments_stats test_hic.no_header_alignable_sam test_hic.out_pairs test_hic.out_dedup test_hic.no_header_hic"
