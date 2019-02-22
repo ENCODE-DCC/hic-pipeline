@@ -79,7 +79,6 @@ workflows:
                 - master
                 - dev-1
                 - PIP-530-workflow-test
-                - PIP-526-fix-create-hic-test
       - test:
           name: test_align
           requires:
