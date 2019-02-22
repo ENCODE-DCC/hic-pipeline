@@ -10,7 +10,7 @@ workflow test_create_hic {
         pairs_file = pairs_file,
         chrsz_ = chrsz_,
         stats = stats,
-        stats_hists = stats_hists
+        stats_hists = stats_hists,
         quality = "30"
     }
 
