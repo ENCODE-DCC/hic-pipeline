@@ -40,21 +40,23 @@ workflow hic {
         not_merged_pe = if length(input_dedup_pairs)>0 then input_dedup_pairs else process_library.library_dedup
     }
 
-
-    call create_hic { input:
-        pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
-        stats = process_library.stats[0],
-        stats_hists = process_library.stats_hists[0],
-        #pairs_file = if defined(input_pairs) then input_pairs else dedup.out_file,
-        chrsz_ = chrsz
+    Array[String] qualities = ["1", "30"]
+    scatter(i in range(length(qualities))) {
+        call create_hic { input:
+            pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
+            stats = process_library.stats[0],
+            stats_hists = process_library.stats_hists[0],
+            chrsz_ = chrsz,
+            quality = qualities[i]
+        }
     }
 
     call arrowhead { input:
-        hic_file = if defined(input_hic) then input_hic else create_hic.inter_30
+        hic_file = if defined(input_hic) then input_hic else create_hic.inter[1]
     }
 
     call hiccups{ input:
-        hic_file = if defined(input_hic) then input_hic else create_hic.inter_30
+        hic_file = if defined(input_hic) then input_hic else create_hic.inter[1]
     }
 
     output{
@@ -64,7 +66,8 @@ workflow hic {
         Array[File] out_dedup = process_library.library_dedup
 
         # Create hic outputs
-        File out_hic = create_hic.inter_30
+        File out_hic_1 = create_hic.inter[0]
+        File out_hic_30 = create_hic.inter[1]
         
         # TADs output
         File out_tads = arrowhead.out_file
@@ -72,7 +75,9 @@ workflow hic {
         File out_hiccups = hiccups.out_file
 
         #QC outputs
-        #Array[File] out_align_qc = hic_sub.out_align_qc
+        Array[File] library_complexity = process_library.library_stats_json
+        Array[File] stats = process_library.stats_json
+        Array[Array[File]] alignments_stats = process_library.alignments_stats
     }
 
 }
@@ -103,13 +108,14 @@ task create_hic {
     File stats
     File stats_hists
     File chrsz_
+    String quality
 
     command {
-        /opt/scripts/common/juicer_tools pre -s ${stats} -g ${stats_hists} -q 30 ${pairs_file} inter_30.hic ${chrsz_}
+        /opt/scripts/common/juicer_tools pre -s ${stats} -g ${stats_hists} -q ${quality} ${pairs_file} inter_${quality}.hic ${chrsz_}
     }
 
     output {
-        File inter_30 = glob('inter_30.hic')[0]
+        File inter = glob('inter*.hic')[0]
     }
 
     runtime {

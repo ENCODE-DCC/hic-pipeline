@@ -49,22 +49,29 @@ workflow test_hic {
         not_merged_pe = if length(input_dedup_pairs)>0 then input_dedup_pairs else process_library.library_dedup
     }
 
-    call hic.create_hic as create_hic { input:
-        pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
-        stats = process_library.stats[0],
-        stats_hists = process_library.stats_hists[0],
-        chrsz_ = chrsz
-    }
 
-    call strip_header { input:
-        hic_file = create_hic.inter_30
+    Array[String] qualities = ["1", "30"]
+    scatter(i in range(length(qualities))) {
+        call hic.create_hic as create_hic { input:
+            pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
+            stats = process_library.stats[0],
+            stats_hists = process_library.stats_hists[0],
+            chrsz_ = chrsz,
+            quality = qualities[i]
+        }
+    }
+    scatter(i in range(length(qualities))) {
+        call strip_header { input:
+            hic_file = create_hic.inter[i]
+        }
     }
 
     output{
         File no_header_alignable_sam = strip_headers.no_header
         File out_pairs = tail_of_pairs.no_header
         File out_dedup = process_library.library_dedup[0]
-        File no_header_hic = strip_header.no_header
+        File no_header_hic_1 = strip_header.no_header[0]
+        File no_header_hic_30 = strip_header.no_header[1]
 
         #QC outputs
         File library_complexity = process_library.library_stats_json[0]
@@ -103,14 +110,15 @@ task strip_header {
     File hic_file
 
     command {
+        FILE=$(basename "${hic_file}" ".hic")
         hic_file=${hic_file}
         matrix_start=$(python3 /opt/straw/python/get_matrix_start.py $hic_file)
         matrix_start=$((matrix_start + 1))
         # tail -c +$matrix_start $hic_file > no_header.hic
-        tail -c 10000 $hic_file > no_header.hic
+        tail -c 10000 $hic_file > $FILE.no_header.hic
     }
 
     output {
-        File no_header = glob("no_header.hic")[0]
+        File no_header = glob("*.no_header.hic")[0]
     }
 }

@@ -10,12 +10,16 @@ workflow test_create_hic {
         pairs_file = pairs_file,
         chrsz_ = chrsz_,
         stats = stats,
-        stats_hists = stats_hists
+        stats_hists = stats_hists,
+        quality = "30"
     }
-    File hic_file = test_create_hic_task.inter_30
+
+    File hic_file = test_create_hic_task.inter
+    
     call strip_header { input:
         hic_file = hic_file
     }
+    
     output {
         File no_header = strip_header.no_header
     }
