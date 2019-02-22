@@ -75,7 +75,9 @@ workflow hic {
         File out_hiccups = hiccups.out_file
 
         #QC outputs
-        #Array[File] out_align_qc = hic_sub.out_align_qc
+        Array[File] library_complexity = process_library.library_stats_json
+        Array[File] stats = process_library.stats_json
+        Array[Array[File]] alignments_stats = process_library.alignments_stats
     }
 
 }
