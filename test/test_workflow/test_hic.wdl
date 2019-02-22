@@ -105,8 +105,9 @@ task strip_header {
     command {
         hic_file=${hic_file}
         matrix_start=$(python3 /opt/straw/python/get_matrix_start.py $hic_file)
-        tail -c +$matrix_start $hic_file > no_header.hic
-        echo $(wc -c no_header.hic)
+        matrix_start=$((matrix_start + 1))
+        # tail -c +$matrix_start $hic_file > no_header.hic
+        tail -c 10000 $hic_file > no_header.hic
     }
 
     output {
