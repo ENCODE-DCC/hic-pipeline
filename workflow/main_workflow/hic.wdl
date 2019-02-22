@@ -43,8 +43,8 @@ workflow hic {
 
     call create_hic { input:
         pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
-        stats = process_library.library_stats,
-        stats_hists = process_library.library_stats_hists,
+        stats = process_library.stats[0],
+        stats_hists = process_library.stats_hists[0],
         #pairs_file = if defined(input_pairs) then input_pairs else dedup.out_file,
         chrsz_ = chrsz
     }

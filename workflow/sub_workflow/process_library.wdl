@@ -58,8 +58,10 @@ workflow process_library {
         File alignable_bam = merge.merged_output[4]
         File pairs_file = bam2pairs.out_file
         File library_dedup = dedup.out_file
-        File stats = dedup.stats_json
-        File library_stats = dedup.library_complexity_json
+        File stats_json = dedup.stats_json
+        File library_stats_json = dedup.library_complexity_json
+        File stats = dedup.stats
+        File stats_hists = dedup.stats_hists
         Array[File] alignments_stats = fragment.stats_sub_result_json
     }
 }

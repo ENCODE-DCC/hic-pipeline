@@ -27,7 +27,7 @@ workflow test_hic {
 
     # scatter over libraries
     scatter(i in range(lib_length)) {
-        call sub.process_library { input:
+        call sub.process_library as process_library { input:
             sub_fastq = fastq[i],
             chrsz = chrsz,
             reference_index = reference_index,
@@ -51,6 +51,8 @@ workflow test_hic {
 
     call hic.create_hic as create_hic { input:
         pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
+        stats = process_library.stats[0],
+        stats_hists = process_library.stats_hists[0],
         chrsz_ = chrsz
     }
 
@@ -65,8 +67,8 @@ workflow test_hic {
         File no_header_hic = strip_header.no_header
 
         #QC outputs
-        File library_complexity = process_library.library_stats[0]
-        File stats = process_library.stats[0]
+        File library_complexity = process_library.library_stats_json[0]
+        File stats = process_library.stats_json[0]
         File alignments_stats = process_library.alignments_stats[0][0]
     }
 }
