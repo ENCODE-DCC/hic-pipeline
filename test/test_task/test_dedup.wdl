@@ -4,11 +4,13 @@ workflow test_dedup {
     File merged_sort
     File restriction_sites
     String ligation_site
+    File alignable_bam
 
     call hic.dedup as test_dedup_task { input:
         merged_sort = merged_sort,
         restriction_sites = restriction_sites,
-        ligation_site = ligation_site
+        ligation_site = ligation_site,
+        alignable_bam = alignable_bam
     }
 
     output{
