@@ -1,7 +1,7 @@
 ##Encode DCC Hi-C pipeline
 import "test_hic.wdl" as hic
 
-workflow test_hic {
+workflow test_multiple_libraries {
     Array[Array[Array[File]]] fastq
     String ligation_site
     File restriction_sites
