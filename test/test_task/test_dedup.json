@@ -2,5 +2,5 @@
     "test_dedup.merged_sort": "test/test_data/merged_sort.txt",
     "test_dedup.ligation_site": "AGCTAGCT",
     "test_dedup.restriction_sites": "test/test_data/ce10_selected_MboI.txt",
-    "test_dedup.alignable_bam": "/Users/idan/Desktop/tes/merged_bam_files.bam"
+    "test_dedup.alignable_bam": "test/test_data/alignable_shard0.bam"
 }

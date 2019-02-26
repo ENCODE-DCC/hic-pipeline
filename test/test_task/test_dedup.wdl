@@ -15,5 +15,6 @@ workflow test_dedup {
 
     output{
         File deduped = test_dedup_task.out_file
+        File deduped_bam = test_dedup_task.deduped_bam
     }
 }
