@@ -27,7 +27,7 @@ jobs:
       test_name:
         description: "The name of the test being performed, like hic, align, merge, etc."
         type: enum
-        enum: ["align", "arrowhead", "bam2pairs", "create_hic", "dedup", "hiccups", "merge", "merge_sort", "hic"]
+        enum: ["align", "arrowhead", "bam2pairs", "create_hic", "dedup", "hiccups", "merge", "merge_sort", "hic", "multiple_libraries"]
       test_type:
         default: "task"
         description: "Describes if the test is for a task or for a workflow"
@@ -78,7 +78,7 @@ workflows:
               only:
                 - master
                 - dev-1
-                - PIP-535-inter-zero
+                - PIP-538-mult-lib
       - test:
           name: test_align
           requires:
@@ -128,3 +128,10 @@ workflows:
           test_name: "hic"
           test_type: "workflow"
           keys_to_inspect: "test_hic.library_complexity test_hic.stats test_hic.alignments_stats test_hic.no_header_alignable_sam test_hic.out_pairs test_hic.out_dedup test_hic.no_header_hic_1 test_hic.no_header_hic_30"
+      - test:
+          name: test_multiple_libraries
+          requires:
+            - build
+          test_name: "multiple_libraries"
+          test_type: "workflow"
+          keys_to_inspect: "test_multiple_libraries.no_header_alignable_sam test_multiple_libraries.out_pairs test_multiple_libraries.out_dedup test_multiple_libraries.no_header_hic_1 test_multiple_libraries.no_header_hic_30"
