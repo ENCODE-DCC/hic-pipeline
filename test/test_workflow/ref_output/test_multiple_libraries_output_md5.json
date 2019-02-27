@@ -1,5 +1,5 @@
 {
-    "merged_bam_files.no_header.sam" : "11ee5d0cbea913485563f80beda9e905",
+    "result_alignable_dedup.no_header.sam" : "e5a63c16dff623746351d584b38fdbe7",
     "no_header.pairs" : "e6e2f79ad4882fd76b59e2c9bd984f26",
     "inter_30.no_header.hic" : "69db013a00add5356ed8509a9ce43f1e",
     "inter_1.no_header.hic" : "c3b1f8243919a7f3c9a1ca02e5476a04",

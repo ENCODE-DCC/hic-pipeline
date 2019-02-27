@@ -36,12 +36,6 @@ workflow process_library {
             bam_files = bams_to_merge[i]
         }
     }
-
-    # convert alignable bam to pairs to be consistent with 4DN
-    call bam2pairs { input:
-        bam_file = merge.merged_output[4],
-        chrsz_  = chrsz
-    }  
   
     call merge_sort { input:
         sort_files_ = fragment.sort_file
@@ -51,11 +45,18 @@ workflow process_library {
     call dedup { input:
         merged_sort = merge_sort.out_file,
         ligation_site = ligation_site,
-        restriction_sites = restriction_sites
+        restriction_sites = restriction_sites,
+        alignable_bam = merge.merged_output[4]
     }
     
+    # convert alignable bam to pairs to be consistent with 4DN
+    call bam2pairs { input:
+        bam_file = dedup.deduped_bam,
+        chrsz_  = chrsz
+    }
+
     output {
-        File alignable_bam = merge.merged_output[4]
+        File alignable_bam = dedup.deduped_bam
         File pairs_file = bam2pairs.out_file
         File library_dedup = dedup.out_file
         File stats_json = dedup.stats_json
@@ -211,6 +212,7 @@ task dedup {
     File merged_sort
     String ligation_site
     File restriction_sites
+    File alignable_bam
 
     command <<<
         touch dups.txt
@@ -224,9 +226,15 @@ task dedup {
         /opt/scripts/common/statistics.pl -s ${restriction_sites} -l ${ligation_site} merged_nodups.txt
         python3 /opt/hic-pipeline/src/jsonify_stats.py --library-complexity library_complexity.txt
         python3 /opt/hic-pipeline/src/jsonify_stats.py --library-stats stats.txt
+        awk '{split($(NF-1), a, "$"); split($NF, b, "$"); print a[3],b[3] > a[2]"_dedup"}' merged_nodups.txt
+        samtools view -h ${alignable_bam} | awk 'BEGIN{OFS="\t"}FNR==NR{for (i=$1; i<=$2; i++){a[i];} next}(!(FNR in a) && $1 !~ /^@/){$2=or($2,1024)}{print}' result_dedup - > result_alignable_dedup.sam
+        samtools view -hb result_alignable_dedup.sam > result_alignable_dedup.bam
+        rm result_alignable_dedup.sam
+        rm ${alignable_bam}
     >>>
 
     output {
+        File deduped_bam = glob('result_alignable_dedup.bam')[0]
         File out_file = glob('merged_nodups.txt')[0]
         File library_complexity = glob('library_complexity.txt')[0]
         File library_complexity_json = glob('library_complexity.json')[0]
