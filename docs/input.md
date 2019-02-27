@@ -58,3 +58,11 @@ In order to run the HiC pipeline you will need to specify the bwa index file pre
 |genome fasta|GRCh38|[link](https://www.encodeproject.org/files/GRCh38_no_alt_analysis_set_GCA_000001405.15/)|
 |chromosome sizes|GRCh38|[link](https://www.encodeproject.org/files/GRCh38_EBV.chrom.sizes/)|
 
+You will also need a restriction map file appropriate for the restriction enzyme and assembly. MboI and DpnII share the same restriction map because they have the same recognition site.
+
+|restriction enzymes|assembly|ENCODE portal link|
+|-|-|-|
+|DpnII, MboI|GRCh38|[link](https://www.encodeproject.org/files/ENCFF246KDZ/)|
+|HindIII|GRCh38|[link](https://www.encodeproject.org/files/ENCFF509VQM/)|
+|DpnII, MboI|hg19|[link](https://www.encodeproject.org/files/ENCFF955ICX/)|
+|HindIII|hg19|[link](https://www.encodeproject.org/files/ENCFF997LWB/)|
