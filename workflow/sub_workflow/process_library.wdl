@@ -227,7 +227,7 @@ task dedup {
         python3 /opt/hic-pipeline/src/jsonify_stats.py --library-complexity library_complexity.txt
         python3 /opt/hic-pipeline/src/jsonify_stats.py --library-stats stats.txt
         awk '{split($(NF-1), a, "$"); split($NF, b, "$"); print a[3],b[3] > a[2]"_dedup"}' merged_nodups.txt
-        samtools view ${alignable_bam} | awk 'BEGIN{OFS="\t"}FNR==NR{for (i=$1; i<=$2; i++){a[i];} next}(!(FNR in a) && $1 !~ /^@/){$2=or($2,1024)}{print}' result_dedup - > result_alignable_dedup.sam
+        samtools view -h ${alignable_bam} | awk 'BEGIN{OFS="\t"}FNR==NR{for (i=$1; i<=$2; i++){a[i];} next}(!(FNR in a) && $1 !~ /^@/){$2=or($2,1024)}{print}' result_dedup - > result_alignable_dedup.sam
         samtools view -hb result_alignable_dedup.sam > result_alignable_dedup.bam
         rm result_alignable_dedup.sam
         rm ${alignable_bam}
