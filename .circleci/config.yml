@@ -78,7 +78,6 @@ workflows:
               only:
                 - master
                 - dev-1
-                - PIP-496-bam-dups
       - test:
           name: test_align
           requires:
