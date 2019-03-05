@@ -20,6 +20,8 @@ workflow test_dedup {
     output{
         File deduped = test_dedup_task.out_file
         File deduped_no_header = strip_headers.no_header
+        File library_complexity_json = test_dedup_task.library_complexity_json
+        File stats_json = test_dedup_task.stats_json
     }
 }
 

@@ -6,5 +6,6 @@
     "mapq0.no_header.sam" : "a9df472b6579d7762600408efe023d77",
     "sort.txt" : "f2df3edfbd1d165c3639bae687e20b25",
     "result.res.txt" : "672be91363a851385a8a0a6f9292688d",
-    "alignment_stats.txt" : "88d7181a19b758a5a6b828a8a4e20082"
+    "alignment_stats.txt" : "88d7181a19b758a5a6b828a8a4e20082",
+    "alignment_stats.json": "b600b63a91b7e89edf93db244f89c5f8"
 }
