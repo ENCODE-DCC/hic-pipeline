@@ -78,12 +78,13 @@ workflows:
               only:
                 - master
                 - dev-1
+                - PIP-534-test-json-stats
       - test:
           name: test_align
           requires:
             - build
           test_name: "align"
-          keys_to_inspect: "test_align.collisions test_align.collisions_low_mapq test_align.unmapped test_align.mapq0 test_align.alignable test_align.sort_file test_align.norm_res test_align.stats_sub_result"
+          keys_to_inspect: "test_align.collisions test_align.collisions_low_mapq test_align.unmapped test_align.mapq0 test_align.alignable test_align.sort_file test_align.norm_res test_align.stats_sub_result test_align.stats_sub_result_json"
       - test:
           name: test_bam2pairs
           requires:
@@ -101,7 +102,7 @@ workflows:
           requires:
             - build
           test_name: "dedup"
-          keys_to_inspect: "test_dedup.deduped"
+          keys_to_inspect: "test_dedup.deduped test_dedup.library_complexity_json test_dedup.stats_json"
       - test:
           name: test_merge
           requires:

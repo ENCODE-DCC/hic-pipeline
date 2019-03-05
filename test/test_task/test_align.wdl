@@ -45,6 +45,7 @@ workflow test_align {
         File sort_file = test_fragment.sort_file
         File norm_res = test_fragment.norm_res
         File stats_sub_result = test_fragment.stats_sub_result
+        File stats_sub_result_json = test_fragment.stats_sub_result_json
     }
 }
 
