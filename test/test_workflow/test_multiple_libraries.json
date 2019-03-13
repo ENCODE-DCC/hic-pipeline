@@ -15,5 +15,5 @@
     "test_multiple_libraries.chrsz": "test/test_data/ce10_selected.chrom.sizes.tsv",
     "test_multiple_libraries.restriction_sites": "test/test_data/ce10_selected_MboI.txt",
     "test_multiple_libraries.reference_index": "test/test_data/ce10_selected.tar.gz",
-    "test_multiple_libraries.ligation_site": "AGCTAGCT"
+    "test_multiple_libraries.restriction_enzyme": "MboI"
 }

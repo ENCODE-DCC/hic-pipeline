@@ -12,7 +12,7 @@ workflow hic {
     File? input_hic
     File? sub_ms
 
-    String ligation_site
+    String restriction_enzyme
     File restriction_sites
     File chrsz
     File reference_index
@@ -30,7 +30,7 @@ workflow hic {
             sub_fastq = fastq[i],
             chrsz = chrsz,
             reference_index = reference_index,
-            ligation_site = ligation_site,
+            restriction_enzyme = restriction_enzyme,
             cpu = cpu,
             restriction_sites = restriction_sites
         }

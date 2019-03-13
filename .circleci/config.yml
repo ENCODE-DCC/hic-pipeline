@@ -78,7 +78,7 @@ workflows:
               only:
                 - master
                 - dev-1
-                - PIP-534-test-json-stats
+                - PIP-543-enzyme-name
       - test:
           name: test_align
           requires:

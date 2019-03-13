@@ -13,11 +13,14 @@ workflow test_hic {
     File? input_hic
     File? sub_ms
 
-    String ligation_site
+    String restriction_enzyme
     File restriction_sites
     File chrsz
     File reference_index
     Int? cpu
+
+    Map[String, String] restriction_enzyme_to_site = read_map("workflow/sub_workflow/restriction_enzyme_to_site.tsv")
+    String ligation_site = restriction_enzyme_to_site[restriction_enzyme]
 
     #determine range of scatter
     Int lib_length = if length(fastq) > 0 then length(fastq)
@@ -31,7 +34,7 @@ workflow test_hic {
             sub_fastq = fastq[i],
             chrsz = chrsz,
             reference_index = reference_index,
-            ligation_site = ligation_site,
+            restriction_enzyme = restriction_enzyme,
             cpu = cpu,
             restriction_sites = restriction_sites
         }
