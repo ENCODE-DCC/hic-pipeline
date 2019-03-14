@@ -14,7 +14,7 @@ An input JSON file includes all input parameters and metadata for running pipeli
 
 6. Pipeline parameters.
 7. Boolean flag _no_call_loops_ to skip loop calling using HiCCUPS. To set this flag, add the following parameter to the input json:
-`"hic.no_call_loops": true`.
+`"hic.no_call_loops": true`
 
 ## Templates
 
