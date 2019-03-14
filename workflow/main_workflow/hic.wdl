@@ -17,6 +17,7 @@ workflow hic {
     File chrsz
     File reference_index
     Int? cpu
+    Boolean? no_call_loops = false
 
     #determine range of scatter
     Int lib_length = if length(fastq) > 0 then length(fastq)
@@ -55,11 +56,13 @@ workflow hic {
         hic_file = if defined(input_hic) then input_hic else create_hic.inter[1]
     }
 
-    call hiccups{ input:
-        hic_file = if defined(input_hic) then input_hic else create_hic.inter[1]
+    if ( !no_call_loops ) {
+        call hiccups { input:
+            hic_file = if defined(input_hic) then input_hic else create_hic.inter[1]
+        }
     }
 
-    output{
+    output {
         # Sub-workflow processing a library outputs
         Array[File] out_merged_align = process_library.alignable_bam
         Array[File] out_pairs = process_library.pairs_file
@@ -72,7 +75,7 @@ workflow hic {
         # TADs output
         File out_tads = arrowhead.out_file
         # HiCCUps output
-        File out_hiccups = hiccups.out_file
+        File? out_hiccups = hiccups.out_file
 
         #QC outputs
         Array[File] library_complexity = process_library.library_stats_json
