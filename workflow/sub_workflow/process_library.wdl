@@ -1,12 +1,17 @@
 workflow process_library {
     Array[Array[File]] sub_fastq
-    String ligation_site
+    String restriction_enzyme
     File restriction_sites
     File chrsz
     File reference_index
     Int? cpu
 
     Int fastqs_len = length(sub_fastq)
+
+    # The ligation junctions are consistent with mega.sh
+    Map[String, String] restriction_enzyme_to_site = read_map("workflow/sub_workflow/restriction_enzyme_to_site.tsv")
+    String ligation_site = restriction_enzyme_to_site[restriction_enzyme]
+
     scatter(j in range(fastqs_len)){
         call align { input:
             fastqs = sub_fastq[j],

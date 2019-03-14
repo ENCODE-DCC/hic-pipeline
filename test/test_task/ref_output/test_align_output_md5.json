@@ -5,7 +5,7 @@
     "unmapped.no_header.sam" : "e24ff1e0d5e6471fec6976d0aeaa1061",
     "mapq0.no_header.sam" : "a9df472b6579d7762600408efe023d77",
     "sort.txt" : "f2df3edfbd1d165c3639bae687e20b25",
-    "result.res.txt" : "672be91363a851385a8a0a6f9292688d",
-    "alignment_stats.txt" : "88d7181a19b758a5a6b828a8a4e20082",
-    "alignment_stats.json": "b600b63a91b7e89edf93db244f89c5f8"
+    "result.res.txt" : "05f048df3da2992e7aa29c8b58c62d86",
+    "alignment_stats.txt" : "b28c7acf877f91de840d22e3566c4d4d",
+    "alignment_stats.json": "802a0e5249f8623607ec581c179b9ac9"
 }

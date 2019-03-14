@@ -78,7 +78,6 @@ workflows:
               only:
                 - master
                 - dev-1
-                - PIP-534-test-json-stats
       - test:
           name: test_align
           requires:

@@ -8,7 +8,7 @@ An input JSON file includes all input parameters and metadata for running pipeli
 2. Reference genome bwa index.
 3. Reference genome chromosome sizes.
 4. Restriction site locations in the reference genome sequence.
-5. Sequence of the ligation site
+5. Name of the restriction enzyme
 
 * Optional
 
@@ -37,10 +37,10 @@ Let us take a close look at the following template JSON. Comments are not allowe
     "hic.restriction_sites": "test/test_data/ce10_selected_MboI.txt",
 
     ////////// 4) Reference genome index //////////
-    "thic.reference_index": "test/test_data/ce10_selected.tar.gz",
+    "hic.reference_index": "test/test_data/ce10_selected.tar.gz",
     
     ////////// 5) Ligation site sequence //////////
-    "hic.ligation_site": "AGCTAGCT"
+    "hic.restriction_enzyme": "MboI"
 
 }
 ```

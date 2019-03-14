@@ -6,7 +6,7 @@
     "test_align.chrsz": "test/test_data/ce10_selected.chrom.sizes.tsv",
     "test_align.restriction": "test/test_data/ce10_selected_MboI.txt",
     "test_align.idx_tar": "test/test_data/ce10_selected.tar.gz",
-    "test_align.ligation_site": "AGCTAGCT"
+    "test_align.restriction_enzyme": "MboI"
 }
 
 
