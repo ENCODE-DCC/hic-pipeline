@@ -1,0 +1,15 @@
+{
+    "test_hic_from_libraries.input_dedup_pairs": [
+        "test/test_data/merged_nodups_lib1.txt",
+        "test/test_data/merged_nodups_lib2.txt"
+    ],
+    "test_hic_from_libraries.library_stats": [
+        "test/test_data/stats_lib1.txt",
+        "test/test_data/stats_lib2.txt"
+    ],
+    "test_hic_from_libraries.library_stats_hists": [
+        "test/test_data/stats_hists_lib1.m",
+        "test/test_data/stats_hists_lib2.m"
+    ],
+    "test_hic_from_libraries.chrsz": "test/test_data/ce10_selected.chrom.sizes.tsv"
+}
