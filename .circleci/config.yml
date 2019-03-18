@@ -27,7 +27,7 @@ jobs:
       test_name:
         description: "The name of the test being performed, like hic, align, merge, etc."
         type: enum
-        enum: ["align", "arrowhead", "bam2pairs", "create_hic", "dedup", "hiccups", "merge", "merge_sort", "hic", "multiple_libraries", "no_call_loops"]
+        enum: ["align", "arrowhead", "bam2pairs", "create_hic", "dedup", "hiccups", "merge", "merge_sort", "hic", "multiple_libraries", "no_call_loops", "hic_from_libraries"]
       test_type:
         default: "task"
         description: "Describes if the test is for a task or for a workflow"
@@ -78,7 +78,7 @@ workflows:
               only:
                 - master
                 - dev-1
-                - PIP-545-no-loops
+                - PIP-546-entrypoint-after-libraries
       - test:
           name: test_align
           requires:
@@ -142,3 +142,10 @@ workflows:
           test_name: "no_call_loops"
           test_type: "workflow"
           keys_to_inspect: "test_no_call_loops.domains"
+      - test:
+          name: test_hic_from_libraries
+          requires:
+            - build
+          test_name: "hic_from_libraries"
+          test_type: "workflow"
+          keys_to_inspect: "test_hic_from_libraries.inter_1_no_header test_hic_from_libraries.inter_30_no_header"

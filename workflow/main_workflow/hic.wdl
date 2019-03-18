@@ -7,17 +7,23 @@ workflow hic {
     Array[Array[Array[File]]] input_bams = [] #[lib_id[[collisions1,collisions2],[collisions_low],[unmapped],[mapq0],[alignable]], 
     Array[Array[File]] input_sort_files = [] #[lib_id] 2d Array [lib[sort1, sirt2]]
     Array[File] input_merged_sort = []
-    Array[File] input_dedup_pairs = []
     File? input_pairs
     File? input_hic
     File? sub_ms
 
+    # Inputs and logic for entrypoint after library processing
+    Array[File?] input_dedup_pairs = []
+    Array[File?] library_stats = []
+    Array[File?] library_stats_hists = []
+
+    # Inputs for library processing
     String? restriction_enzyme
     File? restriction_sites
     File? chrsz
     File? reference_index
     Int? cpu
     Boolean? no_call_loops = false
+    Boolean? no_call_tads = false
 
     #determine range of scatter
     Int lib_length = if length(fastq) > 0 then length(fastq)
@@ -45,14 +51,14 @@ workflow hic {
     scatter(i in range(length(qualities))) {
         call create_hic { input:
             pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
-            stats = process_library.stats[0],
-            stats_hists = process_library.stats_hists[0],
+            stats = if length(library_stats) > 0 then library_stats[0] else process_library.stats[0],
+            stats_hists = if length(library_stats_hists) > 0 then library_stats_hists[0] else process_library.stats_hists[0],
             chrsz_ = chrsz,
             quality = qualities[i]
         }
     }
 
-    if (defined(input_hic) || defined(create_hic.inter)) {
+    if ( (defined(input_hic) || defined(create_hic.inter)) && !no_call_tads ) {
         call arrowhead { input:
             hic_file = if defined(input_hic) then input_hic else create_hic.inter[1]
         }
@@ -84,12 +90,11 @@ workflow hic {
         Array[File] stats = process_library.stats_json
         Array[Array[File]] alignments_stats = process_library.alignments_stats
     }
-
 }
 
 
 task merge_pairs_file{
-    Array[File] not_merged_pe
+    Array[File?] not_merged_pe
     # Need to add following line back under sort command
     # ${juiceDir}/scripts/common/statistics.pl -s $site_file -l $ligation -o $outputdir/stats_dups.txt $outputdir/dups.txt
     
