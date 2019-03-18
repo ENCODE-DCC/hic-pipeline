@@ -12,10 +12,10 @@ workflow hic {
     File? input_hic
     File? sub_ms
 
-    String restriction_enzyme
-    File restriction_sites
-    File chrsz
-    File reference_index
+    String? restriction_enzyme
+    File? restriction_sites
+    File? chrsz
+    File? reference_index
     Int? cpu
     Boolean? no_call_loops = false
 
@@ -41,7 +41,7 @@ workflow hic {
         not_merged_pe = if length(input_dedup_pairs)>0 then input_dedup_pairs else process_library.library_dedup
     }
 
-    Array[String] qualities = ["1", "30"]
+    Array[String] qualities = if !defined(input_hic) then ["1", "30"] else []
     scatter(i in range(length(qualities))) {
         call create_hic { input:
             pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
@@ -52,8 +52,10 @@ workflow hic {
         }
     }
 
-    call arrowhead { input:
-        hic_file = if defined(input_hic) then input_hic else create_hic.inter[1]
+    if (defined(input_hic) || defined(create_hic.inter)) {
+        call arrowhead { input:
+            hic_file = if defined(input_hic) then input_hic else create_hic.inter[1]
+        }
     }
 
     if ( !no_call_loops ) {
@@ -69,11 +71,11 @@ workflow hic {
         Array[File] out_dedup = process_library.library_dedup
 
         # Create hic outputs
-        File out_hic_1 = create_hic.inter[0]
-        File out_hic_30 = create_hic.inter[1]
-        
+        File? out_hic_1 = if length(create_hic.inter) > 1 then create_hic.inter[0] else input_hic
+        File? out_hic_30 = if length(create_hic.inter) > 1 then create_hic.inter[1] else input_hic
+
         # TADs output
-        File out_tads = arrowhead.out_file
+        File? out_tads = arrowhead.out_file
         # HiCCUps output
         File? out_hiccups = hiccups.out_file
 

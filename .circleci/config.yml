@@ -134,3 +134,10 @@ workflows:
           test_name: "multiple_libraries"
           test_type: "workflow"
           keys_to_inspect: "test_multiple_libraries.no_header_alignable_sam test_multiple_libraries.out_pairs test_multiple_libraries.out_dedup test_multiple_libraries.no_header_hic_1 test_multiple_libraries.no_header_hic_30"
+      - test:
+          name: test_no_call_loops
+          requires:
+            - build
+          test_name: "no_call_loops"
+          test_type: "workflow"
+          keys_to_inspect: "test_no_call_loops.domains"
