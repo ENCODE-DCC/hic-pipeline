@@ -27,7 +27,7 @@ jobs:
       test_name:
         description: "The name of the test being performed, like hic, align, merge, etc."
         type: enum
-        enum: ["align", "arrowhead", "bam2pairs", "create_hic", "dedup", "hiccups", "merge", "merge_sort", "hic", "multiple_libraries"]
+        enum: ["align", "arrowhead", "bam2pairs", "create_hic", "dedup", "hiccups", "merge", "merge_sort", "hic", "multiple_libraries", "no_call_loops"]
       test_type:
         default: "task"
         description: "Describes if the test is for a task or for a workflow"
@@ -78,6 +78,7 @@ workflows:
               only:
                 - master
                 - dev-1
+                - PIP-545-no-loops
       - test:
           name: test_align
           requires:
