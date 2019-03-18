@@ -23,6 +23,7 @@ workflow hic {
     File? reference_index
     Int? cpu
     Boolean? no_call_loops = false
+    Boolean? no_call_tads = false
 
     #determine range of scatter
     Int lib_length = if length(fastq) > 0 then length(fastq)
@@ -57,7 +58,7 @@ workflow hic {
         }
     }
 
-    if (defined(input_hic) || defined(create_hic.inter)) {
+    if ( (defined(input_hic) || defined(create_hic.inter)) && !no_call_tads ) {
         call arrowhead { input:
             hic_file = if defined(input_hic) then input_hic else create_hic.inter[1]
         }
