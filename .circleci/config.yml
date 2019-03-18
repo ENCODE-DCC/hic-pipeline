@@ -148,4 +148,4 @@ workflows:
             - build
           test_name: "hic_from_libraries"
           test_type: "workflow"
-          keys_to_inspect: "test_hic_from_libraries.inter_1 test_hic_from_libraries.inter_30"
+          keys_to_inspect: "test_hic_from_libraries.inter_1_no_header test_hic_from_libraries.inter_30_no_header"
