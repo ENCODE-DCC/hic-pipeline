@@ -1,16 +1,16 @@
 import "../../workflow/main_workflow/hic.wdl" as hic
 
 workflow test_create_hic {
+    Array[String] ligation_junctions
     File pairs_file
     File chrsz_
-    File stats
-    File stats_hists
+    File restriction_sites
 
     call hic.create_hic as test_create_hic_task { input:
         pairs_file = pairs_file,
         chrsz_ = chrsz_,
-        stats = stats,
-        stats_hists = stats_hists,
+        ligation_junctions = ligation_junctions,
+        restriction_sites = restriction_sites,
         quality = "30"
     }
 

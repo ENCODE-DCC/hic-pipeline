@@ -1,0 +1,4 @@
+Unique Reads: 298,658 
+PCR Duplicates: 11,048 
+Optical Duplicates: 0 
+Library Complexity Estimate: 4,237,096

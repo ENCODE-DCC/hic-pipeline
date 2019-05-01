@@ -9,7 +9,7 @@ workflow process_library {
     Int fastqs_len = length(sub_fastq)
 
     # The ligation junctions are consistent with mega.sh
-    Map[String, String] restriction_enzyme_to_site = read_map("workflow/sub_workflow/restriction_enzyme_to_site.tsv")
+    Map[String, String] restriction_enzyme_to_site = read_map("workflow/restriction_enzyme_to_site.tsv")
     String ligation_site = restriction_enzyme_to_site[restriction_enzyme]
 
     scatter(j in range(fastqs_len)){
@@ -65,10 +65,12 @@ workflow process_library {
         File pairs_file = bam2pairs.out_file
         File library_dedup = dedup.out_file
         File stats_json = dedup.stats_json
+        File library_stats = dedup.library_complexity
         File library_stats_json = dedup.library_complexity_json
         File stats = dedup.stats
         File stats_hists = dedup.stats_hists
-        Array[File] alignments_stats = fragment.stats_sub_result_json
+        Array[File] alignment_stats = fragment.stats_sub_result
+        Array[File] alignment_stats_json = fragment.stats_sub_result_json
     }
 }
 
