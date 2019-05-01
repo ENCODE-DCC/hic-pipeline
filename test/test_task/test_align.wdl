@@ -7,7 +7,7 @@ workflow test_align {
     File restriction    # restriction enzyme sites in the reference genome
     String restriction_enzyme
 
-    Map[String, String] restriction_enzyme_to_site = read_map("workflow/sub_workflow/restriction_enzyme_to_site.tsv")
+    Map[String, String] restriction_enzyme_to_site = read_map("workflow/restriction_enzyme_to_site.tsv")
     String ligation_site = restriction_enzyme_to_site[restriction_enzyme]
 
 	call hic.align as test_align_task { input:

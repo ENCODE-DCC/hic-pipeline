@@ -8,7 +8,7 @@ workflow test_multiple_libraries {
     File chrsz
     File reference_index
 
-    Map[String, String] restriction_enzyme_to_site = read_map("workflow/sub_workflow/restriction_enzyme_to_site.tsv")
+    Map[String, String] restriction_enzyme_to_site = read_map("workflow/restriction_enzyme_to_site.tsv")
     String ligation_site = restriction_enzyme_to_site[restriction_enzyme]
 
     call hic.test_hic as test { input:
