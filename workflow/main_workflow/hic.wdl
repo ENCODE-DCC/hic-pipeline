@@ -48,7 +48,7 @@ workflow hic {
     }
 
     call merge_stats { input:
-        alignment_stats = flatten(process_library.alignment_stats),
+        alignment_stats = flatten(process_library.alignments_stats),
         library_stats = process_library.library_stats
     }
 

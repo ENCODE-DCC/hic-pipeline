@@ -69,7 +69,7 @@ workflow process_library {
         File library_stats_json = dedup.library_complexity_json
         File stats = dedup.stats
         File stats_hists = dedup.stats_hists
-        Array[File] alignment_stats = fragment.stats_sub_result
+        Array[File] alignments_stats = fragment.stats_sub_result
         Array[File] alignment_stats_json = fragment.stats_sub_result_json
     }
 }
