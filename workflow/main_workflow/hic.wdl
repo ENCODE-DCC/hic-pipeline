@@ -54,7 +54,7 @@ workflow hic {
 
     # Prepare array of restriction sites for megamap
     Map[String, String] restriction_enzyme_to_site = read_map("workflow/restriction_enzyme_to_site.tsv")
-    Array[String] ligation_junctions = [restriction_enzyme_to_site[restriction_enzyme]]
+    Array[String] ligation_junctions = if defined(restriction_enzyme) then [restriction_enzyme_to_site[restriction_enzyme]] else []
 
     Array[String] qualities = if !defined(input_hic) then ["1", "30"] else []
     scatter(i in range(length(qualities))) {

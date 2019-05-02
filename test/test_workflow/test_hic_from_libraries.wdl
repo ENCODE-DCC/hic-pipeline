@@ -6,6 +6,7 @@ workflow test_hic_from_libraries {
     Array[File] library_stats
     Array[File] library_stats_hists
     File chrsz
+    String restriction_enzyme
     Boolean no_call_loops
     Boolean no_call_tads
 
@@ -14,6 +15,7 @@ workflow test_hic_from_libraries {
         library_stats = library_stats,
         library_stats_hists = library_stats_hists,
         chrsz = chrsz,
+        restriction_enzyme = restriction_enzyme,
         no_call_loops = no_call_loops,
         no_call_tads = no_call_tads
     }
