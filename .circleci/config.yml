@@ -27,7 +27,21 @@ jobs:
       test_name:
         description: "The name of the test being performed, like hic, align, merge, etc."
         type: enum
-        enum: ["align", "arrowhead", "bam2pairs", "create_hic", "dedup", "hiccups", "merge", "merge_sort", "hic", "multiple_libraries", "no_call_loops", "hic_from_libraries"]
+        enum: [
+          "align",
+          "arrowhead",
+          "bam2pairs",
+          "create_hic",
+          "dedup",
+          "hiccups",
+          "merge",
+          "merge_sort",
+          "hic",
+          "multiple_libraries",
+          "no_call_loops",
+          "hic_from_libraries",
+          "merge_stats"
+      ]
       test_type:
         default: "task"
         description: "Describes if the test is for a task or for a workflow"
@@ -78,7 +92,7 @@ workflows:
               only:
                 - master
                 - dev-1
-                - PIP-546-entrypoint-after-libraries
+                - PIP-610-megamap-support
       - test:
           name: test_align
           requires:
@@ -109,6 +123,12 @@ workflows:
             - build
           test_name: "merge"
           keys_to_inspect: "test_merge.merged_no_header"
+      - test:
+          name: test_merge_stats
+          requires:
+            - build
+          test_name: "merge_stats"
+          keys_to_inspect: "test_merge_stats.merged_stats test_merge_stats.merged_stats_json"
       - test:
           name: arrowhead
           requires:

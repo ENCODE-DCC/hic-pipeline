@@ -15,6 +15,7 @@ workflow hic {
     Array[File?] input_dedup_pairs = []
     Array[File?] library_stats = []
     Array[File?] library_stats_hists = []
+    Array[String?] input_ligation_junctions = []
 
     # Inputs for library processing
     String? restriction_enzyme
@@ -47,12 +48,22 @@ workflow hic {
         not_merged_pe = if length(input_dedup_pairs)>0 then input_dedup_pairs else process_library.library_dedup
     }
 
+    call merge_stats { input:
+        alignment_stats = flatten(process_library.alignments_stats),
+        library_stats = process_library.library_stats
+    }
+
+    # Prepare array of restriction sites for megamap
+    Map[String, String] restriction_enzyme_to_site = read_map("workflow/restriction_enzyme_to_site.tsv")
+    String? ligation_junction = if defined(restriction_enzyme) then restriction_enzyme_to_site[restriction_enzyme] else ""
+    Array[String] ligation_junctions = select_all(if defined(restriction_enzyme) then [ligation_junction] else input_ligation_junctions)
+
     Array[String] qualities = if !defined(input_hic) then ["1", "30"] else []
     scatter(i in range(length(qualities))) {
         call create_hic { input:
             pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
-            stats = if length(library_stats) > 0 then library_stats[0] else process_library.stats[0],
-            stats_hists = if length(library_stats_hists) > 0 then library_stats_hists[0] else process_library.stats_hists[0],
+            restriction_sites = restriction_sites,
+            ligation_junctions = ligation_junctions,
             chrsz_ = chrsz,
             quality = qualities[i]
         }
@@ -95,11 +106,9 @@ workflow hic {
 
 task merge_pairs_file{
     Array[File?] not_merged_pe
-    # Need to add following line back under sort command
-    # ${juiceDir}/scripts/common/statistics.pl -s $site_file -l $ligation -o $outputdir/stats_dups.txt $outputdir/dups.txt
-    
+
     command {
-        sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 10% ${sep=' ' not_merged_pe}  > merged_pairs.txt
+        sort -m -k2,2d -k6,6d --parallel=8 -S 10% ${sep=' ' not_merged_pe}  > merged_pairs.txt
     }
     
     output {
@@ -113,15 +122,33 @@ task merge_pairs_file{
 }
 
 
+task merge_stats {
+    # Merge QC statistics from multiple libraries
+    Array[File?] alignment_stats
+    Array[File?] library_stats
+
+    command {
+        awk -f /opt/scripts/common/makemega_addstats.awk ${sep=' ' alignment_stats} ${sep=' ' library_stats} > merged_stats.txt
+        python3 /opt/hic-pipeline/src/jsonify_stats.py --alignment-stats merged_stats.txt
+    }
+
+    output {
+        File merged_stats = glob('merged_stats.txt')[0]
+        File merged_stats_json = glob("merged_stats.json")[0]
+    }
+}
+
+
 task create_hic {
+    Array[String] ligation_junctions
     File pairs_file
-    File stats
-    File stats_hists
     File chrsz_
+    File restriction_sites
     String quality
 
     command {
-        /opt/scripts/common/juicer_tools pre -s ${stats} -g ${stats_hists} -q ${quality} ${pairs_file} inter_${quality}.hic ${chrsz_}
+        /opt/scripts/common/statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l ${sep=' ' ligation_junctions} ${pairs_file}
+        /opt/scripts/common/juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} ${pairs_file} inter_${quality}.hic ${chrsz_}
     }
 
     output {

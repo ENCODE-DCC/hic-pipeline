@@ -19,8 +19,9 @@ workflow test_hic {
     File reference_index
     Int? cpu
 
-    Map[String, String] restriction_enzyme_to_site = read_map("workflow/sub_workflow/restriction_enzyme_to_site.tsv")
+    Map[String, String] restriction_enzyme_to_site = read_map("workflow/restriction_enzyme_to_site.tsv")
     String ligation_site = restriction_enzyme_to_site[restriction_enzyme]
+    Array[String] ligation_junctions = [ligation_site]
 
     #determine range of scatter
     Int lib_length = if length(fastq) > 0 then length(fastq)
@@ -57,8 +58,8 @@ workflow test_hic {
     scatter(i in range(length(qualities))) {
         call hic.create_hic as create_hic { input:
             pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
-            stats = process_library.stats[0],
-            stats_hists = process_library.stats_hists[0],
+            ligation_junctions = ligation_junctions,
+            restriction_sites = restriction_sites,
             chrsz_ = chrsz,
             quality = qualities[i]
         }
