@@ -15,6 +15,7 @@ workflow hic {
     Array[File?] input_dedup_pairs = []
     Array[File?] library_stats = []
     Array[File?] library_stats_hists = []
+    Array[String?] input_ligation_junctions = []
 
     # Inputs for library processing
     String? restriction_enzyme
@@ -54,7 +55,8 @@ workflow hic {
 
     # Prepare array of restriction sites for megamap
     Map[String, String] restriction_enzyme_to_site = read_map("workflow/restriction_enzyme_to_site.tsv")
-    Array[String] ligation_junctions = if defined(restriction_enzyme) then [restriction_enzyme_to_site[restriction_enzyme]] else []
+    String? ligation_junction = if defined(restriction_enzyme) then restriction_enzyme_to_site[restriction_enzyme] else ""
+    Array[String] ligation_junctions = select_all(if defined(restriction_enzyme) then [ligation_junction] else input_ligation_junctions)
 
     Array[String] qualities = if !defined(input_hic) then ["1", "30"] else []
     scatter(i in range(length(qualities))) {
