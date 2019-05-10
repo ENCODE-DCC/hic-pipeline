@@ -8,7 +8,7 @@ workflow test_create_hic {
 
     call hic.create_hic as test_create_hic_task { input:
         pairs_file = pairs_file,
-        chrsz_ = chrsz_,
+        use_juicer_chrsz = true,
         ligation_junctions = ligation_junctions,
         restriction_sites = restriction_sites,
         quality = "30"

@@ -1,6 +1,6 @@
 {
     "default_runtime_attributes": {
-        "docker" : "quay.io/encode-dcc/hic-pipeline:template",
+        "docker" : "quay.io/encode-dcc/hic-pipeline:test-new-juicertools",
         "zones": "us-west1-a us-west1-b us-west1-c us-east1-b",
         "preemptible": "0",
         "bootDiskSizeGb": "10",

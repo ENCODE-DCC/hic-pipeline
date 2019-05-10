@@ -142,13 +142,16 @@ task merge_stats {
 task create_hic {
     Array[String] ligation_junctions
     File pairs_file
-    File chrsz_
+    File? chrsz_
     File restriction_sites
     String quality
+    Boolean? use_juicer_chrsz = false
+
+    String chrsz = if use_juicer_chrsz then "ce10" else chrsz_
 
     command {
         /opt/scripts/common/statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l ${sep=' ' ligation_junctions} ${pairs_file}
-        /opt/scripts/common/juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} ${pairs_file} inter_${quality}.hic ${chrsz_}
+        /opt/scripts/common/juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} ${pairs_file} inter_${quality}.hic ${chrsz}
     }
 
     output {

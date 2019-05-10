@@ -50,9 +50,9 @@ RUN git clone --branch encode https://github.com/theaidenlab/juicer.git
 RUN cd juicer && chmod +x CPU/* CPU/common/* 
 
 # Install Juicer tools
-ADD http://hicfiles.tc4ga.com.s3.amazonaws.com/public/juicer/juicer_tools.1.9.9_jcuda.0.8.jar /opt/juicer/CPU/common
-RUN ln -s /opt/juicer/CPU/common/juicer_tools.1.9.9_jcuda.0.8.jar /opt/juicer/CPU/common/juicer_tools.jar
-RUN chmod 666 /opt/juicer/CPU/common/juicer_tools.1.9.9_jcuda.0.8.jar
+ADD http://hicfiles.tc4ga.com.s3.amazonaws.com/public/juicer/juicer_tools_1.10.12_jcuda.0.8.jar /opt/juicer/CPU/common
+RUN ln -s /opt/juicer/CPU/common/juicer_tools_1.10.12_jcuda.0.8.jar /opt/juicer/CPU/common/juicer_tools.jar
+RUN chmod 666 /opt/juicer/CPU/common/juicer_tools_1.10.12_jcuda.0.8.jar
 RUN ln -s juicer/CPU scripts
 
 # Install Straw for removal of hic header in create_hic test
