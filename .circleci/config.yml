@@ -107,7 +107,7 @@ jobs:
             echo "pulling template!"
             docker pull quay.io/encode-dcc/${QUAY_REPO}:template
             docker login -u=${QUAY_ROBOT_USER} -p=${QUAY_ROBOT_USER_TOKEN} quay.io
-            docker build --cache-from quay.io/encode-dcc/${QUAY_REPO}:template --build-arg GIT_COMMIT_HASH=${CIRCLE_SHA1} --build-arg BRANCH=${CIRCLE_BRANCH} --build-arg BUILD_TAG=${TAG} -t $TAG -t quay.io/encode-dcc/${QUAY_REPO}:template -f {DOCKERFILE_DIR}/Dockerfile .
+            docker build --cache-from quay.io/encode-dcc/${QUAY_REPO}:template --build-arg GIT_COMMIT_HASH=${CIRCLE_SHA1} --build-arg BRANCH=${CIRCLE_BRANCH} --build-arg BUILD_TAG=${TAG} -t $TAG -t quay.io/encode-dcc/${QUAY_REPO}:template -f ${DOCKERFILE_DIR}/Dockerfile .
             docker push $TAG
             docker push quay.io/encode-dcc/${QUAY_REPO}:template
             docker logout
