@@ -65,6 +65,17 @@ jobs:
 
   build:
     <<: *defaults
+    parameters:
+      quay_repo:
+        description: "The name of the quay.io repository the image should be pushed to"
+        type: enum
+        default: "hic-pipeline"
+        enum: ["hic-pipeline", "hiccups"]
+      dockerfile_dir:
+        description: "The folder containing the Dockerfile to be built"
+        type: enum
+        default: "docker_image"
+        enum: ["docker_image", "nvidia_docker_image"]
     steps:
       - checkout
       - setup_remote_docker
@@ -74,11 +85,11 @@ jobs:
           command: |
             source ${BASH_ENV}
             echo "pulling template!"
-            docker pull quay.io/encode-dcc/hic-pipeline:template
+            docker pull quay.io/encode-dcc/${quay_repo}:template
             docker login -u=${QUAY_ROBOT_USER} -p=${QUAY_ROBOT_USER_TOKEN} quay.io
-            docker build --cache-from quay.io/encode-dcc/hic-pipeline:template --build-arg GIT_COMMIT_HASH=${CIRCLE_SHA1} --build-arg BRANCH=${CIRCLE_BRANCH} --build-arg BUILD_TAG=${TAG} -t $TAG -t quay.io/encode-dcc/hic-pipeline:template -f docker_image/Dockerfile .
+            docker build --cache-from quay.io/encode-dcc/${quay_repo}:template --build-arg GIT_COMMIT_HASH=${CIRCLE_SHA1} --build-arg BRANCH=${CIRCLE_BRANCH} --build-arg BUILD_TAG=${TAG} -t $TAG -t quay.io/encode-dcc/${quay_repo}:template -f {dockerfile_dir}/Dockerfile .
             docker push $TAG
-            docker push quay.io/encode-dcc/hic-pipeline:template
+            docker push quay.io/encode-dcc/${quay_repo}:template
             docker logout
 
 # Define workflow here
@@ -93,6 +104,13 @@ workflows:
                 - master
                 - dev-1
                 - /.*-test$/
+      - build:
+          quay_repo: "hiccups"
+          dockerfile_dir: "nvidia_docker_image"
+          filters:
+            branches:
+              only:
+                - /.*hiccups-image-update$/
       - test:
           name: test_align
           requires:
