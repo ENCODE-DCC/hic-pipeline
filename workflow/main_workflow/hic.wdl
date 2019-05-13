@@ -145,9 +145,9 @@ task create_hic {
     File? chrsz_
     File restriction_sites
     String quality
-    Boolean? use_juicer_chrsz = false
+    Boolean? use_builtin_ce_chrsz
 
-    String chrsz = if use_juicer_chrsz then "ce10" else chrsz_
+    String? chrsz = if defined(use_builtin_ce_chrsz) then "ce10" else chrsz_
 
     command {
         /opt/scripts/common/statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l ${sep=' ' ligation_junctions} ${pairs_file}
@@ -185,7 +185,7 @@ task hiccups{
     File hic_file
     
     command {
-        java -jar /opt/scripts/common/juicer_tools.jar hiccups --ignore_sparsity ${hic_file} loops
+        java -jar -Ddevelopment=false /opt/scripts/common/juicer_tools.jar hiccups --ignore_sparsity ${hic_file} loops
     }
     
     output {

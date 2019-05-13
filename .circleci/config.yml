@@ -92,7 +92,7 @@ workflows:
               only:
                 - master
                 - dev-1
-                - PIP-622-enzyme-bugfix
+                - /.*-test$/
       - test:
           name: test_align
           requires:
@@ -140,7 +140,7 @@ workflows:
           requires:
             - build
           test_name: "create_hic"
-          keys_to_inspect: "test_create_hic.no_header"
+          keys_to_inspect: "test_create_hic.hic_file"
       - test:
           name: test_hic
           requires:
