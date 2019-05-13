@@ -11,7 +11,7 @@ machine_defaults: &machine_defaults
 make_tag: &make_tag
   name: make docker image tag
   command: |
-    echo "export TAG=quay.io/encode-dcc/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}" > ${BASH_ENV}
+    echo "export TAG=quay.io/encode-dcc/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}" >> ${BASH_ENV}
 
 get_cromwell: &get_cromwell
   name: get the cromwell 36
@@ -88,9 +88,9 @@ jobs:
           steps:
             - run:
                 command: |
-                  echo "export TAG=quay.io/encode-dcc/hiccups:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}" > ${BASH_ENV}
-                  echo "export QUAY_REPO=hiccups" > ${BASH_ENV}
-                  echo "export DOCKERFILE_DIR=nvidia_docker_image" > ${BASH_ENV}
+                  echo "export TAG=quay.io/encode-dcc/hiccups:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}" >> ${BASH_ENV}
+                  echo "export QUAY_REPO=hiccups" >> ${BASH_ENV}
+                  echo "export DOCKERFILE_DIR=nvidia_docker_image" >> ${BASH_ENV}
       - unless:
           condition: << parameters.is_hiccups_image >>
           steps:
@@ -98,8 +98,8 @@ jobs:
             - run:
                 name: set environ
                 command: |
-                  echo "export QUAY_REPO=hic-pipeline" > ${BASH_ENV}
-                  echo "export DOCKERFILE_DIR=docker_image" > ${BASH_ENV}
+                  echo "export QUAY_REPO=hic-pipeline" >> ${BASH_ENV}
+                  echo "export DOCKERFILE_DIR=docker_image" >> ${BASH_ENV}
       - run:
           name: build image
           command: |
