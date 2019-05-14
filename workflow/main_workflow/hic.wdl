@@ -145,13 +145,13 @@ task create_hic {
     File? chrsz_
     File restriction_sites
     String quality
-    Boolean? use_builtin_ce_chrsz
+    # Boolean? use_builtin_ce_chrsz
 
-    String? chrsz = if defined(use_builtin_ce_chrsz) then "ce10" else chrsz_
+    # File? chrsz = if defined(use_builtin_ce_chrsz) then "ce10" else chrsz_
 
     command {
         /opt/scripts/common/statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l ${sep=' ' ligation_junctions} ${pairs_file}
-        /opt/scripts/common/juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} ${pairs_file} inter_${quality}.hic ${chrsz}
+        /opt/scripts/common/juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} ${pairs_file} inter_${quality}.hic ${default="ce10" chrsz_}
     }
 
     output {

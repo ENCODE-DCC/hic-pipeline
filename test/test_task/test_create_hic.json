@@ -1,6 +1,5 @@
 {
     "test_create_hic.pairs_file": "test/test_data/merged_nodups.txt",
-    "test_create_hic.use_builtin_ce_chrsz": true,
     "test_create_hic.ligation_junctions": ["GATCGATC"],
     "test_create_hic.restriction_sites": "test/test_data/ce10_selected_MboI.txt"
 }
