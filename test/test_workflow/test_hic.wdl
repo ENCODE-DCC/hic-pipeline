@@ -60,13 +60,7 @@ workflow test_hic {
             pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
             ligation_junctions = ligation_junctions,
             restriction_sites = restriction_sites,
-            chrsz_ = chrsz,
             quality = qualities[i]
-        }
-    }
-    scatter(i in range(length(qualities))) {
-        call strip_header { input:
-            hic_file = create_hic.inter[i]
         }
     }
 
@@ -74,8 +68,8 @@ workflow test_hic {
         File no_header_alignable_sam = strip_headers.no_header
         File out_pairs = tail_of_pairs.no_header
         File out_dedup = process_library.library_dedup[0]
-        File no_header_hic_1 = strip_header.no_header[0]
-        File no_header_hic_30 = strip_header.no_header[1]
+        File no_header_hic_1 = create_hic.inter[0]
+        File no_header_hic_30 = create_hic.inter[1]
 
         #QC outputs
         File library_complexity = process_library.library_stats_json[0]
@@ -106,22 +100,5 @@ task strip_headers{
     }
     output {
         File no_header = glob("*.no_header.sam")[0]
-    }
-}
-
-task strip_header {
-    File hic_file
-
-    command {
-        FILE=$(basename "${hic_file}" ".hic")
-        hic_file=${hic_file}
-        matrix_start=$(python3 /opt/straw/python/get_matrix_start.py $hic_file)
-        matrix_start=$((matrix_start + 1))
-        # tail -c +$matrix_start $hic_file > no_header.hic
-        tail -c 10000 $hic_file > $FILE.no_header.hic
-    }
-
-    output {
-        File no_header = glob("*.no_header.hic")[0]
     }
 }
