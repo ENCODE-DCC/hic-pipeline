@@ -92,7 +92,7 @@ workflows:
               only:
                 - master
                 - dev-1
-                - PIP-610-megamap-support
+                - PIP-622-enzyme-bugfix
       - test:
           name: test_align
           requires:
