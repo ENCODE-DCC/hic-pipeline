@@ -1,5 +1,4 @@
 import "../../workflow/main_workflow/hic.wdl" as hic
-import "../../test/test_utils.wdl" as utils
 
 workflow test_hic_from_libraries {
     Array[File] input_dedup_pairs
@@ -15,23 +14,19 @@ workflow test_hic_from_libraries {
         input_dedup_pairs = input_dedup_pairs,
         library_stats = library_stats,
         library_stats_hists = library_stats_hists,
+<<<<<<< HEAD
         chrsz = chrsz,
         restriction_enzyme = restriction_enzyme,
+=======
+        input_ligation_junctions = ligation_junctions,
+>>>>>>> fix hic_from_libraries test
         restriction_sites = restriction_sites,
         no_call_loops = no_call_loops,
         no_call_tads = no_call_tads
     }
 
-    Array[File?] hic_files = [hic.out_hic_1, hic.out_hic_30]
-
-    scatter(hic_file in hic_files) {
-        call utils.strip_hic_header as strip_hic_header { input:
-            hic_file = hic_file
-        }
-    }
-
     output {
-        File? inter_1_no_header = strip_hic_header.no_header[0]
-        File? inter_30_no_header = strip_hic_header.no_header[1]
+        File? inter_1_no_header = hic.out_hic_1
+        File? inter_30_no_header = hic.out_hic_30
     }
 }
