@@ -25,6 +25,7 @@ workflow hic {
     Int? cpu
     Boolean? no_call_loops = false
     Boolean? no_call_tads = false
+    Boolean? no_bam2pairs = false
 
     #determine range of scatter
     Int lib_length = if length(fastq) > 0 then length(fastq)
@@ -40,7 +41,8 @@ workflow hic {
             reference_index = reference_index,
             restriction_enzyme = restriction_enzyme,
             cpu = cpu,
-            restriction_sites = restriction_sites
+            restriction_sites = restriction_sites,
+            no_bam2pairs = no_bam2pairs
         }
     }
 
@@ -84,7 +86,7 @@ workflow hic {
     output {
         # Sub-workflow processing a library outputs
         Array[File] out_merged_align = process_library.alignable_bam
-        Array[File] out_pairs = process_library.pairs_file
+        Array[File?] out_pairs = process_library.pairs_file
         Array[File] out_dedup = process_library.library_dedup
 
         # Create hic outputs

@@ -5,6 +5,7 @@ workflow process_library {
     File chrsz
     File reference_index
     Int? cpu
+    Boolean? no_bam2pairs = false
 
     Int fastqs_len = length(sub_fastq)
 
@@ -55,14 +56,16 @@ workflow process_library {
     }
     
     # convert alignable bam to pairs to be consistent with 4DN
-    call bam2pairs { input:
-        bam_file = dedup.deduped_bam,
-        chrsz_  = chrsz
+    if ( !no_bam2pairs ) {
+        call bam2pairs { input:
+            bam_file = dedup.deduped_bam,
+            chrsz_  = chrsz
+        }
     }
 
     output {
         File alignable_bam = dedup.deduped_bam
-        File pairs_file = bam2pairs.out_file
+        File? pairs_file = bam2pairs.out_file
         File library_dedup = dedup.out_file
         File stats_json = dedup.stats_json
         File library_stats = dedup.library_complexity
