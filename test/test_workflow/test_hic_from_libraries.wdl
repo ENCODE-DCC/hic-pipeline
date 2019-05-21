@@ -4,7 +4,6 @@ workflow test_hic_from_libraries {
     Array[File] input_dedup_pairs
     Array[File] library_stats
     Array[File] library_stats_hists
-    File chrsz
     File restriction_sites
     String restriction_enzyme
     Boolean no_call_loops
@@ -14,7 +13,6 @@ workflow test_hic_from_libraries {
         input_dedup_pairs = input_dedup_pairs,
         library_stats = library_stats,
         library_stats_hists = library_stats_hists,
-        chrsz = chrsz,
         restriction_enzyme = restriction_enzyme,
         restriction_sites = restriction_sites,
         no_call_loops = no_call_loops,
