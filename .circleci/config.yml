@@ -70,16 +70,6 @@ jobs:
         description: "Determines if the job is building a hiccups Docker image"
         type: boolean
         default: false
-      # quay_repo:
-      #   description: "The name of the quay.io repository the image should be pushed to"
-      #   type: enum
-      #   default: "hic-pipeline"
-      #   enum: ["hic-pipeline", "hiccups"]
-      # dockerfile_dir:
-      #   description: "The folder containing the Dockerfile to be built"
-      #   type: enum
-      #   default: "docker_image"
-      #   enum: ["docker_image", "nvidia_docker_image"]
     steps:
       - checkout
       - setup_remote_docker

@@ -190,7 +190,7 @@ task hiccups{
     }
     
     runtime {
-        docker: "quay.io/encode-dcc/hiccups:stripped_down"
+        docker: "quay.io/encode-dcc/hiccups:template"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         zones: ["us-east1-b"]
