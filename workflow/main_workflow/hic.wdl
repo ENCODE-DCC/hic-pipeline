@@ -142,13 +142,13 @@ task merge_stats {
 task create_hic {
     Array[String] ligation_junctions
     File pairs_file
-    File chrsz_
+    File? chrsz_
     File restriction_sites
     String quality
 
     command {
         /opt/scripts/common/statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l ${sep=' ' ligation_junctions} ${pairs_file}
-        /opt/scripts/common/juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} ${pairs_file} inter_${quality}.hic ${chrsz_}
+        /opt/scripts/common/juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} ${pairs_file} inter_${quality}.hic ${default="ce10" chrsz_}
     }
 
     output {
@@ -182,7 +182,7 @@ task hiccups{
     File hic_file
     
     command {
-        java -jar /opt/scripts/common/juicer_tools.jar hiccups --ignore_sparsity ${hic_file} loops
+        java -jar -Ddevelopment=false /opt/scripts/common/juicer_tools.jar hiccups --ignore_sparsity ${hic_file} loops
     }
     
     output {

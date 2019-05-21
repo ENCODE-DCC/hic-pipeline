@@ -229,7 +229,7 @@ task dedup {
         pcr=$(wc -l dups.txt | awk '{print $1}')
         unique=$(wc -l merged_nodups.txt | awk '{print $1}')
         opt=$(wc -l optdups.txt | awk '{print $1}')
-        java -jar /opt/scripts/common/juicer_tools.jar LibraryComplexity $unique $pcr $opt > library_complexity.txt
+        java -jar -Ddevelopment=false /opt/scripts/common/juicer_tools.jar LibraryComplexity $unique $pcr $opt > library_complexity.txt
         /opt/scripts/common/statistics.pl -s ${restriction_sites} -l ${ligation_site} merged_nodups.txt
         python3 /opt/hic-pipeline/src/jsonify_stats.py --library-complexity library_complexity.txt
         python3 /opt/hic-pipeline/src/jsonify_stats.py --library-stats stats.txt

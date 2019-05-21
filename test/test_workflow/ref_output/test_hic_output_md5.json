@@ -2,8 +2,8 @@
     "result_alignable_dedup.no_header.sam" : "127bc8d5458407c76dcb53f2937ae5af",
     "merged_nodups.txt" : "d16174d16848c3efa477d3d54ab6a117",
     "no_header.pairs" : "36175186060d792ea1b7051905ae1f32",
-    "inter_30.no_header.hic" : "8821f3a4c24e76859f71757ae683ec45",
-    "inter_1.no_header.hic" : "110113941a61a25bca182c50e760dcaf",
+    "inter_30.hic" : "53d4e1a49e9d68d00467344f8b41608d",
+    "inter_1.hic" : "9bd9aa218141f0d9e686c327425c1caf",
     "alignment_stats.txt": "b28c7acf877f91de840d22e3566c4d4d",
     "library_complexity.json": "ad342fb69ccc39c3f5dd4ed68421bc8e",
     "stats.json": "c013c14b6342417008016ecd04c8d8a7"
