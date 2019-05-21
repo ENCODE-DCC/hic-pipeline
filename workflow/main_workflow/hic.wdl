@@ -18,7 +18,7 @@ workflow hic {
     Array[String?] input_ligation_junctions = []
 
     # Inputs for library processing
-    String? restriction_enzyme
+    String restriction_enzyme
     File? restriction_sites
     File? chrsz
     File? reference_index
