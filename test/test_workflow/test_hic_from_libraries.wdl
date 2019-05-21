@@ -14,12 +14,8 @@ workflow test_hic_from_libraries {
         input_dedup_pairs = input_dedup_pairs,
         library_stats = library_stats,
         library_stats_hists = library_stats_hists,
-<<<<<<< HEAD
         chrsz = chrsz,
         restriction_enzyme = restriction_enzyme,
-=======
-        input_ligation_junctions = ligation_junctions,
->>>>>>> fix hic_from_libraries test
         restriction_sites = restriction_sites,
         no_call_loops = no_call_loops,
         no_call_tads = no_call_tads
