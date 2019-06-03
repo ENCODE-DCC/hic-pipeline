@@ -168,7 +168,7 @@ workflows:
           requires:
             - build
           test_name: "create_hic"
-          keys_to_inspect: "test_create_hic.hic_file"
+          keys_to_inspect: "test_create_hic.hic_file test_create_hic.stats test_create_hic.stats_json test_create_hic.stats_hists"
       - test:
           name: test_hic
           requires:

@@ -149,10 +149,14 @@ task create_hic {
     command {
         /opt/scripts/common/statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l ${sep=' ' ligation_junctions} ${pairs_file}
         /opt/scripts/common/juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} ${pairs_file} inter_${quality}.hic ${default="ce10" chrsz_}
+        python3 /opt/hic-pipeline/src/jsonify_stats.py --alignment-stats stats_${quality}.txt
     }
 
     output {
         File inter = glob('inter*.hic')[0]
+        File stats = glob('stats*.txt')[0]
+        File stats_json = glob('stats*.json')[0]
+        File stats_hists = glob('stats*hists.m')[0]
     }
 
     runtime {
