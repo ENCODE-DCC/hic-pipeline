@@ -14,5 +14,8 @@ workflow test_create_hic {
 
     output {
         File hic_file = test_create_hic_task.inter
+        File stats = test_create_hic_task.stats
+        File stats_json = test_create_hic_task.stats_json
+        File stats_hists = test_create_hic_task.stats_hists
     }
 }
