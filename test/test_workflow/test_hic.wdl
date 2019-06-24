@@ -13,6 +13,7 @@ workflow test_hic {
     File? input_pairs
     File? input_hic
     File? sub_ms
+    String assembly_name
 
     String restriction_enzyme
     File restriction_sites
@@ -61,7 +62,9 @@ workflow test_hic {
             pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
             ligation_junctions = ligation_junctions,
             restriction_sites = restriction_sites,
-            quality = qualities[i]
+            quality = qualities[i],
+            chrsz_ = chrsz,
+            assembly_name = assembly_name
         }
     }
 

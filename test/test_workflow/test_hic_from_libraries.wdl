@@ -7,7 +7,9 @@ workflow test_hic_from_libraries {
     Array[File] library_stats
     Array[File] library_stats_hists
     File restriction_sites
+    File chrsz
     String restriction_enzyme
+    String assembly_name
     Boolean no_call_loops
     Boolean no_call_tads
 
@@ -17,8 +19,10 @@ workflow test_hic_from_libraries {
         library_stats_hists = library_stats_hists,
         restriction_enzyme = restriction_enzyme,
         restriction_sites = restriction_sites,
+        chrsz = chrsz,
         no_call_loops = no_call_loops,
-        no_call_tads = no_call_tads
+        no_call_tads = no_call_tads,
+        assembly_name = assembly_name
     }
 
     output {

@@ -6,5 +6,6 @@
     "test_hic.chrsz": "test/test_data/ce10_selected.chrom.sizes.tsv",
     "test_hic.restriction_sites": "test/test_data/ce10_selected_MboI.txt",
     "test_hic.reference_index": "test/test_data/ce10_selected.tar.gz",
-    "test_hic.restriction_enzyme": "MboI"
+    "test_hic.restriction_enzyme": "MboI",
+    "test_hic.assembly_name": "ce10"
 }
