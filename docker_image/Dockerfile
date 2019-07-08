@@ -12,7 +12,7 @@ MAINTAINER Neva C. Durand
 # Update the repository sources list
 # Install base packages: java, git, wget
 RUN apt-get update && apt-get install -y \
-    default-jdk \
+    openjdk-8-jdk \
     gawk \
     gcc \
     git \

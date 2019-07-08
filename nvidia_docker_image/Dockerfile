@@ -1,10 +1,10 @@
-FROM nvidia/cuda:7.5-devel-ubuntu14.04
+FROM nvidia/cuda:8.0-devel-ubuntu16.04
 LABEL maintainer "NVIDIA CORPORATION <cudatools@nvidia.com>"
 
 # Update the repository sources list
 # Install base packages: java, git, wget
 RUN apt-get update && apt-get install -y \
-    default-jdk \
+    openjdk-8-jdk \
     gawk \
     gcc \
     git \

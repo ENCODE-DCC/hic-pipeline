@@ -1,5 +1,3 @@
-.DS_Store
-.git
-.gitignore
-cromwell-executions
-cromwell-workflow-logs
+# The * ignores everything, then !src creates an exception for the src folder
+*
+!src
