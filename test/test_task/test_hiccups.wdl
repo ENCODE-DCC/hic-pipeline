@@ -1,3 +1,5 @@
+#CAPER docker quay.io/encode-dcc/hiccups:template
+
 import "../../workflow/main_workflow/hic.wdl" as hic
 
 workflow test_hiccups {

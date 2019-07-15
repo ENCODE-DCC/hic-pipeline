@@ -1,3 +1,5 @@
+#CAPER docker quay.io/encode-dcc/hic-pipeline:template
+
 import "../../workflow/sub_workflow/process_library.wdl" as hic
 
 workflow test_merge {

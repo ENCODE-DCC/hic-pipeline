@@ -1,4 +1,5 @@
-##Encode DCC Hi-C pipeline
+#CAPER docker quay.io/encode-dcc/hic-pipeline:template
+
 import "test_hic.wdl" as hic
 
 workflow test_multiple_libraries {
