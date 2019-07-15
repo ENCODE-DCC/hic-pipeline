@@ -13,10 +13,11 @@ make_tag: &make_tag
   command: |
     echo "export TAG=quay.io/encode-dcc/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}" >> ${BASH_ENV}
 
-get_cromwell: &get_cromwell
-  name: get the cromwell 36
+get_caper: &get_caper
+  name: get caper
   command: |
-    wget -N -c https://github.com/broadinstitute/cromwell/releases/download/36/cromwell-36.jar
+    pyenv global 3.5.2
+    pip install caper
 
 version: 2.1
 jobs:
@@ -53,10 +54,9 @@ jobs:
     steps:
       - checkout
       - run: *make_tag
-      - run: *get_cromwell
+      - run: *get_caper
       - run:
           command: |
-            pyenv global 3.5.2
             source ${BASH_ENV}
             test/test_task/test.sh test/test_<< parameters.test_type >>/test_<< parameters.test_name >>.wdl test/test_<< parameters.test_type >>/test_<< parameters.test_name >>.json $TAG docker
             python3 src/compare_md5.py --keys_to_inspect << parameters.keys_to_inspect >> --metadata_json test_<< parameters.test_name >>.metadata.json --reference_json test/test_<< parameters.test_type >>/ref_output/test_<< parameters.test_name >>_output_md5.json --outfile result.json

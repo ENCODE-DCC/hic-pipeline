@@ -6,17 +6,16 @@
     $ cd hic-pipeline
     ```
 
-2. Download [cromwell](https://github.com/broadinstitute/cromwell). The pipeline has been tested with cromwell version 37.
+2. Install [Caper](https://github.com/ENCODE-DCC/caper), requires Python > 3.4.1
     ```bash
-    $ wget https://github.com/broadinstitute/cromwell/releases/download/37/cromwell-37.jar
-    $ chmod +rx cromwell-37.jar
+    $ pip install caper
     ```
     
 3. Run a pipeline for the test sample.
     ```bash
     $ INPUT=examples/template_one.json 
     $ PIPELINE_METADATA=metadata.json
-    $ java -jar -Dconfig.file=backends/backend.conf cromwell-37.jar run workflow/main_workflow/hic.wdl -i ${INPUT} -o workflow_opts/docker.json -m ${PIPELINE_METADATA}
+    $ caper run workflow/main_workflow/hic.wdl --use-docker -i ${INPUT} -m ${PIPELINE_METADATA}
     ```
 
 4. Execution of the pipeline on your local machine should take less than 10 minutes (delay could result from internet connection speed and the need to download the Docker image that is several 100s Mb large). You will be able to find all outputs on `cromwell-executions/hic/[RANDOM_HASH_STRING]/`. See [output directory structure](output.md) for details.

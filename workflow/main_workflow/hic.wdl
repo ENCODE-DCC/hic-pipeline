@@ -1,4 +1,8 @@
 ##Encode DCC Hi-C pipeline
+
+#CAPER docker quay.io/encode-dcc/hic-pipeline:template
+#CAPER singularity docker://quay.io/encode-dcc/hic-pipeline:template
+
 import "../../workflow/sub_workflow/process_library.wdl" as sub
 
 workflow hic {
