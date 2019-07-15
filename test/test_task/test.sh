@@ -17,4 +17,4 @@ fi
 PREFIX=$(basename ${WDL} .wdl)
 METADATA=${PREFIX}.metadata.json # metadata
 
-caper run ${WDL} --use-docker ${DOCKER_IMAGE} -i ${INPUT} -m ${METADATA}
+caper run ${WDL} --docker ${DOCKER_IMAGE} -i ${INPUT} -m ${METADATA}

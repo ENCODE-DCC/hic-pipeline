@@ -35,10 +35,9 @@ All testing data is included in the repository. You won't have to download any d
     $ cd hic-pipeline
     ```
 
-11. Download [cromwell](https://github.com/broadinstitute/cromwell). The pipeline has been tested with cromwell version 37.
+11. Install [Caper](https://github.com/ENCODE-DCC/caper), requires Python > 3.4.1
     ```bash
-    $ wget https://github.com/broadinstitute/cromwell/releases/download/37/cromwell-37.jar
-    $ chmod +rx cromwell-37.jar
+    $ pip install caper
     ```
 
 12. Run a pipeline using test dataset.
@@ -48,7 +47,7 @@ All testing data is included in the repository. You won't have to download any d
     $ INPUT=examples/google_template.json 
     $ PIPELINE_METADATA=metadata.json
 
-    $ java -jar -Dconfig.file=backends/backend.conf -Dbackend.default=google -Dbackend.providers.google.config.project=${PROJECT} -Dbackend.providers.google.config.root=${BUCKET} cromwell-37.jar run workflow/main_workflow/hic.wdl -i ${INPUT} -o workflow_opts/docker.json -m ${PIPELINE_METADATA}
+    $ caper run run workflow/main_workflow/hic.wdl --use-docker -b gcp --gcp-prj ${PROJECT} --tmp-gcs-bucket ${BUCKET} --out-gcs-bucket ${BUCKET} -i ${INPUT} -o workflow_opts/docker.json -m ${PIPELINE_METADATA}
     ```
 
 13. You will be able to find all outputs on your Google Cloud bucket. `gs://[YOUR_BUCKET_NAME] cromwell-executions/hic/[RANDOM_HASH_STRING]/`. See [output directory structure](output.md) for details.
