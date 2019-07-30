@@ -6,12 +6,16 @@ workflow test_create_hic {
     Array[String] ligation_junctions
     File pairs_file
     File restriction_sites
+    File chrsz
+    String assembly_name
 
     call hic.create_hic as test_create_hic_task { input:
         pairs_file = pairs_file,
         ligation_junctions = ligation_junctions,
         restriction_sites = restriction_sites,
-        quality = "30"
+        chrsz_ = chrsz,
+        quality = "30",
+        assembly_name = assembly_name
     }
 
     output {

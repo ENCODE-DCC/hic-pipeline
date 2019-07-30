@@ -14,6 +14,7 @@ workflow hic {
     File? input_pairs
     File? input_hic
     File? sub_ms
+    String? assembly_name
 
     # Inputs and logic for entrypoint after library processing
     Array[File?] input_dedup_pairs = []
@@ -69,7 +70,8 @@ workflow hic {
             restriction_sites = restriction_sites,
             ligation_junctions = ligation_junctions,
             chrsz_ = chrsz,
-            quality = qualities[i]
+            quality = qualities[i],
+            assembly_name = assembly_name
         }
     }
 
@@ -146,13 +148,20 @@ task merge_stats {
 task create_hic {
     Array[String] ligation_junctions
     File pairs_file
-    File? chrsz_
+    File chrsz_
     File restriction_sites
     String quality
+    String? assembly_name
 
     command {
         /opt/scripts/common/statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l ${sep=' ' ligation_junctions} ${pairs_file}
-        /opt/scripts/common/juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} ${pairs_file} inter_${quality}.hic ${default="ce10" chrsz_}
+        ASSEMBLY_NAME=${default='' assembly_name}
+        # If the assembly name is empty, then we write chrsz path into file as usual, otherwise, use the assembly name instead of the path
+        if [ -z "$ASSEMBLY_NAME" ]; then
+            /opt/scripts/common/juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} ${pairs_file} inter_${quality}.hic ${chrsz_}
+        else
+            /opt/scripts/common/juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} -y $ASSEMBLY_NAME ${pairs_file} inter_${quality}.hic ${chrsz_}
+        fi
         python3 /opt/hic-pipeline/src/jsonify_stats.py --alignment-stats stats_${quality}.txt
     }
 
