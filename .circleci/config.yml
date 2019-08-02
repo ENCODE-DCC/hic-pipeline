@@ -55,6 +55,10 @@ jobs:
         description: "Determines if the job is building a hiccups Docker image"
         type: boolean
         default: false
+      push_template:
+        description: "Determines whether or not to push images with template tag."
+        type: boolean
+        default: false
     steps:
       - checkout
       - setup_remote_docker
@@ -84,8 +88,13 @@ jobs:
             docker login -u=${QUAY_ROBOT_USER} -p=${QUAY_ROBOT_USER_TOKEN} quay.io
             docker build --cache-from quay.io/encode-dcc/${QUAY_REPO}:template --build-arg GIT_COMMIT_HASH=${CIRCLE_SHA1} --build-arg BRANCH=${CIRCLE_BRANCH} --build-arg BUILD_TAG=${TAG} -t $TAG -t quay.io/encode-dcc/${QUAY_REPO}:template -f ${DOCKERFILE_DIR}/Dockerfile .
             docker push $TAG
-            docker push quay.io/encode-dcc/${QUAY_REPO}:template
             docker logout
+      - when:
+          condition: << parameters.push_template >>
+          steps:
+            run:
+              name: push template
+              command: docker push quay.io/encode-dcc/${QUAY_REPO}:template
 
 # Define workflow here
 workflows:
@@ -137,13 +146,13 @@ workflows:
           test_name: "merge_stats"
           keys_to_inspect: "test_merge_stats.merged_stats test_merge_stats.merged_stats_json"
       - test:
-          name: arrowhead
+          name: test_arrowhead
           requires:
             - build
           test_name: "arrowhead"
           keys_to_inspect: "test_arrowhead.arrowhead_out"
       - test:
-          name: create_hic
+          name: test_create_hic
           requires:
             - build
           test_name: "create_hic"
@@ -183,3 +192,25 @@ workflows:
           test_name: "no_bam2pairs"
           test_type: "workflow"
           keys_to_inspect: "test_no_bam2pairs.inter_1 test_no_bam2pairs.inter_30"
+      - build:
+          name: push_template
+          push_template: true
+          filters:
+            branches:
+              only:
+                - dev-1
+                - /.*hiccups-image-update$/
+          requires:
+            - build
+            - test_align
+            - test_arrowhead
+            - test_bam2pairs
+            - test_create_hic
+            - test_dedup
+            - test_merge
+            - test_merge_stats
+            - test_merge_sort
+            - test_hic
+            - test_multiple_libraries
+            - test_no_call_loops
+            - test_hic_from_libraries
