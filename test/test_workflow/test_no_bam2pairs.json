@@ -1,0 +1,12 @@
+{ 
+    "test_no_bam2pairs.fastq": [[[
+        "test/test_data/merged_read1.fastq.gz",
+        "test/test_data/merged_read2.fastq.gz"]]],
+    "test_no_bam2pairs.restriction_sites": "test/test_data/ce10_selected_MboI.txt",
+    "test_no_bam2pairs.reference_index": "test/test_data/ce10_selected.tar.gz",
+    "test_no_bam2pairs.restriction_enzyme": "MboI",
+    "test_no_bam2pairs.bam2pairs_chrsz": "test/test_data/ce10_selected.chrom.sizes.tsv",
+    "test_no_bam2pairs.no_call_loops": true,
+    "test_no_bam2pairs.no_call_tads": true,
+    "test_no_bam2pairs.no_bam2pairs": false
+}

@@ -197,3 +197,10 @@ workflows:
           test_name: "hic_from_libraries"
           test_type: "workflow"
           keys_to_inspect: "test_hic_from_libraries.inter_1_no_header test_hic_from_libraries.inter_30_no_header"
+      - test:
+          name: test_no_bam2pairs
+          requires:
+            - build
+          test_name: "no_bam2pairs"
+          test_type: "workflow"
+          keys_to_inspect: "test_no_bam2pairs.inter_1 test_no_bam2pairs.inter_30"
