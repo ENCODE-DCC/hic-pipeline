@@ -6,6 +6,7 @@ workflow test_no_bam2pairs {
     String restriction_enzyme
     File restriction_sites
     File reference_index
+    File chrsz
     Boolean no_bam2pairs
     Boolean no_call_loops
     Boolean no_call_tads
@@ -16,6 +17,7 @@ workflow test_no_bam2pairs {
         restriction_sites = restriction_sites,
         reference_index = reference_index,
         restriction_sites = restriction_sites,
+        chrsz = chrsz,
         no_call_loops = no_call_loops,
         no_call_tads = no_call_tads,
         no_bam2pairs = no_bam2pairs

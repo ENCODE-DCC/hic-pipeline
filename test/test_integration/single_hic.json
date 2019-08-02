@@ -1,7 +1,0 @@
-{ 
-    "hic.input_hic":"/Users/anacismaru/ENCODE/neva.hic",
-
-    "hic.chrsz": "/home/anacis/bucket/encode-hic-pipeline-Freference_grch38_chr10_chrM-Fhg38_chr19_chrM.chrom.sizes",
-    "hic.restriction_sites": "/home/anacis/bucket/encode-hic-pipeline-Freference_grch38_chr10_chrM-FGRCh38_no_alt_analysis_set_GCA_000001405.15.chr19_chrM_MboI.txt",
-    "hic.reference_index": "/home/anacis/bucket/index.tar.gz"
-}
