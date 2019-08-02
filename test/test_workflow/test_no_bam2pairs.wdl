@@ -4,6 +4,7 @@ workflow test_no_bam2pairs {
     #User inputs 
     Array[Array[Array[File]]] fastq = [] #[lib_id][fastq_id][read_end_id]
     String restriction_enzyme
+    String assembly_name
     File restriction_sites
     File reference_index
     File chrsz
@@ -20,7 +21,8 @@ workflow test_no_bam2pairs {
         chrsz = chrsz,
         no_call_loops = no_call_loops,
         no_call_tads = no_call_tads,
-        no_bam2pairs = no_bam2pairs
+        no_bam2pairs = no_bam2pairs,
+        assembly_name = assembly_name
     }
 
     Array[File?] hic_files = [hic.out_hic_1, hic.out_hic_30]
