@@ -1,8 +1,0 @@
-{
-    "hic.input_merged_sort": ["/Users/anacismaru/Desktop/bucket/merged_sort_1/merged_sort.txt"],
-        
-    "hic.chrsz": "/Users/anacismaru/Desktop/bucket/encode-hic-pipeline-Freference_grch38_chr10_chrM-Fhg38_chr19_chrM.chrom.sizes",
-    "hic.restriction_sites": "/Users/anacismaru/Desktop/bucket/encode-hic-pipeline-Freference_grch38_chr10_chrM-FGRCh38_no_alt_analysis_set_GCA_000001405.15.chr19_chrM_MboI.txt",
-    "hic.reference_index": "/Users/anacismaru/Desktop/bucket/index.tar.gz"
-
-}
