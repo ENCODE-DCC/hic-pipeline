@@ -47,8 +47,9 @@ RUN cd samtools-1.6 && ./configure --without-curses --disable-bz2 --disable-lzma
 
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
-    git checkout 44752230566dffae0aabddb35116f5d9b72aface
-RUN cd juicer && chmod +x CPU/* CPU/common/* 
+    cd juicer && \
+    git checkout 44752230566dffae0aabddb35116f5d9b72aface && \
+    chmod +x CPU/* CPU/common/*
 
 # Install Juicer tools
 ADD http://s3.amazonaws.com/hicfiles.tc4ga.com/public/juicer/juicer_tools_1.11.09_jcuda.0.8.jar /opt/juicer/CPU/common
