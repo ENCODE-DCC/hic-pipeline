@@ -92,13 +92,7 @@ workflows:
   version: 2
   build_workflow:
     jobs:
-      - build:
-          filters:
-            branches:
-              only:
-                - master
-                - dev-1
-                - /.*-test$/
+      - build
       - build:
           name: build_hiccups
           is_hiccups_image: true

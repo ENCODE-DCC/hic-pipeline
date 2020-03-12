@@ -10,7 +10,8 @@ workflow process_library {
     Int fastqs_len = length(sub_fastq)
 
     # The ligation junctions are consistent with mega.sh
-    Map[String, String] restriction_enzyme_to_site = read_map("workflow/restriction_enzyme_to_site.tsv")
+    File restriction_enzyme_to_site_file = "workflow/restriction_enzyme_to_site.tsv"
+    Map[String, String] restriction_enzyme_to_site = read_map(restriction_enzyme_to_site_file)
     String ligation_site = restriction_enzyme_to_site[restriction_enzyme]
 
     scatter(j in range(fastqs_len)){
