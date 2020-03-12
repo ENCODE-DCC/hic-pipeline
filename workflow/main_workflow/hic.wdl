@@ -61,7 +61,7 @@ workflow hic {
     }
 
     # Prepare array of restriction sites for megamap
-    File restriction_enzyme_to_site_file = "../restriction_enzyme_to_site.tsv"
+    File restriction_enzyme_to_site_file = "workflow/restriction_enzyme_to_site.tsv"
     Map[String, String] restriction_enzyme_to_site = read_map(restriction_enzyme_to_site_file)
     String? ligation_junction = if defined(restriction_enzyme) then restriction_enzyme_to_site[restriction_enzyme] else ""
     Array[String] ligation_junctions = select_all(if defined(restriction_enzyme) then [ligation_junction] else input_ligation_junctions)
