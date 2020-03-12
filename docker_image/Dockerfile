@@ -46,7 +46,8 @@ RUN tar xf samtools-1.6.tar
 RUN cd samtools-1.6 && ./configure --without-curses --disable-bz2 --disable-lzma && make && make install
 
 # Install Juicer
-RUN git clone --branch encode https://github.com/theaidenlab/juicer.git
+RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
+    git checkout 44752230566dffae0aabddb35116f5d9b72aface
 RUN cd juicer && chmod +x CPU/* CPU/common/* 
 
 # Install Juicer tools
