@@ -21,7 +21,8 @@ workflow test_hic {
     File reference_index
     Int? cpu
 
-    Map[String, String] restriction_enzyme_to_site = read_map("workflow/restriction_enzyme_to_site.tsv")
+    File restriction_enzyme_to_site_file = "../../workflow/restriction_enzyme_to_site.tsv"
+    Map[String, String] restriction_enzyme_to_site = read_map(restriction_enzyme_to_site_file)
     String ligation_site = restriction_enzyme_to_site[restriction_enzyme]
     Array[String] ligation_junctions = [ligation_site]
 
