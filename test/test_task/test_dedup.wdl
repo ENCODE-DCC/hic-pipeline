@@ -10,6 +10,7 @@ workflow test_dedup {
 
     File restriction_enzyme_to_site_file = "../../workflow/restriction_enzyme_to_site.tsv"
     Map[String, String] restriction_enzyme_to_site = read_map(restriction_enzyme_to_site_file)
+    String ligation_site = restriction_enzyme_to_site[restriction_enzyme]
 
     call hic.dedup as test_dedup_task { input:
         merged_sort = merged_sort,
