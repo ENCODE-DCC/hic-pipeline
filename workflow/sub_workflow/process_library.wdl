@@ -162,7 +162,7 @@ task fragment {
         if [ $? -ne 0 ]
         then
             echo "***! Failure during sort"
-            exit 1x
+            exit 1
         fi
     }
 
@@ -181,6 +181,7 @@ task fragment {
     runtime {
         cpu : "1"
         disks: "local-disk 1000 HDD"
+        memory: "16 GB"
     }
 }
 
@@ -216,6 +217,7 @@ task merge_sort {
     runtime {
         cpu : "8"
         disks: "local-disk 1000 HDD"
+        memory: "16 GB"
     }
 }
 
