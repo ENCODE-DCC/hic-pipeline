@@ -210,9 +210,9 @@ task hiccups{
     }
     
     runtime {
+        bootDiskSizeGb: "20"
         docker: "quay.io/encode-dcc/hiccups:template"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
-        zones: ["us-east1-b"]
-    }     
+    }
 }
