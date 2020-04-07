@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/ENCODE-DCC/hic-pipeline/tree/dev-1.svg?style=svg)](https://circleci.com/gh/ENCODE-DCC/hic-pipeline/tree/dev-1)
+[![CircleCI](https://circleci.com/gh/ENCODE-DCC/hic-pipeline/tree/dev.svg?style=svg)](https://circleci.com/gh/ENCODE-DCC/hic-pipeline/tree/dev)
 
 HiC uniform processing pipeline
 ===================================================
