@@ -1,12 +1,14 @@
-#CAPER docker quay.io/encode-dcc/hic-pipeline:template
+version 1.0
 
-import "../../workflow/main_workflow/hic.wdl" as hic
+import "../../hic.wdl" as hic
 
 workflow test_no_call_loops {
-    File input_hic
-    Boolean no_call_loops
-    # Added in PIP-622, not actually used by test
-    String restriction_enzyme = "MboI"
+    input {
+        File input_hic
+        Boolean no_call_loops
+        # Added in PIP-622, not actually used by test
+        String restriction_enzyme = "MboI"
+    }
 
     call hic.hic { input:
         input_hic = input_hic,

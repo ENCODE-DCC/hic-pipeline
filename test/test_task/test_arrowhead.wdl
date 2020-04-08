@@ -1,9 +1,11 @@
-#CAPER docker quay.io/encode-dcc/hic-pipeline:template
+version 1.0
 
-import "../../workflow/main_workflow/hic.wdl" as hic
+import "../../hic.wdl" as hic
 
 workflow test_arrowhead {
-    File input_hic
+    input {
+        File input_hic
+    }
     
     call hic.arrowhead as test_arrowhead_task { input:
         hic_file = input_hic

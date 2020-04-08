@@ -4,7 +4,6 @@ version 1.0
 #CAPER singularity docker://quay.io/encode-dcc/hic-pipeline:template
 
 workflow hic {
-    #User inputs
     input {
         Array[Array[Array[File]]] fastq = [] #[lib_id][fastq_id][read_end_id]
         Array[Array[Array[File]]] input_bams = [] #[lib_id[[collisions1,collisions2],[collisions_low],[unmapped],[mapq0],[alignable]], 
@@ -16,14 +15,14 @@ workflow hic {
         String? assembly_name
 
         # Inputs and logic for entrypoint after library processing
-        Array[File] input_dedup_pairs
+        Array[File]? input_dedup_pairs
         Array[File?] library_stats = []
         Array[File?] library_stats_hists = []
         Array[String]? input_ligation_junctions
 
         # Inputs for library processing
         String restriction_enzyme
-        File restriction_sites
+        File? restriction_sites
         File? chrsz
         File? reference_index
         Int? cpu
@@ -32,19 +31,23 @@ workflow hic {
         Boolean? no_bam2pairs = false
     }
 
-    # Pipeline internal data: do not specify as input
+    # Pipeline internal "global" variables: do not specify as input
     # These ligation junctions are consistent with mega.sh
-    Map[String, String] restriction_enzyme_to_site = {
+    Map[String, String] RESTRICTION_ENZYME_TO_SITE = {
         "HindIII": "AAGCTAGCTT",
         "DpnII": "GATCGATC",
         "MboI": "GATCGATC",
     }
-    String ligation_site = restriction_enzyme_to_site[restriction_enzyme]
+
+    # Default MAPQ thresholds for generating .hic contact maps
+    Array[String] DEFAULT_HIC_QUALITIES = ["1", "30"]
+
+    # Determine ligation site from enzyme name
+    String ligation_site = RESTRICTION_ENZYME_TO_SITE[restriction_enzyme]
     # Prepare array of restriction sites for megamap
     Array[String] ligation_junctions = select_first([input_ligation_junctions, [ligation_site]])
 
     # Default MAPQ thresholds for .hic contact map generation
-    Array[String] DEFAULT_HIC_QUALITIES = ["1", "30"]
 
     #determine range of scatter
     Int lib_length = if length(fastq) > 0 then length(fastq)
@@ -53,7 +56,7 @@ workflow hic {
     else length(input_merged_sort)
 
     # scatter over libraries
-    if (defined(chrsz) && defined(reference_index)) {
+    if (defined(chrsz) && defined(reference_index) && defined(restriction_sites)) {
         # A WDL technicality here.
         File chrsz_ = select_first([chrsz])
         File reference_index_ = select_first([reference_index])
@@ -71,7 +74,7 @@ workflow hic {
                 call fragment { input:
                     bam_file = align.result,
                     norm_res_input = align.norm_res,
-                    restriction = restriction_sites
+                    restriction = select_first([restriction_sites])
                 }
             }
 
@@ -97,7 +100,7 @@ workflow hic {
             call dedup { input:
                 merged_sort = merge_sort.out_file,
                 ligation_site = ligation_site,
-                restriction_sites = restriction_sites,
+                restriction_sites =select_first([restriction_sites]),
                 alignable_bam = merge.merged_output[4]
             }
             
@@ -123,11 +126,11 @@ workflow hic {
     }
 
     Array[String] qualities = if !defined(input_hic) then DEFAULT_HIC_QUALITIES else []
-    if (defined(chrsz)) {
+    if (defined(chrsz) && defined(restriction_sites)) {
         scatter(i in range(length(qualities))) {
             call create_hic { input:
                 pairs_file = select_first([input_pairs, merge_pairs_file.out_file]),
-                restriction_sites = restriction_sites,
+                restriction_sites = select_first([restriction_sites]),
                 ligation_junctions = ligation_junctions,
                 chrsz_ = select_first([chrsz]),
                 quality = qualities[i],
@@ -148,6 +151,19 @@ workflow hic {
         call hiccups { input:
              hic_file = hic_file
         }
+    }
+
+    output {
+        Array[File]? alignable_bam = dedup.deduped_bam
+        Array[File?]? out_pairs = bam2pairs.out_file
+        Array[File]? out_dedup =  dedup.out_file
+        Array[File]? library_complexity_stats_json = dedup.library_complexity_json
+        Array[File]? stats = dedup.stats_json
+        Array[Array[File]]? alignment_stats = fragment.alignment_stats
+        Array[Array[File]]? alignment_stats_json = fragment.alignment_stats_json
+        File? out_hic_1 = if defined(create_hic.inter) then select_first([create_hic.inter])[0] else input_hic
+        File? out_hic_30 = if defined(create_hic.inter) then select_first([create_hic.inter])[1] else input_hic
+        File? out_tads = arrowhead.out_file
     }
 }
 

@@ -1,10 +1,12 @@
-#CAPER docker quay.io/encode-dcc/hic-pipeline:template
+version 1.0
 
-import "../../workflow/main_workflow/hic.wdl" as hic
+import "../../hic.wdl" as hic
 
 workflow test_merge_stats {
-    Array[File] alignment_stats
-    Array[File] library_stats
+    input {
+        Array[File] alignment_stats
+        Array[File] library_stats
+    }
 
     call hic.merge_stats as test_merge_stats_task { input:
         alignment_stats = alignment_stats,

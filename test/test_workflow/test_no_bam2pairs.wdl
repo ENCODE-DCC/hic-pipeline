@@ -1,16 +1,19 @@
-import "../../workflow/main_workflow/hic.wdl" as hic
+version 1.0
+
+import "../../hic.wdl" as hic
 
 workflow test_no_bam2pairs {
-    #User inputs 
-    Array[Array[Array[File]]] fastq = [] #[lib_id][fastq_id][read_end_id]
-    String restriction_enzyme
-    String assembly_name
-    File restriction_sites
-    File reference_index
-    File chrsz
-    Boolean no_bam2pairs
-    Boolean no_call_loops
-    Boolean no_call_tads
+    input {
+        Array[Array[Array[File]]] fastq = []
+        String restriction_enzyme
+        String assembly_name
+        File restriction_sites
+        File reference_index
+        File chrsz
+        Boolean no_bam2pairs
+        Boolean no_call_loops
+        Boolean no_call_tads
+    }
 
     call hic.hic { input:
         fastq = fastq,
@@ -29,7 +32,7 @@ workflow test_no_bam2pairs {
 
     # Ensure this output is null to check the flag works properly
     call check_no_pairs { input:
-        pairs = hic.out_pairs
+        pairs = select_first([hic.out_pairs])
     }
 
     output {
@@ -39,7 +42,9 @@ workflow test_no_bam2pairs {
 }
 
 task check_no_pairs {
-    Array[File?] pairs
+    input {
+        Array[File?] pairs
+    }
     command {
         pairs=${sep='' pairs}
         # Exit unsuccessfully if pairs is not empty
