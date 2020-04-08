@@ -114,8 +114,10 @@ workflow hic {
         }
     }
 
-    call merge_pairs_file { input:
-        not_merged_pe = select_first([input_dedup_pairs, dedup.out_file])
+    if (defined(input_dedup_pairs) || defined(dedup.out_file)) {
+        call merge_pairs_file { input:
+            not_merged_pe = select_first([input_dedup_pairs, dedup.out_file])
+        }
     }
 
     if (defined(fragment.alignment_stats) && defined(dedup.library_complexity)) {
