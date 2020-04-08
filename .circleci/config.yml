@@ -198,7 +198,7 @@ workflows:
           filters:
             branches:
               only:
-                - dev-1
+                - dev
                 - /.*hiccups-image-update$/
           requires:
             - build
