@@ -68,7 +68,7 @@ workflow hic {
                     chrsz = chrsz_,
                     idx_tar = reference_index_,
                     ligation_site = ligation_site,
-                    cpu = cpu
+                    cpu = select_first([cpu, 32]),
                 }
 
                 call fragment { input:
