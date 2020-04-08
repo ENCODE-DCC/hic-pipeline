@@ -16,7 +16,7 @@ make_tag: &make_tag
 get_caper: &get_caper
   name: get caper
   command: |
-    pyenv global 3.5.2
+    pyenv global 3.7.0
     pip install caper
 
 version: 2.1
