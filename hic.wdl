@@ -25,7 +25,7 @@ workflow hic {
         File? restriction_sites
         File? chrsz
         File? reference_index
-        Int? cpu
+        Int cpu = 32
         Boolean? no_call_loops = false
         Boolean? no_call_tads = false
         Boolean? no_bam2pairs = false
@@ -173,7 +173,7 @@ task align {
         Array[File] fastqs  # [read_end_id]
         File chrsz          # chromosome sizes file
         String ligation_site
-        Int cpu = 32
+        Int? cpu = 32
     }
 
     command {
