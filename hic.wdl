@@ -68,7 +68,7 @@ workflow hic {
                     chrsz = chrsz_,
                     idx_tar = reference_index_,
                     ligation_site = ligation_site,
-                    cpu = select_first([cpu, 32]),
+                    cpu = cpu,
                 }
 
                 call fragment { input:
@@ -173,7 +173,7 @@ task align {
         Array[File] fastqs  # [read_end_id]
         File chrsz          # chromosome sizes file
         String ligation_site
-        Int? cpu
+        Int cpu = 32
     }
 
     command {
@@ -195,7 +195,7 @@ task align {
         source /opt/scripts/common/countligations.sh
         # Align reads
         echo "Running bwa command"
-        bwa mem -SP5M -t ${select_first([cpu,32])} $reference_index_path ${fastqs[0]} ${fastqs[1]} | samtools view -hbS - > result.bam
+        bwa mem -SP5M -t ${cpu} $reference_index_path ${fastqs[0]} ${fastqs[1]} | samtools view -hbS - > result.bam
     }
 
     output {
