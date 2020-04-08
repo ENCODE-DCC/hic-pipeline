@@ -100,7 +100,7 @@ workflow hic {
             call dedup { input:
                 merged_sort = merge_sort.out_file,
                 ligation_site = ligation_site,
-                restriction_sites =select_first([restriction_sites]),
+                restriction_sites = select_first([restriction_sites]),
                 alignable_bam = merge.merged_output[4]
             }
             
@@ -326,23 +326,24 @@ task dedup {
         File alignable_bam
     }
 
+    # Can't use regular {} for command block, parser complains once hits awk command
     command <<<
         touch dups.txt
         touch optdups.txt
         touch merged_nodups.txt
-        awk -f /opt/scripts/common/dups.awk ${merged_sort}
+        awk -f /opt/scripts/common/dups.awk ~{merged_sort}
         pcr=$(wc -l dups.txt | awk '{print $1}')
         unique=$(wc -l merged_nodups.txt | awk '{print $1}')
         opt=$(wc -l optdups.txt | awk '{print $1}')
         java -jar -Ddevelopment=false /opt/scripts/common/juicer_tools.jar LibraryComplexity $unique $pcr $opt > library_complexity.txt
-        /opt/scripts/common/statistics.pl -s ${restriction_sites} -l ${ligation_site} merged_nodups.txt
+        /opt/scripts/common/statistics.pl -s ~{restriction_sites} -l ~{ligation_site} merged_nodups.txt
         python3 /opt/hic-pipeline/src/jsonify_stats.py --library-complexity library_complexity.txt
         python3 /opt/hic-pipeline/src/jsonify_stats.py --library-stats stats.txt
         awk '{split($(NF-1), a, "$"); split($NF, b, "$"); print a[3],b[3] > a[2]"_dedup"}' merged_nodups.txt
-        samtools view -h ${alignable_bam} | awk 'BEGIN{OFS="\t"}FNR==NR{for (i=$1; i<=$2; i++){a[i];} next}(!(FNR in a) && $1 !~ /^@/){$2=or($2,1024)}{print}' result_dedup - > result_alignable_dedup.sam
+        samtools view -h ~{alignable_bam} | awk 'BEGIN{OFS="\t"}FNR==NR{for (i=$1; i<=$2; i++){a[i];} next}(!(FNR in a) && $1 !~ /^@/){$2=or($2,1024)}{print}' result_dedup - > result_alignable_dedup.sam
         samtools view -hb result_alignable_dedup.sam > result_alignable_dedup.bam
         rm result_alignable_dedup.sam
-        rm ${alignable_bam}
+        rm ~{alignable_bam}
     >>>
 
     output {
