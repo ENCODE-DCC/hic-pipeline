@@ -149,7 +149,7 @@ workflow hic {
 
     if ( (defined(input_hic) || defined(create_hic.inter)) && !no_call_loops ) {
         call hiccups { input:
-             hic_file = select_first([input_hic, select_first([create_hic.inter])[1]])
+            hic_file = if defined(input_hic) then select_first([input_hic]) else select_first([create_hic.inter])[1]
         }
     }
 
