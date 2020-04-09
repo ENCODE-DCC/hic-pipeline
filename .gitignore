@@ -7,3 +7,5 @@ Jenkinsfile
 testing_inputs/
 venv
 target
+.caper_tmp
+.vscode
