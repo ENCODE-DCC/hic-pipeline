@@ -4,10 +4,10 @@
 ############################################################
 
 # Set the base image to Ubuntu
-FROM ubuntu:16.04
+FROM ubuntu:16.04 as main
 
-# File Author / Maintainer
-MAINTAINER Neva C. Durand 
+LABEL maintainer "Paul Sud"
+LABEL maintainer.email "encode-help@lists.stanford.edu"
 
 # Update the repository sources list
 # Install base packages: java, git, wget
@@ -71,16 +71,16 @@ RUN rm pairix-0.3.6.zip && rm samtools-1.6.tar && rm v0.7.17.zip
 ENV LC_ALL C
 ENV PATH=/opt:/opt/scripts:/opt/scripts/common:$PATH
 
-# Largely copied from https://github.com/ENCODE-DCC/atac-seq-pipeline/blob/master/docker_image/Dockerfile
-# Get scripts from hic-pipeline repo
-# This COPY assumes the build context is the root of the hic-pipeline repo
-# and it gets whatever is checked out plus local modifications
-# so the buildling command should:
-# cd [GIT_REPO_DIR] && docker build -f docker_image/Dockerfile .
+# Use multistage build for fragment
+FROM rust:1.42.0-slim-stretch@sha256:1201e100253c82c4accd19c649d187ab741b89954397dcdddb792008f898f93a as builder
+WORKDIR /hic-pipeline
+COPY . .
+RUN cargo build --release
+
+FROM main
+
 RUN mkdir -p hic-pipeline/hic_pipeline
 COPY hic_pipeline hic-pipeline/hic_pipeline/
+# Add compiled binary from other stage of build
+COPY --from=builder /wgbs-pipeline/target/release/fragment hic-pipeline/hic_pipeline/
 ENV PATH="/opt/hic-pipeline/hic_pipeline:${PATH}"
-
-#CMD ["-h"]
-
-
