@@ -31,8 +31,8 @@ workflow test_no_bam2pairs {
     Array[File?] hic_files = [hic.out_hic_1, hic.out_hic_30]
 
     # Ensure this output is null to check the flag works properly
-    call check_no_pairs { input:
-        pairs = select_first([hic.out_pairs, []])
+    if (defined(hic.out_pairs)) {
+        call raise_error
     }
 
     output {
@@ -41,13 +41,8 @@ workflow test_no_bam2pairs {
     }
 }
 
-task check_no_pairs {
-    input {
-        Array[File?] pairs
-    }
+task raise_error {
     command {
-        pairs=${sep='' pairs}
-        # Exit unsuccessfully if pairs is not empty
-        if [ ! -z $pairs ]; then exit 1; fi
+        exit 1
     }
 }
