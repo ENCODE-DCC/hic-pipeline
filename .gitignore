@@ -5,3 +5,5 @@ Jenkinsfile
 .DS_Store
 *.zip
 testing_inputs/
+venv
+target
