@@ -244,7 +244,7 @@ task fragment {
         # qc for alignment portion
         cat ${norm_res_input} *.res.txt | awk -f /opt/scripts/common/stats_sub.awk >> alignment_stats.txt
         paste -d "" ${norm_res_input} *.res.txt > result.res.txt
-        python3 /opt/hic-pipeline/src/jsonify_stats.py --alignment-stats alignment_stats.txt
+        python3 /opt/hic-pipeline/hic_pipeline/jsonify_stats.py --alignment-stats alignment_stats.txt
 
         # convert sams to bams and delete the sams
         echo "Converting sam to bam"
@@ -348,8 +348,8 @@ task dedup {
         opt=$(wc -l optdups.txt | awk '{print $1}')
         java -jar -Ddevelopment=false /opt/scripts/common/juicer_tools.jar LibraryComplexity $unique $pcr $opt > library_complexity.txt
         /opt/scripts/common/statistics.pl -s ~{restriction_sites} -l ~{ligation_site} merged_nodups.txt
-        python3 /opt/hic-pipeline/src/jsonify_stats.py --library-complexity library_complexity.txt
-        python3 /opt/hic-pipeline/src/jsonify_stats.py --library-stats stats.txt
+        python3 /opt/hic-pipeline/hic_pipeline/jsonify_stats.py --library-complexity library_complexity.txt
+        python3 /opt/hic-pipeline/hic_pipeline/jsonify_stats.py --library-stats stats.txt
         awk '{split($(NF-1), a, "$"); split($NF, b, "$"); print a[3],b[3] > a[2]"_dedup"}' merged_nodups.txt
         samtools view -h ~{alignable_bam} | awk 'BEGIN{OFS="\t"}FNR==NR{for (i=$1; i<=$2; i++){a[i];} next}(!(FNR in a) && $1 !~ /^@/){$2=or($2,1024)}{print}' result_dedup - > result_alignable_dedup.sam
         samtools view -hb result_alignable_dedup.sam > result_alignable_dedup.bam
@@ -423,7 +423,7 @@ task merge_stats {
 
     command {
         awk -f /opt/scripts/common/makemega_addstats.awk ${sep=' ' alignment_stats} ${sep=' ' library_stats} > merged_stats.txt
-        python3 /opt/hic-pipeline/src/jsonify_stats.py --alignment-stats merged_stats.txt
+        python3 /opt/hic-pipeline/hic_pipeline/jsonify_stats.py --alignment-stats merged_stats.txt
     }
 
     output {
@@ -451,7 +451,7 @@ task create_hic {
         else
             /opt/scripts/common/juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} -y $ASSEMBLY_NAME ${pairs_file} inter_${quality}.hic ${chrsz_}
         fi
-        python3 /opt/hic-pipeline/src/jsonify_stats.py --alignment-stats stats_${quality}.txt
+        python3 /opt/hic-pipeline/hic_pipeline/jsonify_stats.py --alignment-stats stats_${quality}.txt
     }
 
     output {
