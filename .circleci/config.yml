@@ -19,6 +19,11 @@ get_caper: &get_caper
     pyenv global 3.7.0
     pip install caper
 
+get_md5_script: &get_md5_script
+  name: get compare_md5.py script
+  command: |
+    curl -O https://raw.githubusercontent.com/ENCODE-DCC/rna-seq-pipeline/master/src/compare_md5.py
+
 version: 2.1
 jobs:
   test:
@@ -40,11 +45,12 @@ jobs:
       - checkout
       - run: *make_tag
       - run: *get_caper
+      - run: *get_md5_script
       - run:
           command: |
             source ${BASH_ENV}
             test/test_task/test.sh test/test_<< parameters.test_type >>/test_<< parameters.test_name >>.wdl test/test_<< parameters.test_type >>/test_<< parameters.test_name >>.json $TAG docker
-            python3 src/compare_md5.py --keys_to_inspect << parameters.keys_to_inspect >> --metadata_json test_<< parameters.test_name >>.metadata.json --reference_json test/test_<< parameters.test_type >>/ref_output/test_<< parameters.test_name >>_output_md5.json --outfile result.json
+            python3 compare_md5.py --keys_to_inspect << parameters.keys_to_inspect >> --metadata_json test_<< parameters.test_name >>.metadata.json --reference_json test/test_<< parameters.test_type >>/ref_output/test_<< parameters.test_name >>_output_md5.json --outfile result.json
             cat result.json
             python3 -c "import sys; import json; data=json.loads(sys.stdin.read()); sys.exit(int(not data['match_overall']))" < result.json
 

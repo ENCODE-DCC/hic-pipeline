@@ -229,22 +229,22 @@ task fragment {
     }
 
     command {
-        samtools view -h ${bam_file} | awk -v "fname"=result -f /opt/scripts/common/chimeric_blacklist.awk
+        samtools view -h ${bam_file} | awk -v "fname"=result -f $(which chimeric_blacklist.awk)
  
         # if any normal reads were written, find what fragment they correspond
         # to and store that
         
         echo "Running fragment"
-        /opt/scripts/common/fragment.pl result_norm.txt result_frag.txt ${restriction}   
+        fragment result_norm.txt result_frag.txt ${restriction}
         echo $(ls)
 
         # no restriction site !!!!
         # need to add support
        
         # qc for alignment portion
-        cat ${norm_res_input} *.res.txt | awk -f /opt/scripts/common/stats_sub.awk >> alignment_stats.txt
+        cat ${norm_res_input} *.res.txt | awk -f  $(which stats_sub.awk) >> alignment_stats.txt
         paste -d "" ${norm_res_input} *.res.txt > result.res.txt
-        python3 /opt/hic-pipeline/src/jsonify_stats.py --alignment-stats alignment_stats.txt
+        python3 $(which jsonify_stats.py) --alignment-stats alignment_stats.txt
 
         # convert sams to bams and delete the sams
         echo "Converting sam to bam"
@@ -342,14 +342,14 @@ task dedup {
         touch dups.txt
         touch optdups.txt
         touch merged_nodups.txt
-        awk -f /opt/scripts/common/dups.awk ~{merged_sort}
+        awk -f $(which dups.awk) ~{merged_sort}
         pcr=$(wc -l dups.txt | awk '{print $1}')
         unique=$(wc -l merged_nodups.txt | awk '{print $1}')
         opt=$(wc -l optdups.txt | awk '{print $1}')
         java -jar -Ddevelopment=false /opt/scripts/common/juicer_tools.jar LibraryComplexity $unique $pcr $opt > library_complexity.txt
         /opt/scripts/common/statistics.pl -s ~{restriction_sites} -l ~{ligation_site} merged_nodups.txt
-        python3 /opt/hic-pipeline/src/jsonify_stats.py --library-complexity library_complexity.txt
-        python3 /opt/hic-pipeline/src/jsonify_stats.py --library-stats stats.txt
+        python3 $(which jsonify_stats.py) --library-complexity library_complexity.txt
+        python3 $(which jsonify_stats.py) --library-stats stats.txt
         awk '{split($(NF-1), a, "$"); split($NF, b, "$"); print a[3],b[3] > a[2]"_dedup"}' merged_nodups.txt
         samtools view -h ~{alignable_bam} | awk 'BEGIN{OFS="\t"}FNR==NR{for (i=$1; i<=$2; i++){a[i];} next}(!(FNR in a) && $1 !~ /^@/){$2=or($2,1024)}{print}' result_dedup - > result_alignable_dedup.sam
         samtools view -hb result_alignable_dedup.sam > result_alignable_dedup.bam
@@ -380,7 +380,7 @@ task bam2pairs {
     }
 
     command {
-        /opt/pairix-0.3.6/util/bam2pairs/bam2pairs -c ${chrsz_} ${bam_file} pairix
+        bam2pairs -c ${chrsz_} ${bam_file} pairix
     }
 
     output {
@@ -422,8 +422,8 @@ task merge_stats {
     }
 
     command {
-        awk -f /opt/scripts/common/makemega_addstats.awk ${sep=' ' alignment_stats} ${sep=' ' library_stats} > merged_stats.txt
-        python3 /opt/hic-pipeline/src/jsonify_stats.py --alignment-stats merged_stats.txt
+        awk -f $(which makemega_addstats.awk) ${sep=' ' alignment_stats} ${sep=' ' library_stats} > merged_stats.txt
+        python3 $(which jsonify_stats.py) --alignment-stats merged_stats.txt
     }
 
     output {
@@ -443,15 +443,15 @@ task create_hic {
     }
 
     command {
-        /opt/scripts/common/statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l ${sep=' ' ligation_junctions} ${pairs_file}
+        statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l ${sep=' ' ligation_junctions} ${pairs_file}
         ASSEMBLY_NAME=${default='' assembly_name}
         # If the assembly name is empty, then we write chrsz path into file as usual, otherwise, use the assembly name instead of the path
         if [ -z "$ASSEMBLY_NAME" ]; then
-            /opt/scripts/common/juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} ${pairs_file} inter_${quality}.hic ${chrsz_}
+            juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} ${pairs_file} inter_${quality}.hic ${chrsz_}
         else
-            /opt/scripts/common/juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} -y $ASSEMBLY_NAME ${pairs_file} inter_${quality}.hic ${chrsz_}
+            juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} -y $ASSEMBLY_NAME ${pairs_file} inter_${quality}.hic ${chrsz_}
         fi
-        python3 /opt/hic-pipeline/src/jsonify_stats.py --alignment-stats stats_${quality}.txt
+        python3 $(which jsonify_stats.py) --alignment-stats stats_${quality}.txt
     }
 
     output {
@@ -475,7 +475,7 @@ task arrowhead {
     }
 
     command {
-        /opt/scripts/common/juicer_tools arrowhead ${hic_file} contact_domains
+        juicer_tools arrowhead ${hic_file} contact_domains
     }
 
     output {

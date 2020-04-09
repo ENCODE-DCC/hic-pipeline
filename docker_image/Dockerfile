@@ -4,25 +4,30 @@
 ############################################################
 
 # Set the base image to Ubuntu
-FROM ubuntu:16.04
+FROM ubuntu:16.04@sha256:e9938f45e51d9ff46e2b05a62e0546d0f07489b7f22fbc5288defe760599e38a as main
 
-# File Author / Maintainer
-MAINTAINER Neva C. Durand 
+LABEL maintainer "Paul Sud"
+LABEL maintainer.email "encode-help@lists.stanford.edu"
 
-# Update the repository sources list
-# Install base packages: java, git, wget
+# Package versions
+ENV BWA_VERSION=0.7.17
+ENV SAMTOOLS_VERSION=1.6
+ENV JUICER_TOOLS_VERSION=1.11.09_jcuda.0.8
+ENV PAIRIX_VERSION=0.3.6
+
 RUN apt-get update && apt-get install -y \
-    openjdk-8-jdk \
+    bzip2 \
+    curl \
     gawk \
     gcc \
     git \
+    libbz2-dev \
     libz-dev \
     locales \
     make \
-    unzip \
-    bzip2 \
-    libbz2-dev \
+    openjdk-8-jdk \
     python3 \
+    unzip \
 && rm -rf /var/lib/apt/lists/*
 
 # GAWK has the 'and' function, needed for chimeric_blacklist
@@ -34,16 +39,24 @@ RUN locale-gen en_US.UTF-8
 WORKDIR /opt/
 
 # Install BWA
-ADD https://github.com/lh3/bwa/archive/v0.7.17.zip .
-RUN unzip v0.7.17.zip 
-RUN cd bwa-0.7.17/ && make
-RUN ln -s bwa-0.7.17/bwa bwa
+RUN curl -OL "https://github.com/lh3/bwa/archive/v${BWA_VERSION}.zip" && \
+    unzip "v${BWA_VERSION}.zip" && \
+    cd "bwa-${BWA_VERSION}/" && \
+    make && \
+    cp bwa /usr/local/bin && \
+    cd .. && \
+    rm -rf "bwa-v${BWA_VERSION}" 
 
 # Install Samtools
-ADD https://github.com/samtools/samtools/releases/download/1.6/samtools-1.6.tar.bz2 .
-RUN bunzip2 samtools-1.6.tar.bz2 
-RUN tar xf samtools-1.6.tar 
-RUN cd samtools-1.6 && ./configure --without-curses --disable-bz2 --disable-lzma && make && make install
+RUN curl -OL "https://github.com/samtools/samtools/releases/download/${SAMTOOLS_VERSION}/samtools-${SAMTOOLS_VERSION}.tar.bz2" && \
+    bunzip2 "samtools-${SAMTOOLS_VERSION}.tar.bz2" && \
+    tar xf "samtools-${SAMTOOLS_VERSION}.tar" && \
+    cd "samtools-${SAMTOOLS_VERSION}" && \
+    ./configure --without-curses --disable-bz2 --disable-lzma && \
+    make && \
+    make install && \
+    cd .. && \
+    rm -rf "samtools-${SAMTOOLS_VERSION}" "samtools-${SAMTOOLS_VERSION}.tar"
 
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
@@ -52,35 +65,33 @@ RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     chmod +x CPU/* CPU/common/*
 
 # Install Juicer tools
-ADD http://s3.amazonaws.com/hicfiles.tc4ga.com/public/juicer/juicer_tools_1.11.09_jcuda.0.8.jar /opt/juicer/CPU/common
-RUN ln -s /opt/juicer/CPU/common/juicer_tools_1.11.09_jcuda.0.8.jar /opt/juicer/CPU/common/juicer_tools.jar
-RUN chmod 666 /opt/juicer/CPU/common/juicer_tools_1.11.09_jcuda.0.8.jar
-RUN ln -s juicer/CPU scripts
+RUN curl -L "http://s3.amazonaws.com/hicfiles.tc4ga.com/public/juicer/juicer_tools_${JUICER_TOOLS_VERSION}.jar" -o /opt/juicer/CPU/common/juicer_tools.jar && \
+    chmod 666 /opt/juicer/CPU/common/juicer_tools.jar && \
+    ln -s juicer/CPU scripts
 
-# Install Straw for removal of hic header in create_hic test
-RUN git clone --branch master https://github.com/aidenlab/straw.git
-
-# Install pairix
-ADD https://github.com/4dn-dcic/pairix/archive/0.3.6.zip .
-RUN mv 0.3.6.zip pairix-0.3.6.zip && unzip pairix-0.3.6.zip 
-RUN cd pairix-0.3.6/ && make
-
-RUN rm pairix-0.3.6.zip && rm samtools-1.6.tar && rm v0.7.17.zip
+# Install pairix, only need bam2pairs
+RUN curl -OL "https://github.com/4dn-dcic/pairix/archive/${PAIRIX_VERSION}.zip" && \
+    unzip "${PAIRIX_VERSION}.zip" && \
+    cd "pairix-${PAIRIX_VERSION}/" && \
+    make && \
+    cp util/bam2pairs/bam2pairs /opt && \
+    cd .. && \
+    rm -rf "${PAIRIX_VERSION}.zip" "pairix-${PAIRIX_VERSION}"
 
 # For sorting, LC_ALL is C
 ENV LC_ALL C
 ENV PATH=/opt:/opt/scripts:/opt/scripts/common:$PATH
 
-# Largely copied from https://github.com/ENCODE-DCC/atac-seq-pipeline/blob/master/docker_image/Dockerfile
-# Get scripts from hic-pipeline repo
-# This COPY assumes the build context is the root of the hic-pipeline repo
-# and it gets whatever is checked out plus local modifications
-# so the buildling command should:
-# cd [GIT_REPO_DIR] && docker build -f docker_image/Dockerfile .
-RUN mkdir -p hic-pipeline/src
-COPY src hic-pipeline/src/
-ENV PATH="/opt/hic-pipeline/src:${PATH}"
+# Use multistage build for fragment
+FROM rust:1.42.0-slim-stretch@sha256:1201e100253c82c4accd19c649d187ab741b89954397dcdddb792008f898f93a as builder
+WORKDIR /hic-pipeline
+COPY . .
+RUN cargo build --release
 
-#CMD ["-h"]
+FROM main
 
-
+RUN mkdir -p hic-pipeline/hic_pipeline
+COPY hic_pipeline hic-pipeline/hic_pipeline/
+# Add compiled binary from other stage of build
+COPY --from=builder /hic-pipeline/target/release/fragment hic-pipeline/hic_pipeline/
+ENV PATH="/opt/hic-pipeline/hic_pipeline:${PATH}"

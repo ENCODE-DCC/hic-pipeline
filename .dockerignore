@@ -1,3 +1,5 @@
 # The * ignores everything, then !src creates an exception for the src folder
 *
-!src
+!hic_pipeline/*.py
+!hic_pipeline/*/
+!Cargo.toml
