@@ -5,30 +5,48 @@ version 1.0
 
 workflow hic {
     input {
-        Array[Array[Array[File]]] fastq = [] #[lib_id][fastq_id][read_end_id]
-        Array[Array[Array[File]]] input_bams = [] #[lib_id[[collisions1,collisions2],[collisions_low],[unmapped],[mapq0],[alignable]], 
-        Array[Array[File]] input_sort_files = [] #[lib_id] 2d Array [lib[sort1, sirt2]]
-        Array[File] input_merged_sort = []
+        # Main entrypoint, need to specify all five of these values when running from fastqs
+        Array[Array[Array[File]]] fastq = []
+        String restriction_enzyme
+        File? restriction_sites
+        File? chrsz
+        File? reference_index
+
+        # Entrypoint right before hic generation
         File? input_pairs
+
+        # Entrypoint for loop and TAD calls
         File? input_hic
-        File? sub_ms
-        String? assembly_name
 
         # Inputs and logic for entrypoint after library processing
         Array[File]? input_dedup_pairs
         Array[File?] library_stats = []
         Array[File?] library_stats_hists = []
-        Array[String]? input_ligation_junctions
 
-        # Inputs for library processing
-        String restriction_enzyme
-        File? restriction_sites
-        File? chrsz
-        File? reference_index
-        Int cpu = 32
+        Boolean? no_bam2pairs = false
         Boolean? no_call_loops = false
         Boolean? no_call_tads = false
-        Boolean? no_bam2pairs = false
+        Array[String]? input_ligation_junctions
+        Int cpu = 32
+        String? assembly_name
+    }
+
+    parameter_meta {
+        fastq: "Twice nested array of input fastqs, takes form of [lib_id][fastq_id][read_end_id]"
+        restriction_enzyme: "The name of the restriction enzyme used to generate the Hi-C libraries"
+        restriction_sites: "A text file containing cut sites for the given restriction enzyme. You should generate this file using this script: https://github.com/aidenlab/juicer/blob/encode/misc/generate_site_positions.py"
+        chrsz: "A chromosome sizes file for the desired assembly, this is a tab-separated text file whose rows take the form [chromosome] [size]"
+        reference_index: "A pregenerated BWA index for the desired assembly"
+        input_pairs: "A text file containing the paired fragments to use to generate the .hic contact maps, a detailed format description can be found here: https://github.com/aidenlab/juicer/wiki/Pre#long-format"
+        input_hic: "An input .hic file for which to call loops and domains"
+        input_dedup_pairs: "An array consisting of text files of paired fragments, one per library, same format as input_pairs"
+        library_stats: "An array of library statistics text files, one per library"
+        library_stats_hists: "An array of library statistics .m files, one per library"
+        input_ligation_junctions: "An array of ligation sites, useful for megamaps"
+        cpu: "Number of threads to use for bwa alignment"
+        no_bam2pairs: "If set to `true`, avoid generating .pairs files, defaults to false"
+        no_call_loops: "If set to `true`, avoid calling loops with hiccups, defaults to false"
+        no_call_tads: "If set to `true`, avoid calling domains with arrowhead, defaults to false"
     }
 
     # Pipeline internal "global" variables: do not specify as input
@@ -47,21 +65,13 @@ workflow hic {
     # Prepare array of restriction sites for megamap
     Array[String] ligation_junctions = select_first([input_ligation_junctions, [ligation_site]])
 
-    # Default MAPQ thresholds for .hic contact map generation
-
-    #determine range of scatter
-    Int lib_length = if length(fastq) > 0 then length(fastq)
-    else if length(input_bams) > 0 then length(input_bams) ##technically the number should be same for bams and sort_files
-    else if length(input_sort_files) > 0 then length(input_sort_files)
-    else length(input_merged_sort)
-
     # scatter over libraries
     if (defined(chrsz) && defined(reference_index) && defined(restriction_sites)) {
         # A WDL technicality here.
         File chrsz_ = select_first([chrsz])
         File reference_index_ = select_first([reference_index])
 
-        scatter(i in range(lib_length)) {
+        scatter(i in range(length(fastq))) {
             scatter(j in range(length(fastq[i]))) {
                 call align { input:
                     fastqs = fastq[i][j],
