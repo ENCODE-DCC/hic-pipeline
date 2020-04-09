@@ -31,7 +31,7 @@ workflow test_no_bam2pairs {
     Array[File?] hic_files = [hic.out_hic_1, hic.out_hic_30]
 
     # Ensure this output is null to check the flag works properly
-    if (defined(hic.out_pairs)) {
+    if (length(select_all(hic.out_pairs)) > 0) {
         call raise_error
     }
 
