@@ -43,10 +43,11 @@ workflow hic {
         library_stats: "An array of library statistics text files, one per library"
         library_stats_hists: "An array of library statistics .m files, one per library"
         input_ligation_junctions: "An array of ligation sites, useful for megamaps"
-        cpu: "Number of threads to use for bwa alignment"
         no_bam2pairs: "If set to `true`, avoid generating .pairs files, defaults to false"
         no_call_loops: "If set to `true`, avoid calling loops with hiccups, defaults to false"
         no_call_tads: "If set to `true`, avoid calling domains with arrowhead, defaults to false"
+        cpu: "Number of threads to use for bwa alignment"
+        assembly_name: "Name of assembly to insert into hic file header, recommended to specify for reproducbility otherwise hic file will be nondeterministic"
     }
 
     # Pipeline internal "global" variables: do not specify as input
