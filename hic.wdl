@@ -141,17 +141,15 @@ workflow hic {
         }
     }
 
-    File hic_file = select_first([input_hic, select_first([create_hic.inter])[1]])
-
     if ( (defined(input_hic) || defined(create_hic.inter)) && !no_call_tads ) {
         call arrowhead { input:
-            hic_file = hic_file
+            hic_file = select_first([input_hic, select_first([create_hic.inter])[1]])
         }
     }
 
     if ( (defined(input_hic) || defined(create_hic.inter)) && !no_call_loops ) {
         call hiccups { input:
-             hic_file = hic_file
+             hic_file = select_first([input_hic, select_first([create_hic.inter])[1]])
         }
     }
 
