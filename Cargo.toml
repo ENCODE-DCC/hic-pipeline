@@ -1,0 +1,14 @@
+[package]
+name = "fragment"
+version = "0.1.0"
+authors = ["Paul Sud <paulsud@stanford.edu>"]
+edition = "2018"
+
+[[bin]]
+name = "fragment"
+path = "hic_pipeline/fragment/src/main.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+structopt = "0.3"

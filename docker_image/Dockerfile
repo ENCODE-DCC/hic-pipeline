@@ -77,9 +77,9 @@ ENV PATH=/opt:/opt/scripts:/opt/scripts/common:$PATH
 # and it gets whatever is checked out plus local modifications
 # so the buildling command should:
 # cd [GIT_REPO_DIR] && docker build -f docker_image/Dockerfile .
-RUN mkdir -p hic-pipeline/src
-COPY src hic-pipeline/src/
-ENV PATH="/opt/hic-pipeline/src:${PATH}"
+RUN mkdir -p hic-pipeline/hic_pipeline
+COPY hic_pipeline hic-pipeline/hic_pipeline/
+ENV PATH="/opt/hic-pipeline/hic_pipeline:${PATH}"
 
 #CMD ["-h"]
 
