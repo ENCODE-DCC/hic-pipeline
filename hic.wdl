@@ -235,7 +235,7 @@ task fragment {
         # to and store that
         
         echo "Running fragment"
-        /opt/scripts/common/fragment.pl result_norm.txt result_frag.txt ${restriction}   
+        fragment result_norm.txt result_frag.txt ${restriction}
         echo $(ls)
 
         # no restriction site !!!!
