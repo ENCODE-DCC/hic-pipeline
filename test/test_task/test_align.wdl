@@ -1,17 +1,18 @@
-#CAPER docker quay.io/encode-dcc/hic-pipeline:template
+version 1.0
 
-import "../../workflow/sub_workflow/process_library.wdl" as hic
+import "../../hic.wdl" as hic
 
 workflow test_align {
-    File idx_tar 		# reference bwa index tar
-    Array[File] fastqs = []	# [read_end_id]
-    File chrsz          # chromosome sizes file
-    File restriction    # restriction enzyme sites in the reference genome
-    String restriction_enzyme
+    input {
+        File idx_tar
+        Array[File] fastqs
+        File chrsz
+        File restriction
+        String restriction_enzyme
+    }
 
-    File restriction_enzyme_to_site_file = "workflow/restriction_enzyme_to_site.tsv"
-    Map[String, String] restriction_enzyme_to_site = read_map(restriction_enzyme_to_site_file)
-    String ligation_site = restriction_enzyme_to_site[restriction_enzyme]
+    # Can't read map from hic.wdl, so hard coded. Corresponse to MboI
+    String ligation_site = "GATCGATC"
 
 	call hic.align as test_align_task { input:
 		fastqs = fastqs,
@@ -50,13 +51,15 @@ workflow test_align {
         
         File sort_file = test_fragment.sort_file
         File norm_res = test_fragment.norm_res
-        File stats_sub_result = test_fragment.stats_sub_result
-        File stats_sub_result_json = test_fragment.stats_sub_result_json
+        File alignment_stats = test_fragment.alignment_stats
+        File alignment_stats_json = test_fragment.alignment_stats_json
     }
 }
 
-task strip_headers{
-    File bam
+task strip_headers {
+    input {
+        File bam
+    }
 
     #it messes up with compare_md5.py since all the files with stripped header are having the same name
     command {
@@ -67,8 +70,4 @@ task strip_headers{
     output{
         File no_header = glob("*.no_header.sam")[0]
     }
-
-    runtime {
-        docker : "quay.io/encode-dcc/hic-pipeline:template"
-	}
 }

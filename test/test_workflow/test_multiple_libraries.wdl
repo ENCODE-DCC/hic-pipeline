@@ -1,14 +1,16 @@
-#CAPER docker quay.io/encode-dcc/hic-pipeline:template
+version 1.0
 
 import "test_hic.wdl" as hic
 
 workflow test_multiple_libraries {
-    Array[Array[Array[File]]] fastq
-    String restriction_enzyme
-    String assembly_name
-    File restriction_sites
-    File chrsz
-    File reference_index
+    input {
+        Array[Array[Array[File]]] fastq
+        String restriction_enzyme
+        String assembly_name
+        File restriction_sites
+        File chrsz
+        File reference_index
+    }
 
     call hic.test_hic as test { input:
         fastq = fastq,

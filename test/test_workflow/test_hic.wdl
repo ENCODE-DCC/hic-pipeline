@@ -1,92 +1,54 @@
-#CAPER docker quay.io/encode-dcc/hic-pipeline:template
+version 1.0
 
-import "../../workflow/main_workflow/hic.wdl" as hic
-import "../../workflow/sub_workflow/process_library.wdl" as sub
+import "../../hic.wdl" as hic
 
 workflow test_hic {
-    #User inputs 
-    Array[Array[Array[File]]] fastq = [] #[lib_id][fastq_id][read_end_id]
-    Array[Array[Array[File]]] input_bams = [] #[lib_id[[collisions1,collisions2],[collisions_low],[unmapped],[mapq0],[alignable]], 
-    Array[Array[File]] input_sort_files = [] #[lib_id] 2d Array [lib[sort1, sirt2]]
-    Array[File] input_merged_sort = []
-    Array[File] input_dedup_pairs = []
-    File? input_pairs
-    File? input_hic
-    File? sub_ms
-    String assembly_name
+    input {
+        Array[Array[Array[File]]] fastq
+        String assembly_name
+        String restriction_enzyme
+        File restriction_sites
+        File chrsz
+        File reference_index
+    }
 
-    String restriction_enzyme
-    File restriction_sites
-    File chrsz
-    File reference_index
-    Int? cpu
-
-    File restriction_enzyme_to_site_file = "workflow/restriction_enzyme_to_site.tsv"
-    Map[String, String] restriction_enzyme_to_site = read_map(restriction_enzyme_to_site_file)
-    String ligation_site = restriction_enzyme_to_site[restriction_enzyme]
-    Array[String] ligation_junctions = [ligation_site]
-
-    #determine range of scatter
-    Int lib_length = if length(fastq) > 0 then length(fastq)
-    else if length(input_bams) > 0 then length(input_bams) ##technically the number should be same for bams and sort_files
-    else if length(input_sort_files) > 0 then length(input_sort_files)
-    else length(input_merged_sort)
-
-    # scatter over libraries
-    scatter(i in range(lib_length)) {
-        call sub.process_library as process_library { input:
-            sub_fastq = fastq[i],
-            chrsz = chrsz,
-            reference_index = reference_index,
-            restriction_enzyme = restriction_enzyme,
-            cpu = cpu,
-            restriction_sites = restriction_sites
-        }
+    call hic.hic { input:
+        fastq = fastq,
+        restriction_enzyme = restriction_enzyme,
+        restriction_sites = restriction_sites,
+        reference_index = reference_index,
+        chrsz = chrsz,
+        assembly_name = assembly_name,
+        no_call_loops = true,
+        no_call_tads = true,
     }
 
     call tail_of_pairs { input:
-        pairs = process_library.pairs_file[0]
+        pairs = select_first([select_first([hic.out_pairs])[0]])
     }
 
     call strip_headers { input:
-        bam = process_library.alignable_bam[0]
+        bam = select_first([hic.alignable_bam])[0]
     }
 
-    call hic.merge_pairs_file as merge_pairs_file { input:
-        not_merged_pe = if length(input_dedup_pairs)>0 then input_dedup_pairs else process_library.library_dedup
-    }
-
-
-    Array[String] qualities = ["1", "30"]
-    scatter(i in range(length(qualities))) {
-        call hic.create_hic as create_hic { input:
-            pairs_file = if defined(input_pairs) then input_pairs else merge_pairs_file.out_file,
-            ligation_junctions = ligation_junctions,
-            restriction_sites = restriction_sites,
-            quality = qualities[i],
-            chrsz_ = chrsz,
-            assembly_name = assembly_name
-        }
-    }
-
-    output{
+    output {
         File no_header_alignable_sam = strip_headers.no_header
         File out_pairs = tail_of_pairs.no_header
-        File out_dedup = process_library.library_dedup[0]
-        File no_header_hic_1 = create_hic.inter[0]
-        File no_header_hic_30 = create_hic.inter[1]
-
-        #QC outputs
-        File library_complexity = process_library.library_stats_json[0]
-        File stats = process_library.stats_json[0]
-        File alignments_stats = process_library.alignments_stats[0][0]
+        File out_dedup = select_first([hic.out_dedup])[0]
+        File no_header_hic_1 = select_first([hic.out_hic_1])
+        File no_header_hic_30 = select_first([hic.out_hic_30])
+        File library_complexity = select_first([hic.library_complexity_stats_json])[0]
+        File stats = select_first([hic.stats])[0]
+        File alignments_stats = select_first([hic.alignment_stats])[0][0]
     }
 }
 
-task tail_of_pairs{
-    File pairs
+task tail_of_pairs {
+    input {
+        File pairs
+    }
 
-    command{
+    command {
         sed 1,5d ${pairs} > no_header.pairs
     }
     
@@ -95,8 +57,10 @@ task tail_of_pairs{
     }
 }
 
-task strip_headers{
-    File bam
+task strip_headers {
+    input {
+        File bam
+    }
 
     #it messes up with compare_md5.py since all the files with stripped header are having the same name
     command {

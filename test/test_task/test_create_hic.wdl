@@ -1,13 +1,15 @@
-#CAPER docker quay.io/encode-dcc/hic-pipeline:template
+version 1.0
 
-import "../../workflow/main_workflow/hic.wdl" as hic
+import "../../hic.wdl" as hic
 
 workflow test_create_hic {
-    Array[String] ligation_junctions
-    File pairs_file
-    File restriction_sites
-    File chrsz
-    String assembly_name
+    input {
+        Array[String] ligation_junctions
+        File pairs_file
+        File restriction_sites
+        File chrsz
+        String assembly_name
+    }
 
     call hic.create_hic as test_create_hic_task { input:
         pairs_file = pairs_file,

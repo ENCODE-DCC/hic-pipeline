@@ -1,10 +1,12 @@
-#CAPER docker quay.io/encode-dcc/hic-pipeline:template
+version 1.0
 
-import "../../workflow/sub_workflow/process_library.wdl" as hic
+import "../../hic.wdl" as hic
 
 workflow test_bam2pairs {
-    File bam            # bam file to convert into pairs
-    File chrsz          # chromosome sizes file
+    input {
+        File bam
+        File chrsz
+    }
 
     call hic.bam2pairs as test { input:
         bam_file = bam,
@@ -21,8 +23,10 @@ workflow test_bam2pairs {
 }
 
 
-task tail_of_pairs{
-    File pairs
+task tail_of_pairs {
+    input {
+        File pairs
+    }
 
     command{
         sed 1,5d ${pairs} > no_header.pairs

@@ -1,16 +1,17 @@
-#CAPER docker quay.io/encode-dcc/hic-pipeline:template
+version 1.0
 
-import "../../workflow/sub_workflow/process_library.wdl" as hic
+import "../../hic.wdl" as hic
 
 workflow test_dedup {
-    File merged_sort
-    File restriction_sites
-    String restriction_enzyme
-    File alignable_bam
+    input {
+        File merged_sort
+        File restriction_sites
+        String restriction_enzyme
+        File alignable_bam
+    }
 
-    File restriction_enzyme_to_site_file = "workflow/restriction_enzyme_to_site.tsv"
-    Map[String, String] restriction_enzyme_to_site = read_map(restriction_enzyme_to_site_file)
-    String ligation_site = restriction_enzyme_to_site[restriction_enzyme]
+    # Can't read map from hic.wdl, so hard coded. Corresponse to MboI
+    String ligation_site = "GATCGATC"
 
     call hic.dedup as test_dedup_task { input:
         merged_sort = merged_sort,
@@ -31,8 +32,10 @@ workflow test_dedup {
     }
 }
 
-task strip_headers{
-    File bam
+task strip_headers {
+    input {
+        File bam
+    }
 
     #it messes up with compare_md5.py since all the files with stripped header are having the same name
     command {

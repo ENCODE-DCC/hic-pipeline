@@ -1,9 +1,11 @@
-#CAPER docker quay.io/encode-dcc/hic-pipeline:template
+version 1.0
 
-import "../../workflow/sub_workflow/process_library.wdl" as hic
+import "../../hic.wdl" as hic
 
 workflow test_merge_sort {
-    Array[File] sort_files
+    input {
+        Array[File] sort_files
+    }
    
     call hic.merge_sort as test_merge_sort_task { input:
         sort_files_ = sort_files

@@ -1,9 +1,11 @@
-#CAPER docker quay.io/encode-dcc/hic-pipeline:template
+version 1.0
 
-import "../../workflow/sub_workflow/process_library.wdl" as hic
+import "../../hic.wdl" as hic
 
 workflow test_merge {
-    Array[File] bams
+    input {
+        Array[File] bams
+    }
 
 	call hic.merge as test_merge_task { input:
 		bam_files = bams
@@ -15,8 +17,10 @@ workflow test_merge {
     }
 }
 
-task strip_headers{
-    File bam
+task strip_headers {
+    input {
+        File bam
+    }
     
     #it messes up with compare_md5.py since all the files with stripped header are having the same name
     command {
