@@ -18,7 +18,9 @@ workflow test_hic {
         restriction_sites = restriction_sites,
         reference_index = reference_index,
         chrsz = chrsz,
-        assembly_name = assembly_name
+        assembly_name = assembly_name,
+        no_call_loops = true,
+        no_call_tads = true,
     }
 
     call tail_of_pairs { input:
