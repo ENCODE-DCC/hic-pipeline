@@ -1,26 +1,14 @@
 {
-    "hic.process_library.align": {
+    "hic.align": {
         "result": {
             "path": "align/rep${i+1}/read_pair_${j+1}/${basename}",
-            "table": "Alignment/Replicate ${i+1}/Read Pair ${j+1}/Raw BAM"
+            "table": "Align/Replicate ${i+1}/Read Pair ${j+1}/Raw BAM"
         }
     },
-    "hic.process_library.fragment": {
-        "stats_sub_result_json": {
-            "path": "qc/rep${i+1}/read_pair_${j+1}/${basename}",
-            "table": "QC and logs/Replicate ${i+1}/Read Pair ${j+1}/Alignment log"
-        }
-    },
-    "hic.process_library.merge": {
-        "merged_output": {
-            "path": "merge/rep${i+1}/${basename}",
-            "table": "Merge/Replicate ${i+1}/Unfiltered Merged BAMs"
-        }
-    },
-    "hic.process_library.dedup": {
+    "hic.dedup": {
         "deduped_bam": {
             "path": "dedup/rep${i+1}/${basename}",
-            "table": "Alignment/Replicate ${i+1}/Filtered Merged BAMs"
+            "table": "Filtering/Replicate ${i+1}/Filtered Merged BAMs"
         },
         "library_complexity_json": {
             "path": "qc/rep${i+1}/${basename}",
@@ -29,6 +17,16 @@
         "stats_json": {
             "path": "qc/rep${i+1}/${basename}",
             "table": "QC and logs/Replicate ${i+1}/Library Stats QC"
+        }
+    },
+    "hic.fragment": {
+        "alignable": {
+            "path": "align/rep${i+1}/read_pair_${j+1}/${basename}",
+            "table": "Align/Replicate ${i+1}/Read Pair ${j+1}/Alignable BAM"
+        },
+        "alignment_stats_json": {
+            "path": "qc/rep${i+1}/read_pair_${j+1}/${basename}",
+            "table": "QC and logs/Replicate ${i+1}/Read Pair ${j+1}/Alignment stats JSON"
         }
     },
     "hic.create_hic": {

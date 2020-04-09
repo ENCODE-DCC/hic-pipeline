@@ -2,6 +2,7 @@ version 1.0
 
 #CAPER docker quay.io/encode-dcc/hic-pipeline:template
 #CAPER singularity docker://quay.io/encode-dcc/hic-pipeline:template
+#CROO out_def https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json
 
 workflow hic {
     input {
