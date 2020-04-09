@@ -32,7 +32,7 @@ workflow test_no_bam2pairs {
 
     # Ensure this output is null to check the flag works properly
     call check_no_pairs { input:
-        pairs = select_first([hic.out_pairs])
+        pairs = select_first([hic.out_pairs, []])
     }
 
     output {
