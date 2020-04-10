@@ -384,7 +384,8 @@ task bam2pairs {
     }
 
     output {
-        File out_file = glob('pairix.*.pairs')[0]
+        File out_file = glob('pairix.*.pairs.gz')[0]
+        File pairs_index = glob('pairix.*.pairs.gz.px2')[0]
     }
 
     runtime {
