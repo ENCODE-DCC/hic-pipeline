@@ -9,3 +9,6 @@ venv
 target
 .caper_tmp
 .vscode
+.mypy_cache
+.tox
+__pycache__/

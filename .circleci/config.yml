@@ -2,10 +2,25 @@ defaults: &defaults
   docker:
     - image: circleci/buildpack-deps:xenial-scm
   working_directory: ~/ENCODE-DCC/hic-pipeline
-  
+
 machine_defaults: &machine_defaults
-  machine: 
+  machine:
     image: ubuntu-1604:201903-01
+  working_directory: ~/ENCODE-DCC/hic-pipeline
+
+lint: &lint
+  docker:
+    - image: quay.io/encode-dcc/hic-pipeline:circleci-lint
+  working_directory: ~/ENCODE-DCC/hic-pipeline
+
+py37: &py37
+  docker:
+    - image: circleci/python:3.7.4-stretch
+  working_directory: ~/ENCODE-DCC/hic-pipeline
+
+rust: &rust
+  docker:
+    - image: circleci/rust:1.42.0-stretch
   working_directory: ~/ENCODE-DCC/hic-pipeline
 
 make_tag: &make_tag
@@ -24,9 +39,42 @@ get_md5_script: &get_md5_script
   command: |
     curl -O https://raw.githubusercontent.com/ENCODE-DCC/rna-seq-pipeline/master/src/compare_md5.py
 
+commands:
+  run_tox:
+    description: "Install and run tox with a given environment"
+    parameters:
+      toxenv:
+        description: "The name of the environment as per tox.ini, e.g. py37 or lint"
+        type: string
+      extra_args:
+        description: "Extra arguments that are consumed only when running pytest"
+        type: string
+        default: ""
+    steps:
+      - run: sudo pip install tox
+      - run: tox -e << parameters.toxenv >> -- << parameters.extra_args >>
+
 version: 2.1
 jobs:
-  test:
+  lint:
+    <<: *lint
+    steps:
+      - checkout
+      - run: cat "${HOME}/.cargo/env" >> ${BASH_ENV}
+      - run_tox:
+          toxenv: "lint"
+  test_py37:
+    <<: *py37
+    steps:
+      - checkout
+      - run_tox:
+          toxenv: "py37"
+  test_rust:
+    <<: *rust
+    steps:
+      - checkout
+      - run: cargo test
+  test_wdl:
     <<: *machine_defaults
     description: Generic testing protocol for wdl tasks
     parameters:
@@ -115,83 +163,92 @@ workflows:
             branches:
               only:
                 - /.*hiccups-image-update$/
-      - test:
+      - lint
+      - test_py37:
+          requires:
+            - build
+            - lint
+      - test_rust:
+          requires:
+            - build
+            - lint
+      - test_wdl:
           name: test_align
           requires:
             - build
           test_name: "align"
           keys_to_inspect: "test_align.collisions test_align.collisions_low_mapq test_align.unmapped test_align.mapq0 test_align.alignable test_align.sort_file test_align.norm_res test_align.alignment_stats test_align.alignment_stats_json"
-      - test:
+      - test_wdl:
           name: test_bam2pairs
           requires:
             - build
           test_name: "bam2pairs"
           keys_to_inspect: "test_bam2pairs.pairs_no_header"
-      - test:
+      - test_wdl:
           name: test_merge_sort
           requires:
             - build
           test_name: "merge_sort"
           keys_to_inspect: "test_merge_sort.merged"
-      - test:
+      - test_wdl:
           name: test_dedup
           requires:
             - build
           test_name: "dedup"
           keys_to_inspect: "test_dedup.deduped test_dedup.library_complexity_json test_dedup.stats_json"
-      - test:
+      - test_wdl:
           name: test_merge
           requires:
             - build
           test_name: "merge"
           keys_to_inspect: "test_merge.merged_no_header"
-      - test:
+      - test_wdl:
           name: test_merge_stats
           requires:
             - build
           test_name: "merge_stats"
           keys_to_inspect: "test_merge_stats.merged_stats test_merge_stats.merged_stats_json"
-      - test:
+      - test_wdl:
           name: test_arrowhead
           requires:
             - build
           test_name: "arrowhead"
           keys_to_inspect: "test_arrowhead.arrowhead_out"
-      - test:
+      - test_wdl:
           name: test_create_hic
           requires:
             - build
           test_name: "create_hic"
           keys_to_inspect: "test_create_hic.hic_file test_create_hic.stats test_create_hic.stats_json test_create_hic.stats_hists"
-      - test:
+      - test_wdl:
           name: test_hic
           requires:
             - build
           test_name: "hic"
           test_type: "workflow"
           keys_to_inspect: "test_hic.library_complexity test_hic.stats test_hic.alignments_stats test_hic.no_header_alignable_sam test_hic.out_pairs test_hic.out_dedup test_hic.no_header_hic_1 test_hic.no_header_hic_30"
-      - test:
+      - test_wdl:
           name: test_multiple_libraries
           requires:
             - build
           test_name: "multiple_libraries"
           test_type: "workflow"
           keys_to_inspect: "test_multiple_libraries.no_header_alignable_sam test_multiple_libraries.out_pairs test_multiple_libraries.out_dedup test_multiple_libraries.no_header_hic_1 test_multiple_libraries.no_header_hic_30"
-      - test:
+      - test_wdl:
           name: test_no_call_loops
           requires:
             - build
           test_name: "no_call_loops"
           test_type: "workflow"
           keys_to_inspect: "test_no_call_loops.domains"
-      - test:
+      - test_wdl:
           name: test_hic_from_libraries
           requires:
             - build
           test_name: "hic_from_libraries"
           test_type: "workflow"
           keys_to_inspect: "test_hic_from_libraries.inter_1_no_header test_hic_from_libraries.inter_30_no_header"
-      - test:
+      - test_wdl:
           name: test_no_bam2pairs
           requires:
             - build

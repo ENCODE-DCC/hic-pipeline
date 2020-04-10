@@ -34,13 +34,13 @@ Let us take a close look at the following template JSON. Comments are not allowe
 
     ////////// 2) Reference genome chromosome sizes//////////
     "hic.chrsz": "test/test_data/ce10_selected.chrom.sizes.tsv",
-    
+
     ////////// 3) Restriction sites locations in the reference genome sequence //////////
     "hic.restriction_sites": "test/test_data/ce10_selected_MboI.txt",
 
     ////////// 4) Reference genome index //////////
     "hic.reference_index": "test/test_data/ce10_selected.tar.gz",
-    
+
     ////////// 5) Ligation site sequence //////////
     "hic.restriction_enzyme": "MboI"
 

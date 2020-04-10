@@ -31,7 +31,7 @@ task tail_of_pairs {
     command {
         gzip -dc ${pairs} | sed 1,5d > no_header.pairs
     }
-    
+
     output {
         File no_header = glob("no_header.pairs")[0]
     }

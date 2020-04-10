@@ -45,7 +45,7 @@ RUN curl -OL "https://github.com/lh3/bwa/archive/v${BWA_VERSION}.zip" && \
     make && \
     cp bwa /usr/local/bin && \
     cd .. && \
-    rm -rf "bwa-v${BWA_VERSION}" 
+    rm -rf "bwa-v${BWA_VERSION}"
 
 # Install Samtools
 RUN curl -OL "https://github.com/samtools/samtools/releases/download/${SAMTOOLS_VERSION}/samtools-${SAMTOOLS_VERSION}.tar.bz2" && \

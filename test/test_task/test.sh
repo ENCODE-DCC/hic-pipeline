@@ -14,7 +14,7 @@ if [ $# -gt 2 ]; then
 else
   DOCKER_IMAGE=quay.io/encode-dcc/hic-pipeline:template
 fi
-PREFIX=$(basename ${WDL} .wdl)
-METADATA=${PREFIX}.metadata.json # metadata
+PREFIX=$(basename "${WDL}" .wdl)
+METADATA="${PREFIX}.metadata.json" # metadata
 
-caper run ${WDL} --docker ${DOCKER_IMAGE} -i ${INPUT} -m ${METADATA}
+caper run "${WDL}" --docker "${DOCKER_IMAGE}" -i "${INPUT}" -m "${METADATA}"

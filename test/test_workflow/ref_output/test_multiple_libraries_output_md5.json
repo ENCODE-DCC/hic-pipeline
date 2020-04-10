@@ -1,7 +1,7 @@
 {
-    "result_alignable_dedup.no_header.sam" : "e5a63c16dff623746351d584b38fdbe7",
-    "no_header.pairs" : "e6e2f79ad4882fd76b59e2c9bd984f26",
-    "inter_30.hic" : "68712c507ffe66f630672a0968219080",
-    "inter_1.hic" : "d904d75bb7c83b947ed3fa69bd0fbbd7",
-    "merged_nodups.txt" : "172d6c3e687f181228cd114525b4f919"
+  "inter_1.hic": "d904d75bb7c83b947ed3fa69bd0fbbd7",
+  "inter_30.hic": "68712c507ffe66f630672a0968219080",
+  "merged_nodups.txt": "172d6c3e687f181228cd114525b4f919",
+  "no_header.pairs": "e6e2f79ad4882fd76b59e2c9bd984f26",
+  "result_alignable_dedup.no_header.sam": "e5a63c16dff623746351d584b38fdbe7"
 }

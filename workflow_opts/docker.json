@@ -1,9 +1,9 @@
 {
-    "default_runtime_attributes": {
-        "docker" : "quay.io/encode-dcc/hic-pipeline:template",
-        "zones": "us-central1-c us-central1-b",
-        "preemptible": "0",
-        "bootDiskSizeGb": "10",
-        "noAddress": "false"
-    }
+  "default_runtime_attributes": {
+    "bootDiskSizeGb": "10",
+    "docker": "quay.io/encode-dcc/hic-pipeline:template",
+    "noAddress": "false",
+    "preemptible": "0",
+    "zones": "us-central1-c us-central1-b"
+  }
 }

@@ -102,10 +102,10 @@ workflow hic {
                     bam_files = bams_to_merge[i]
                 }
             }
-        
+
             call merge_sort { input:
                 sort_files_ = fragment.sort_file
-            } 
+            }
 
             # we can collect the alignable.bam using the array merge.out_file
             call dedup { input:
@@ -114,7 +114,7 @@ workflow hic {
                 restriction_sites = select_first([restriction_sites]),
                 alignable_bam = merge.merged_output[4]
             }
-            
+
             # convert alignable bam to pairs to be consistent with 4DN
             if ( !no_bam2pairs ) {
                 call bam2pairs { input:
@@ -192,7 +192,7 @@ task align {
         mkdir reference
         cd reference && tar -xvf ${idx_tar}
         index_folder=$(ls)
-        reference_fasta=$(ls | head -1) 
+        reference_fasta=$(ls | head -1)
         reference_folder=$(pwd)
         reference_index_path=$reference_folder/$reference_fasta
         cd ..
@@ -230,17 +230,17 @@ task fragment {
 
     command {
         samtools view -h ${bam_file} | awk -v "fname"=result -f $(which chimeric_blacklist.awk)
- 
+
         # if any normal reads were written, find what fragment they correspond
         # to and store that
-        
+
         echo "Running fragment"
         fragment result_norm.txt result_frag.txt ${restriction}
         echo $(ls)
 
         # no restriction site !!!!
         # need to add support
-       
+
         # qc for alignment portion
         cat ${norm_res_input} *.res.txt | awk -f  $(which stats_sub.awk) >> alignment_stats.txt
         paste -d "" ${norm_res_input} *.res.txt > result.res.txt
@@ -260,7 +260,7 @@ task fragment {
         rm result_alignable.sam
         #removed all sam files
         ##restriction used to be site_file
-    
+
         # sort by chromosome, fragment, strand, and position
         sort -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 90% result_frag.txt > sort.txt
         if [ $? -ne 0 ]
@@ -293,9 +293,9 @@ task merge {
     input {
         Array[File] bam_files
     }
-    
+
     command {
-        samtools merge merged_bam_files.bam ~{sep=' ' bam_files} 
+        samtools merge merged_bam_files.bam ~{sep=' ' bam_files}
     }
 
     output {
@@ -305,7 +305,7 @@ task merge {
     runtime {
         cpu : "8"
         disks: "local-disk 1000 HDD"
-        
+
     }
 }
 
@@ -403,7 +403,7 @@ task merge_pairs_file {
     command {
         sort -m -k2,2d -k6,6d --parallel=8 -S 10% ${sep=' ' not_merged_pe}  > merged_pairs.txt
     }
-    
+
     output {
         File out_file = glob('merged_pairs.txt')[0]
     }
@@ -491,15 +491,15 @@ task hiccups{
     input {
         File hic_file
     }
-    
+
     command {
         java -jar -Ddevelopment=false /opt/scripts/common/juicer_tools.jar hiccups --ignore_sparsity ${hic_file} loops
     }
-    
+
     output {
         File out_file = glob("loops/*.bedpe")[0]
     }
-    
+
     runtime {
         bootDiskSizeGb: "20"
         docker: "quay.io/encode-dcc/hiccups:template"
