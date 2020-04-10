@@ -6,7 +6,7 @@ workflow test_merge_sort {
     input {
         Array[File] sort_files
     }
-   
+
     call hic.merge_sort as test_merge_sort_task { input:
         sort_files_ = sort_files
     }

@@ -20,7 +20,7 @@ workflow test_align {
 		idx_tar = idx_tar,
         ligation_site = ligation_site
 	}
-    
+
     call hic.fragment as test_fragment { input:
         restriction = restriction,
         bam_file = test_align_task.result,
@@ -48,7 +48,7 @@ workflow test_align {
         File unmapped = strip_headers.no_header[2]
         File mapq0 = strip_headers.no_header[3]
         File alignable = strip_headers.no_header[4]
-        
+
         File sort_file = test_fragment.sort_file
         File norm_res = test_fragment.norm_res
         File alignment_stats = test_fragment.alignment_stats
@@ -66,7 +66,7 @@ task strip_headers {
         FILE=$(basename "${bam}" ".bam")
         samtools view -h ${bam} | samtools view - > $FILE.no_header.sam
     }
-    
+
     output{
         File no_header = glob("*.no_header.sam")[0]
     }

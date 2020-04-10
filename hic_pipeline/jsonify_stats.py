@@ -8,31 +8,29 @@ import os
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        'filepath',
-        type=str,
-        help='filepath to the file to convert to json'
+        "filepath", type=str, help="filepath to the file to convert to json"
     )
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
-        '--library-complexity',
-        help='A library_complexity.txt file',
-        action='store_const',
+        "--library-complexity",
+        help="A library_complexity.txt file",
+        action="store_const",
         const=jsonify_library_complexity,
-        dest='jsonify'
+        dest="jsonify",
     )
     group.add_argument(
-        '--library-stats',
-        help='A statistics file produced during dedup',
-        action='store_const',
+        "--library-stats",
+        help="A statistics file produced during dedup",
+        action="store_const",
         const=jsonify_library_stats,
-        dest='jsonify'
+        dest="jsonify",
     )
     group.add_argument(
-        '--alignment-stats',
-        help='An alignment_stats.txt file generated in fragment task',
-        action='store_const',
+        "--alignment-stats",
+        help="An alignment_stats.txt file generated in fragment task",
+        action="store_const",
         const=jsonify_alignment_stats,
-        dest='jsonify'
+        dest="jsonify",
     )
     args = parser.parse_args()
     return args
@@ -49,8 +47,8 @@ def parse_to_dict(filepath):
     with open(filepath) as f:
         data = f.readlines()
     for line in data:
-        split_line = line.split(': ')
-        key = '_'.join(split_line[0].strip().split(' '))
+        split_line = line.split(": ")
+        key = "_".join(split_line[0].strip().split(" "))
         keys.append(key.lower())
         values.append(split_line[1].strip())
     output = dict(zip(keys, values))
@@ -60,9 +58,9 @@ def parse_to_dict(filepath):
 def jsonify_library_complexity(filepath):
     """
     An example libary_complexity.txt file looks like the following:
-        Unique Reads: 12,101 
-        PCR Duplicates: 120 
-        Optical Duplicates: 0 
+        Unique Reads: 12,101
+        PCR Duplicates: 120
+        Optical Duplicates: 0
         Library Complexity Estimate: 618,223
     """
     jsonified = parse_to_dict(filepath)
@@ -85,21 +83,21 @@ def jsonify_library_stats(filepath):
         Long Range (>20Kb): 589 (4.87%)
     """
     jsonified = parse_to_dict(filepath)
-    value_sep = '-'
+    value_sep = "-"
     for k, v in jsonified.items():
-        if '%' in v and value_sep not in v:
-            split_value = v.split('(')
+        if "%" in v and value_sep not in v:
+            split_value = v.split("(")
             values = {
-                'total': split_value[0].strip(),
-                'percent': split_value[1].rstrip('%)')
+                "total": split_value[0].strip(),
+                "percent": split_value[1].rstrip("%)"),
             }
         else:
             split_value = v.split(value_sep)
             split_value = [i.strip() for i in split_value]
-            if 'bias' in k:
-                fields =['long_range', 'short_range']
-            elif 'pair' in k:
-                fields =['left', 'inner', 'outer', 'right']
+            if "bias" in k:
+                fields = ["long_range", "short_range"]
+            elif "pair" in k:
+                fields = ["left", "inner", "outer", "right"]
             values = dict(zip(fields, split_value))
         jsonified[k] = values
     return jsonified
@@ -120,11 +118,11 @@ def jsonify_alignment_stats(filepath):
     """
     jsonified = parse_to_dict(filepath)
     for k, v in jsonified.items():
-        if '(' in v:
-            split_value = v.split('(')
+        if "(" in v:
+            split_value = v.split("(")
             values = {
-                'total': split_value[0].strip(),
-                'percent': split_value[1].rstrip('%)')
+                "total": split_value[0].strip(),
+                "percent": split_value[1].rstrip("%)"),
             }
         else:
             values = v.strip()
@@ -136,10 +134,10 @@ def main():
     args = parse_arguments()
     filepath = args.filepath
     jsonified = args.jsonify(filepath)
-    filename = os.path.splitext(filepath)[0] + '.json'
-    with open(filename, 'w') as f:
+    filename = os.path.splitext(filepath)[0] + ".json"
+    with open(filename, "w") as f:
         f.write(json.dumps(jsonified, indent=4, sort_keys=True))
 
 
-if __name__== '__main__':
+if __name__ == "__main__":
     main()

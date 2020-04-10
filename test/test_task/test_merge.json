@@ -1,6 +1,6 @@
-{ 
-    "test_merge.bams": [
-        "test/test_data/alignable_shard0.bam",
-        "test/test_data/alignable_shard1.bam"
-    ]
+{
+  "test_merge.bams": [
+    "test/test_data/alignable_shard0.bam",
+    "test/test_data/alignable_shard1.bam"
+  ]
 }

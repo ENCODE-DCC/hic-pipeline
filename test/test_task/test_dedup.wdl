@@ -42,7 +42,7 @@ task strip_headers {
         FILE=$(basename "${bam}" ".bam")
         samtools view -h ${bam} | samtools view - > $FILE.no_header.sam
     }
-    
+
     output{
         File no_header = glob("*.no_header.sam")[0]
     }
