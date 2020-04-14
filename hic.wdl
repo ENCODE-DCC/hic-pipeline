@@ -1,7 +1,7 @@
 version 1.0
 
-#CAPER docker quay.io/encode-dcc/hic-pipeline:template
-#CAPER singularity docker://quay.io/encode-dcc/hic-pipeline:template
+#CAPER docker quay.io/encode-dcc/hic-pipeline:0.1.0
+#CAPER singularity docker://quay.io/encode-dcc/hic-pipeline:0.1.0
 
 workflow hic {
     input {
@@ -502,7 +502,7 @@ task hiccups{
 
     runtime {
         bootDiskSizeGb: "20"
-        docker: "quay.io/encode-dcc/hiccups:template"
+        docker: "quay.io/encode-dcc/hiccups:0.1.0"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
     }

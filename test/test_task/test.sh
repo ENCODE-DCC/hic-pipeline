@@ -12,7 +12,7 @@ INPUT=$2
 if [ $# -gt 2 ]; then
   DOCKER_IMAGE=$3
 else
-  DOCKER_IMAGE=quay.io/encode-dcc/hic-pipeline:template
+  DOCKER_IMAGE=quay.io/encode-dcc/hic-pipeline:0.1.0
 fi
 PREFIX=$(basename "${WDL}" .wdl)
 METADATA="${PREFIX}.metadata.json" # metadata

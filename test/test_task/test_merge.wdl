@@ -33,6 +33,6 @@ task strip_headers {
     }
 
     runtime {
-        docker : "quay.io/encode-dcc/hic-pipeline:template"
+        docker : "quay.io/encode-dcc/hic-pipeline:0.1.0"
     }
 }
