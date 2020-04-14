@@ -1,11 +1,11 @@
 {
-  "alignable.no_header.sam": "565766fa63d2eb402b14db117d63e105",
-  "alignment_stats.json": "802a0e5249f8623607ec581c179b9ac9",
-  "alignment_stats.txt": "b28c7acf877f91de840d22e3566c4d4d",
+  "alignable.no_header.sam": "5682b857978a0e988523f0c979033d73",
+  "alignment_stats.json": "817941625fbb409896248ea997510e04",
+  "alignment_stats.txt": "5428307e8c2b9c92a44eec08abef2721",
   "collisions.no_header.sam": "cb22daea9a4dba2cda0c6e875db51174",
   "collisions_low_mapq.no_header.sam": "63f7d3fa0b818e7d74accc10ef37ddae",
-  "mapq0.no_header.sam": "a9df472b6579d7762600408efe023d77",
-  "result.res.txt": "05f048df3da2992e7aa29c8b58c62d86",
-  "sort.txt": "f2df3edfbd1d165c3639bae687e20b25",
+  "mapq0.no_header.sam": "d41d8cd98f00b204e9800998ecf8427e",
+  "result.res.txt": "00bb191ddb59d075ebda45ba0597efc9",
+  "sort.txt": "06ec107d7b1b7cb2b72e5bfbf6ed1728",
   "unmapped.no_header.sam": "e24ff1e0d5e6471fec6976d0aeaa1061"
 }

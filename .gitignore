@@ -12,3 +12,4 @@ target
 .mypy_cache
 .tox
 __pycache__/
+*.pyc

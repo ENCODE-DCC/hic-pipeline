@@ -61,7 +61,7 @@ RUN curl -OL "https://github.com/samtools/samtools/releases/download/${SAMTOOLS_
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     cd juicer && \
-    git checkout 44752230566dffae0aabddb35116f5d9b72aface && \
+    git checkout 2fff94b9b4e2b961d856c17a01e6751f3e042926 && \
     chmod +x CPU/* CPU/common/*
 
 # Install Juicer tools
