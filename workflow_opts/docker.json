@@ -1,7 +1,7 @@
 {
   "default_runtime_attributes": {
     "bootDiskSizeGb": "10",
-    "docker": "quay.io/encode-dcc/hic-pipeline:template",
+    "docker": "quay.io/encode-dcc/hic-pipeline:0.1.0",
     "noAddress": "false",
     "preemptible": "0",
     "zones": "us-central1-c us-central1-b"

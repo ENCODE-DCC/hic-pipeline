@@ -39,6 +39,12 @@ get_md5_script: &get_md5_script
   command: |
     curl -O https://raw.githubusercontent.com/ENCODE-DCC/rna-seq-pipeline/master/src/compare_md5.py
 
+get_pipeline_version: &get_pipeline_version
+  name: get pipeline version from __init__.py
+  command: |
+    PIPELINE_VERSION=$(python -c "import hic_pipeline;print(hic_pipeline.__version__)")
+    echo "export PIPELINE_VERSION=${PIPELINE_VERSION}" >> ${BASH_ENV}
+
 commands:
   run_tox:
     description: "Install and run tox with a given environment"
@@ -146,9 +152,14 @@ jobs:
       - when:
           condition: << parameters.push_template >>
           steps:
-            run:
-              name: push template
-              command: docker push quay.io/encode-dcc/${QUAY_REPO}:template
+            - run: *get_pipeline_version
+            - run:
+                name: push template
+                command: |
+                  source ${BASH_ENV}
+                  docker tag quay.io/encode-dcc/${QUAY_REPO}:template quay.io/encode-dcc/${QUAY_REPO}:${PIPELINE_VERSION}
+                  docker push quay.io/encode-dcc/${QUAY_REPO}:template
+                  docker push quay.io/encode-dcc/${QUAY_REPO}:${PIPELINE_VERSION}
 
 # Define workflow here
 workflows:
