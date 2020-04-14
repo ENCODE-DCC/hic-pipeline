@@ -26,6 +26,7 @@ workflow hic {
         Boolean? no_bam2pairs = false
         Boolean? no_call_loops = false
         Boolean? no_call_tads = false
+        Boolean? include_mapq0_reads = false
         Array[String]? input_ligation_junctions
         Int cpu = 32
         String? assembly_name
@@ -46,6 +47,7 @@ workflow hic {
         no_bam2pairs: "If set to `true`, avoid generating .pairs files, defaults to false"
         no_call_loops: "If set to `true`, avoid calling loops with hiccups, defaults to false"
         no_call_tads: "If set to `true`, avoid calling domains with arrowhead, defaults to false"
+        include_mapq0_reads: "If set to `true`, chimeric reads (3 alignments) with one MAPQ 0 read will be classified as normal paired reads with the MAPQ 0 read discarded. If `false`, such reads will be classified as low mapq collisions, defaults to false"
         cpu: "Number of threads to use for bwa alignment"
         assembly_name: "Name of assembly to insert into hic file header, recommended to specify for reproducbility otherwise hic file will be nondeterministic"
     }
@@ -226,10 +228,11 @@ task fragment {
         File bam_file
         File norm_res_input
         File restriction    # restriction enzyme sites in the reference genome
+        Boolean include_mapq0_reads = false
     }
 
     command {
-        samtools view -h ${bam_file} | awk -v "fname"=result -f $(which chimeric_blacklist.awk)
+        samtools view -h ${bam_file} | awk -v "fname"=result -f -v "mapq0_reads_included"=${if include_mapq0_reads then 1 else 0} $(which chimeric_blacklist.awk)
 
         # if any normal reads were written, find what fragment they correspond
         # to and store that
