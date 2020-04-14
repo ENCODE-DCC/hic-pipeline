@@ -232,7 +232,7 @@ task fragment {
     }
 
     command {
-        samtools view -h ${bam_file} | awk -v "fname"=result -f -v "mapq0_reads_included"=${if include_mapq0_reads then 1 else 0} $(which chimeric_blacklist.awk)
+        samtools view -h ${bam_file} | awk -v "fname"=result -v "mapq0_reads_included"=${if include_mapq0_reads then 1 else 0} -f $(which chimeric_blacklist.awk)
 
         # if any normal reads were written, find what fragment they correspond
         # to and store that
