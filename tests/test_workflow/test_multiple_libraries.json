@@ -1,25 +1,25 @@
 {
   "test_multiple_libraries.assembly_name": "ce10",
-  "test_multiple_libraries.chrsz": "tests/test_data/ce10_selected.chrom.sizes.tsv",
+  "test_multiple_libraries.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
   "test_multiple_libraries.fastq": [
     [
       [
-        "tests/test_data/SRR1665089_1.subsampled.200.fastq.gz",
-        "tests/test_data/SRR1665089_2.subsampled.200.fastq.gz"
+        "tests/data/SRR1665089_1.subsampled.200.fastq.gz",
+        "tests/data/SRR1665089_2.subsampled.200.fastq.gz"
       ]
     ],
     [
       [
-        "tests/test_data/SRR1665089_1.subsampled.400.fastq.gz",
-        "tests/test_data/SRR1665089_2.subsampled.400.fastq.gz"
+        "tests/data/SRR1665089_1.subsampled.400.fastq.gz",
+        "tests/data/SRR1665089_2.subsampled.400.fastq.gz"
       ],
       [
-        "tests/test_data/merged_read1.fastq.gz",
-        "tests/test_data/merged_read2.fastq.gz"
+        "tests/data/merged_read1.fastq.gz",
+        "tests/data/merged_read2.fastq.gz"
       ]
     ]
   ],
-  "test_multiple_libraries.reference_index": "tests/test_data/ce10_selected.tar.gz",
+  "test_multiple_libraries.reference_index": "tests/data/ce10_selected.tar.gz",
   "test_multiple_libraries.restriction_enzyme": "MboI",
-  "test_multiple_libraries.restriction_sites": "tests/test_data/ce10_selected_MboI.txt"
+  "test_multiple_libraries.restriction_sites": "tests/data/ce10_selected_MboI.txt"
 }

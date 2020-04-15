@@ -1,4 +1,4 @@
 {
-  "test_no_call_loops.input_hic": "tests/test_data/inter_30.hic",
+  "test_no_call_loops.input_hic": "tests/data/inter_30.hic",
   "test_no_call_loops.no_call_loops": true
 }

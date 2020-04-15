@@ -1,20 +1,20 @@
 {
-  "hic.chrsz": "tests/test_data/ce10_selected.chrom.sizes.tsv",
+  "hic.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
   "hic.fastq": [
     [
       [
-        "tests/test_data/lib_1_seq_run_1_read1.fastq.gz",
-        "tests/test_data/lib_1_seq_run_1_read2.fastq.gz"
+        "tests/data/lib_1_seq_run_1_read1.fastq.gz",
+        "tests/data/lib_1_seq_run_1_read2.fastq.gz"
       ]
     ],
     [
       [
-        "tests/test_data/lib_2_seq_run_1_read1.fastq.gz",
-        "tests/test_data/lib_2_seq_run_1_read2.fastq.gz"
+        "tests/data/lib_2_seq_run_1_read1.fastq.gz",
+        "tests/data/lib_2_seq_run_1_read2.fastq.gz"
       ]
     ]
   ],
-  "hic.reference_index": "tests/test_data/ce10_selected.tar.gz",
+  "hic.reference_index": "tests/data/ce10_selected.tar.gz",
   "hic.restriction_enzyme": "MboI",
-  "hic.restriction_sites": "tests/test_data/ce10_selected_MboI.txt"
+  "hic.restriction_sites": "tests/data/ce10_selected_MboI.txt"
 }
