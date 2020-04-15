@@ -1,6 +1,6 @@
 {
   "test_dedup.alignable_bam": "test/test_data/alignable_shard0.bam",
-  "test_dedup.merged_sort": "test/test_data/merged_sort.txt",
+  "test_dedup.merged_sort": "test/test_data/merged_sort.txt.gz",
   "test_dedup.restriction_enzyme": "MboI",
   "test_dedup.restriction_sites": "test/test_data/ce10_selected_MboI.txt"
 }

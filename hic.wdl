@@ -190,6 +190,7 @@ task align {
     }
 
     command {
+        set -euo pipefail
         echo "Starting align"
         mkdir reference
         cd reference && tar -xvf ${idx_tar}
@@ -232,6 +233,7 @@ task fragment {
     }
 
     command {
+        set -euo pipefail
         samtools view -h ${bam_file} | awk -v "fname"=result -v "mapq0_reads_included"=${if include_mapq0_reads then 1 else 0} -f $(which chimeric_blacklist.awk)
 
         # if any normal reads were written, find what fragment they correspond
@@ -299,6 +301,7 @@ task merge {
     }
 
     command {
+        set -euo pipefail
         samtools merge merged_bam_files.bam ~{sep=' ' bam_files}
     }
 
@@ -318,14 +321,16 @@ task merge_sort {
         Array[File] sort_files_
     }
 
-    command {
+    command <<<
+        set -euo pipefail
         SORT_FILES=sort_files
-        mkdir $SORT_FILES
-        mv ~{sep=' ' sort_files_} $SORT_FILES
-        for i in $SORT_FILES/*; do gzip -d $i; done
-        sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 90% $SORT_FILES/*  > merged_sort.txt
+        mkdir "${SORT_FILES}"
+        mv ~{sep=' ' sort_files_} "${SORT_FILES}"
+        # Task test doesn't pass consistently without force option -f due to symlinking
+        gzip -df "${SORT_FILES}"/*
+        sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 90% "${SORT_FILES}"/* > merged_sort.txt
         gzip -n merged_sort.txt
-    }
+    >>>
 
     output {
         File out_file = glob('merged_sort.txt.gz')[0]
@@ -348,6 +353,7 @@ task dedup {
 
     # Can't use regular {} for command block, parser complains once hits awk command
     command <<<
+        set -euo pipefail
         MERGED_SORT_FILE=merged_sort.txt
         touch dups.txt
         touch optdups.txt
@@ -392,6 +398,7 @@ task bam2pairs {
     }
 
     command {
+        set -euo pipefail
         bam2pairs -c ${chrsz_} ${bam_file} pairix
     }
 
@@ -413,6 +420,7 @@ task merge_pairs_file {
     }
 
     command {
+        set -euo pipefail
         NOT_MERGED_PE_FILES=not_merged_pes
         mkdir $NOT_MERGED_PE_FILES
         mv ~{sep=' ' not_merged_pe} $NOT_MERGED_PE_FILES
@@ -440,6 +448,7 @@ task merge_stats {
     }
 
     command {
+        set -euo pipefail
         awk -f $(which makemega_addstats.awk) ${sep=' ' alignment_stats} ${sep=' ' library_stats} > merged_stats.txt
         python3 $(which jsonify_stats.py) --alignment-stats merged_stats.txt
     }
@@ -461,6 +470,7 @@ task create_hic {
     }
 
     command {
+        set -euo pipefail
         MERGED_PAIRS_FILE=merged_pairs.txt
         gzip -dc ~{pairs_file} > $MERGED_PAIRS_FILE
         statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l ${sep=' ' ligation_junctions} $MERGED_PAIRS_FILE
@@ -497,6 +507,7 @@ task arrowhead {
     }
 
     command {
+        set -euo pipefail
         juicer_tools arrowhead ${hic_file} contact_domains
         gzip -n contact_domains/*
     }
@@ -515,6 +526,7 @@ task hiccups{
     }
 
     command {
+        set -euo pipefail
         java -jar -Ddevelopment=false /opt/scripts/common/juicer_tools.jar hiccups --ignore_sparsity ${hic_file} loops
         gzip -n loops/*.bedpe
     }

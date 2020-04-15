@@ -1,10 +1,10 @@
 {
   "alignment_stats.txt": "5428307e8c2b9c92a44eec08abef2721",
-  "inter_1.hic": "0e04f8745f3e0a143c8d01846cca5bae",
-  "inter_30.hic": "028c162dd3922c4cbd7f1ebfb8ebf415",
-  "library_complexity.json": "64ed2a3f04117f1ee2392ba9ea072f3c",
-  "merged_nodups.txt": "7384d3d799d02ccffaba68b9868338d5",
-  "no_header.pairs": "a95ca169256c73b02f2c347b85b41215",
-  "result_alignable_dedup.no_header.sam": "0bc6522586908f128d0f24a4dafe4065",
-  "stats.json": "269844316f24280db0fc502bfebda2aa"
+  "inter_1.hic": "719690c2e71535e218cdfedc439a9ef7",
+  "inter_30.hic": "14f492bfc181c45303df8fa95fdaa54d",
+  "library_complexity.json": "8cd886df307f44e31d4a4e08450b24f4",
+  "merged_nodups.txt.gz": "59230e49c0631464c62ad91c8c0b9574",
+  "no_header.pairs": "d41d8cd98f00b204e9800998ecf8427e",
+  "result_alignable_dedup.no_header.sam": "d41d8cd98f00b204e9800998ecf8427e",
+  "stats.json": "aa88960f6d60ea557a031d05dc5ca1c6"
 }
