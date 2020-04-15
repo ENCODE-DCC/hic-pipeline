@@ -1,4 +1,4 @@
-exclude: ^test/test_data/
+exclude: ^tests/test_data/
 repos:
   - repo: https://github.com/psf/black
     rev: 19.3b0

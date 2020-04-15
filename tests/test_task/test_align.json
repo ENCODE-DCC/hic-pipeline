@@ -1,0 +1,10 @@
+{
+  "test_align.chrsz": "tests/test_data/ce10_selected.chrom.sizes.tsv",
+  "test_align.fastqs": [
+    "tests/test_data/merged_read1.fastq.gz",
+    "tests/test_data/merged_read2.fastq.gz"
+  ],
+  "test_align.idx_tar": "tests/test_data/ce10_selected.tar.gz",
+  "test_align.restriction": "tests/test_data/ce10_selected_MboI.txt",
+  "test_align.restriction_enzyme": "MboI"
+}

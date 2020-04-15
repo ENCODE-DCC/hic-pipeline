@@ -1,0 +1,4 @@
+{
+  "test_bam2pairs.bam": "tests/test_data/bam2pairs.bam",
+  "test_bam2pairs.chrsz": "tests/test_data/chrom.sizes"
+}

@@ -9,7 +9,7 @@ HiC uniform processing pipeline
 * `examples/` : input JSON examples
 * `docker_image/` : Dockerfile
 * `nvidia_docker_image/` : Dockerfile for Nvidia Docker: to use pipeline with GPU
-* `test/` : test scripts for developers
+* `tests/` : test scripts for developers
 
 
 # Installation and tutorial
