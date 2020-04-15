@@ -91,13 +91,14 @@ workflow hic {
                 }
             }
 
-            Array[File] collisions = fragment.collisions  #for separate user entry point
-            Array[File] collisions_low = fragment.collisions_low_mapq
             Array[File] unmapped = fragment.unmapped
             Array[File] mapq0 = fragment.mapq0
             Array[File] alignable = fragment.alignable
 
-            Array[Array[File]] bams_to_merge = [collisions, collisions_low, unmapped, mapq0, alignable]
+            # Array[Array[File]] bams_to_merge = [unmapped, mapq0, alignable]
+            # mapq0 temporarily dropped since bam conversion fails
+            # TODO: add back when chimeric_blacklist fixed
+            Array[Array[File]] bams_to_merge = [unmapped, alignable]
 
             scatter(i in range(length(bams_to_merge))){
                 call merge { input:
@@ -114,7 +115,8 @@ workflow hic {
                 merged_sort = merge_sort.out_file,
                 ligation_site = ligation_site,
                 restriction_sites = select_first([restriction_sites]),
-                alignable_bam = merge.merged_output[4]
+                # TODO: change the index from 1 to 2 when mapq sam headers are fixed
+                alignable_bam = merge.merged_output[1]
             }
 
             # convert alignable bam to pairs to be consistent with 4DN
@@ -247,20 +249,18 @@ task fragment {
         # need to add support
 
         # qc for alignment portion
-        cat ${norm_res_input} *.res.txt | awk -f  $(which stats_sub.awk) >> alignment_stats.txt
-        paste -d "" ${norm_res_input} *.res.txt > result.res.txt
+        cat ${norm_res_input} | awk -f  $(which stats_sub.awk) >> alignment_stats.txt
+        paste -d "" ${norm_res_input} > result.res.txt
         python3 $(which jsonify_stats.py) --alignment-stats alignment_stats.txt
 
         # convert sams to bams and delete the sams
         echo "Converting sam to bam"
-        samtools view -hb result_collisions.sam > collisions.bam
-        rm result_collisions.sam
-        samtools view -hb result_collisions_low_mapq.sam > collisions_low_mapq.bam
-        rm result_collisions_low_mapq.sam
         samtools view -hb result_unmapped.sam > unmapped.bam
         rm result_unmapped.sam
-        samtools view -hb result_mapq0.sam > mapq0.bam
-        rm result_mapq0.sam
+        # Mapq0 sam from chimeric doesn’t have SAM headers, can’t convert to bam
+        # TODO: fix this
+        # samtools view -hb result_mapq0.sam > mapq0.bam
+        # rm result_mapq0.sam
         samtools view -hb result_alignable.sam > alignable.bam
         rm result_alignable.sam
         #removed all sam files
@@ -277,10 +277,9 @@ task fragment {
     }
 
     output {
-        File collisions = glob("collisions.bam")[0]
-        File collisions_low_mapq = glob("collisions_low_mapq.bam")[0]
         File unmapped = glob("unmapped.bam")[0]
-        File mapq0 = glob("mapq0.bam")[0]
+        # TODO: change this to bam when mapq0 sam headers are fixed
+        File mapq0 = glob("result_mapq0.sam")[0]
         File alignable = glob("alignable.bam")[0]
         File sort_file = glob("sort.txt.gz")[0]
         File norm_res = glob("result.res.txt")[0]
@@ -325,7 +324,8 @@ task merge_sort {
         set -euo pipefail
         SORT_FILES=sort_files
         mkdir "${SORT_FILES}"
-        mv ~{sep=' ' sort_files_} "${SORT_FILES}"
+        # Add random number to make filenames unique
+        for i in ~{sep=' ' sort_files_}; do mv $i "${SORT_FILES}/sort_${RANDOM}.txt.gz"; done
         # Task test doesn't pass consistently without force option -f due to symlinking
         gzip -df "${SORT_FILES}"/*
         sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 90% "${SORT_FILES}"/* > merged_sort.txt
@@ -419,15 +419,15 @@ task merge_pairs_file {
         Array[File] not_merged_pe
     }
 
-    command {
+    command <<<
         set -euo pipefail
         NOT_MERGED_PE_FILES=not_merged_pes
-        mkdir $NOT_MERGED_PE_FILES
-        mv ~{sep=' ' not_merged_pe} $NOT_MERGED_PE_FILES
-        for i in $NOT_MERGED_PE_FILES/*; do gzip -d $i; done
-        sort -m -k2,2d -k6,6d --parallel=8 -S 10% $NOT_MERGED_PE_FILES/* > merged_pairs.txt
+        mkdir "${NOT_MERGED_PE_FILES}"
+        for i in ~{sep=' ' not_merged_pe}; do mv $i "${NOT_MERGED_PE_FILES}/merged_nodups_${RANDOM}.txt.gz"; done
+        gzip -df "${NOT_MERGED_PE_FILES}"/*
+        sort -m -k2,2d -k6,6d --parallel=8 -S 10% "${NOT_MERGED_PE_FILES}"/* > merged_pairs.txt
         gzip -n merged_pairs.txt
-    }
+    >>>
 
     output {
         File out_file = glob('merged_pairs.txt.gz')[0]
