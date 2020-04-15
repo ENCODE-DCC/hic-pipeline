@@ -6,6 +6,6 @@
   "collisions_low_mapq.no_header.sam": "63f7d3fa0b818e7d74accc10ef37ddae",
   "mapq0.no_header.sam": "d41d8cd98f00b204e9800998ecf8427e",
   "result.res.txt": "00bb191ddb59d075ebda45ba0597efc9",
-  "sort.txt": "06ec107d7b1b7cb2b72e5bfbf6ed1728",
+  "sort.txt.gz": "594005a83043e6ecc3be735f6c01bd4a",
   "unmapped.no_header.sam": "e24ff1e0d5e6471fec6976d0aeaa1061"
 }

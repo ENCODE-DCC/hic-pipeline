@@ -271,6 +271,7 @@ task fragment {
             echo "***! Failure during sort"
             exit 1
         fi
+        gzip -n sort.txt
     }
 
     output {
@@ -279,7 +280,7 @@ task fragment {
         File unmapped = glob("unmapped.bam")[0]
         File mapq0 = glob("mapq0.bam")[0]
         File alignable = glob("alignable.bam")[0]
-        File sort_file = glob("sort.txt")[0]
+        File sort_file = glob("sort.txt.gz")[0]
         File norm_res = glob("result.res.txt")[0]
         File alignment_stats = glob("alignment_stats.txt")[0]
         File alignment_stats_json = glob("alignment_stats.json")[0]
@@ -318,11 +319,16 @@ task merge_sort {
     }
 
     command {
-        sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 90% ${sep=' ' sort_files_}  > merged_sort.txt
+        SORT_FILES=sort_files
+        mkdir $SORT_FILES
+        mv ~{sep=' ' sort_files_} $SORT_FILES
+        for i in $SORT_FILES/*; do gzip -d $i; done
+        sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 90% $SORT_FILES/*  > merged_sort.txt
+        gzip -n merged_sort.txt
     }
 
     output {
-        File out_file = glob('merged_sort.txt')[0]
+        File out_file = glob('merged_sort.txt.gz')[0]
     }
 
     runtime {
@@ -342,10 +348,12 @@ task dedup {
 
     # Can't use regular {} for command block, parser complains once hits awk command
     command <<<
+        MERGED_SORT_FILE=merged_sort.txt
         touch dups.txt
         touch optdups.txt
         touch merged_nodups.txt
-        awk -f $(which dups.awk) ~{merged_sort}
+        gzip -dc ~{merged_sort} > $MERGED_SORT_FILE
+        awk -f $(which dups.awk) $MERGED_SORT_FILE
         pcr=$(wc -l dups.txt | awk '{print $1}')
         unique=$(wc -l merged_nodups.txt | awk '{print $1}')
         opt=$(wc -l optdups.txt | awk '{print $1}')
@@ -358,11 +366,12 @@ task dedup {
         samtools view -hb result_alignable_dedup.sam > result_alignable_dedup.bam
         rm result_alignable_dedup.sam
         rm ~{alignable_bam}
+        gzip -n merged_nodups.txt
     >>>
 
     output {
         File deduped_bam = glob('result_alignable_dedup.bam')[0]
-        File out_file = glob('merged_nodups.txt')[0]
+        File out_file = glob('merged_nodups.txt.gz')[0]
         File library_complexity = glob('library_complexity.txt')[0]
         File library_complexity_json = glob('library_complexity.json')[0]
         File stats = glob('stats.txt')[0]
@@ -404,11 +413,16 @@ task merge_pairs_file {
     }
 
     command {
-        sort -m -k2,2d -k6,6d --parallel=8 -S 10% ${sep=' ' not_merged_pe}  > merged_pairs.txt
+        NOT_MERGED_PE_FILES=not_merged_pes
+        mkdir $NOT_MERGED_PE_FILES
+        mv ~{sep=' ' not_merged_pe} $NOT_MERGED_PE_FILES
+        for i in $NOT_MERGED_PE_FILES/*; do gzip -d $i; done
+        sort -m -k2,2d -k6,6d --parallel=8 -S 10% $NOT_MERGED_PE_FILES/* > merged_pairs.txt
+        gzip -n merged_pairs.txt
     }
 
     output {
-        File out_file = glob('merged_pairs.txt')[0]
+        File out_file = glob('merged_pairs.txt.gz')[0]
     }
 
     runtime {
@@ -447,14 +461,18 @@ task create_hic {
     }
 
     command {
-        statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l ${sep=' ' ligation_junctions} ${pairs_file}
-        ASSEMBLY_NAME=${default='' assembly_name}
+        MERGED_PAIRS_FILE=merged_pairs.txt
+        gzip -dc ~{pairs_file} > $MERGED_PAIRS_FILE
+        statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l ${sep=' ' ligation_junctions} $MERGED_PAIRS_FILE
         # If the assembly name is empty, then we write chrsz path into file as usual, otherwise, use the assembly name instead of the path
-        if [ -z "$ASSEMBLY_NAME" ]; then
-            juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} ${pairs_file} inter_${quality}.hic ${chrsz_}
-        else
-            juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} -y $ASSEMBLY_NAME ${pairs_file} inter_${quality}.hic ${chrsz_}
-        fi
+        juicer_tools pre \
+            -s stats_${quality}.txt \
+            -g stats_${quality}_hists.m \
+            -q ${quality} \
+            ~{if defined(assembly_name) then "-y " + assembly_name else ""} \
+            $MERGED_PAIRS_FILE \
+            inter_${quality}.hic \
+            ${chrsz_}
         python3 $(which jsonify_stats.py) --alignment-stats stats_${quality}.txt
     }
 
@@ -480,10 +498,11 @@ task arrowhead {
 
     command {
         juicer_tools arrowhead ${hic_file} contact_domains
+        gzip -n contact_domains/*
     }
 
     output {
-        File out_file = glob('contact_domains/*.bedpe')[0]
+        File out_file = glob('contact_domains/*.bedpe.gz')[0]
     }
 
     runtime {
@@ -497,10 +516,11 @@ task hiccups{
 
     command {
         java -jar -Ddevelopment=false /opt/scripts/common/juicer_tools.jar hiccups --ignore_sparsity ${hic_file} loops
+        gzip -n loops/*.bedpe
     }
 
     output {
-        File out_file = glob("loops/*.bedpe")[0]
+        File out_file = glob("loops/*.bedpe.gz")[0]
     }
 
     runtime {
