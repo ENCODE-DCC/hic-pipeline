@@ -2,8 +2,8 @@
   "test_hic_from_libraries.assembly_name": "ce10",
   "test_hic_from_libraries.chrsz": "test/test_data/ce10_selected.chrom.sizes.tsv",
   "test_hic_from_libraries.input_dedup_pairs": [
-    "test/test_data/merged_nodups_lib1.txt",
-    "test/test_data/merged_nodups_lib2.txt"
+    "test/test_data/merged_nodups_lib1.txt.gz",
+    "test/test_data/merged_nodups_lib2.txt.gz"
   ],
   "test_hic_from_libraries.library_stats": [
     "test/test_data/stats_lib1.txt",

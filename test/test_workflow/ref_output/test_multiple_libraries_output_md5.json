@@ -1,7 +1,7 @@
 {
   "inter_1.hic": "651bd544a86311c76b2e8d19fb5ee6dd",
   "inter_30.hic": "5bd1b5db042496b2be5f168b1ae1426d",
-  "merged_nodups.txt": "9f9b9cfaf05217dbda4530ef9f80b424",
+  "merged_nodups.txt.gz": "732861f1392940e9efa84d55b282022a",
   "no_header.pairs": "c176bc697d89b60e1f8ad916942537db",
   "result_alignable_dedup.no_header.sam": "1d36f1e13987f5de4df7cd08bcf7982d"
 }

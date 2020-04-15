@@ -188,7 +188,7 @@ workflows:
           requires:
             - build
           test_name: "align"
-          keys_to_inspect: "test_align.collisions test_align.collisions_low_mapq test_align.unmapped test_align.mapq0 test_align.alignable test_align.sort_file test_align.norm_res test_align.alignment_stats test_align.alignment_stats_json"
+          keys_to_inspect: "test_align.unmapped test_align.mapq0 test_align.alignable test_align.sort_file test_align.norm_res test_align.alignment_stats test_align.alignment_stats_json"
       - test_wdl:
           name: test_bam2pairs
           requires:

@@ -91,13 +91,14 @@ workflow hic {
                 }
             }
 
-            Array[File] collisions = fragment.collisions  #for separate user entry point
-            Array[File] collisions_low = fragment.collisions_low_mapq
             Array[File] unmapped = fragment.unmapped
             Array[File] mapq0 = fragment.mapq0
             Array[File] alignable = fragment.alignable
 
-            Array[Array[File]] bams_to_merge = [collisions, collisions_low, unmapped, mapq0, alignable]
+            # Array[Array[File]] bams_to_merge = [unmapped, mapq0, alignable]
+            # mapq0 temporarily dropped since bam conversion fails
+            # TODO: add back when chimeric_blacklist fixed
+            Array[Array[File]] bams_to_merge = [unmapped, alignable]
 
             scatter(i in range(length(bams_to_merge))){
                 call merge { input:
@@ -114,7 +115,8 @@ workflow hic {
                 merged_sort = merge_sort.out_file,
                 ligation_site = ligation_site,
                 restriction_sites = select_first([restriction_sites]),
-                alignable_bam = merge.merged_output[4]
+                # TODO: change the index from 1 to 2 when mapq sam headers are fixed
+                alignable_bam = merge.merged_output[1]
             }
 
             # convert alignable bam to pairs to be consistent with 4DN
@@ -190,6 +192,7 @@ task align {
     }
 
     command {
+        set -euo pipefail
         echo "Starting align"
         mkdir reference
         cd reference && tar -xvf ${idx_tar}
@@ -232,6 +235,7 @@ task fragment {
     }
 
     command {
+        set -euo pipefail
         samtools view -h ${bam_file} | awk -v "fname"=result -v "mapq0_reads_included"=${if include_mapq0_reads then 1 else 0} -f $(which chimeric_blacklist.awk)
 
         # if any normal reads were written, find what fragment they correspond
@@ -245,20 +249,18 @@ task fragment {
         # need to add support
 
         # qc for alignment portion
-        cat ${norm_res_input} *.res.txt | awk -f  $(which stats_sub.awk) >> alignment_stats.txt
-        paste -d "" ${norm_res_input} *.res.txt > result.res.txt
+        cat ${norm_res_input} | awk -f  $(which stats_sub.awk) >> alignment_stats.txt
+        paste -d "" ${norm_res_input} > result.res.txt
         python3 $(which jsonify_stats.py) --alignment-stats alignment_stats.txt
 
         # convert sams to bams and delete the sams
         echo "Converting sam to bam"
-        samtools view -hb result_collisions.sam > collisions.bam
-        rm result_collisions.sam
-        samtools view -hb result_collisions_low_mapq.sam > collisions_low_mapq.bam
-        rm result_collisions_low_mapq.sam
         samtools view -hb result_unmapped.sam > unmapped.bam
         rm result_unmapped.sam
-        samtools view -hb result_mapq0.sam > mapq0.bam
-        rm result_mapq0.sam
+        # Mapq0 sam from chimeric doesn’t have SAM headers, can’t convert to bam
+        # TODO: fix this
+        # samtools view -hb result_mapq0.sam > mapq0.bam
+        # rm result_mapq0.sam
         samtools view -hb result_alignable.sam > alignable.bam
         rm result_alignable.sam
         #removed all sam files
@@ -271,15 +273,15 @@ task fragment {
             echo "***! Failure during sort"
             exit 1
         fi
+        gzip -n sort.txt
     }
 
     output {
-        File collisions = glob("collisions.bam")[0]
-        File collisions_low_mapq = glob("collisions_low_mapq.bam")[0]
         File unmapped = glob("unmapped.bam")[0]
-        File mapq0 = glob("mapq0.bam")[0]
+        # TODO: change this to bam when mapq0 sam headers are fixed
+        File mapq0 = glob("result_mapq0.sam")[0]
         File alignable = glob("alignable.bam")[0]
-        File sort_file = glob("sort.txt")[0]
+        File sort_file = glob("sort.txt.gz")[0]
         File norm_res = glob("result.res.txt")[0]
         File alignment_stats = glob("alignment_stats.txt")[0]
         File alignment_stats_json = glob("alignment_stats.json")[0]
@@ -298,6 +300,7 @@ task merge {
     }
 
     command {
+        set -euo pipefail
         samtools merge merged_bam_files.bam ~{sep=' ' bam_files}
     }
 
@@ -317,12 +320,20 @@ task merge_sort {
         Array[File] sort_files_
     }
 
-    command {
-        sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 90% ${sep=' ' sort_files_}  > merged_sort.txt
-    }
+    command <<<
+        set -euo pipefail
+        SORT_FILES=sort_files
+        mkdir "${SORT_FILES}"
+        # Add random number to make filenames unique
+        for i in ~{sep=' ' sort_files_}; do mv $i "${SORT_FILES}/sort_${RANDOM}.txt.gz"; done
+        # Task test doesn't pass consistently without force option -f due to symlinking
+        gzip -df "${SORT_FILES}"/*
+        sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 90% "${SORT_FILES}"/* > merged_sort.txt
+        gzip -n merged_sort.txt
+    >>>
 
     output {
-        File out_file = glob('merged_sort.txt')[0]
+        File out_file = glob('merged_sort.txt.gz')[0]
     }
 
     runtime {
@@ -342,10 +353,13 @@ task dedup {
 
     # Can't use regular {} for command block, parser complains once hits awk command
     command <<<
+        set -euo pipefail
+        MERGED_SORT_FILE=merged_sort.txt
         touch dups.txt
         touch optdups.txt
         touch merged_nodups.txt
-        awk -f $(which dups.awk) ~{merged_sort}
+        gzip -dc ~{merged_sort} > $MERGED_SORT_FILE
+        awk -f $(which dups.awk) $MERGED_SORT_FILE
         pcr=$(wc -l dups.txt | awk '{print $1}')
         unique=$(wc -l merged_nodups.txt | awk '{print $1}')
         opt=$(wc -l optdups.txt | awk '{print $1}')
@@ -358,11 +372,12 @@ task dedup {
         samtools view -hb result_alignable_dedup.sam > result_alignable_dedup.bam
         rm result_alignable_dedup.sam
         rm ~{alignable_bam}
+        gzip -n merged_nodups.txt
     >>>
 
     output {
         File deduped_bam = glob('result_alignable_dedup.bam')[0]
-        File out_file = glob('merged_nodups.txt')[0]
+        File out_file = glob('merged_nodups.txt.gz')[0]
         File library_complexity = glob('library_complexity.txt')[0]
         File library_complexity_json = glob('library_complexity.json')[0]
         File stats = glob('stats.txt')[0]
@@ -383,6 +398,7 @@ task bam2pairs {
     }
 
     command {
+        set -euo pipefail
         bam2pairs -c ${chrsz_} ${bam_file} pairix
     }
 
@@ -403,12 +419,18 @@ task merge_pairs_file {
         Array[File] not_merged_pe
     }
 
-    command {
-        sort -m -k2,2d -k6,6d --parallel=8 -S 10% ${sep=' ' not_merged_pe}  > merged_pairs.txt
-    }
+    command <<<
+        set -euo pipefail
+        NOT_MERGED_PE_FILES=not_merged_pes
+        mkdir "${NOT_MERGED_PE_FILES}"
+        for i in ~{sep=' ' not_merged_pe}; do mv $i "${NOT_MERGED_PE_FILES}/merged_nodups_${RANDOM}.txt.gz"; done
+        gzip -df "${NOT_MERGED_PE_FILES}"/*
+        sort -m -k2,2d -k6,6d --parallel=8 -S 10% "${NOT_MERGED_PE_FILES}"/* > merged_pairs.txt
+        gzip -n merged_pairs.txt
+    >>>
 
     output {
-        File out_file = glob('merged_pairs.txt')[0]
+        File out_file = glob('merged_pairs.txt.gz')[0]
     }
 
     runtime {
@@ -426,6 +448,7 @@ task merge_stats {
     }
 
     command {
+        set -euo pipefail
         awk -f $(which makemega_addstats.awk) ${sep=' ' alignment_stats} ${sep=' ' library_stats} > merged_stats.txt
         python3 $(which jsonify_stats.py) --alignment-stats merged_stats.txt
     }
@@ -447,14 +470,19 @@ task create_hic {
     }
 
     command {
-        statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l ${sep=' ' ligation_junctions} ${pairs_file}
-        ASSEMBLY_NAME=${default='' assembly_name}
+        set -euo pipefail
+        MERGED_PAIRS_FILE=merged_pairs.txt
+        gzip -dc ~{pairs_file} > $MERGED_PAIRS_FILE
+        statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l ${sep=' ' ligation_junctions} $MERGED_PAIRS_FILE
         # If the assembly name is empty, then we write chrsz path into file as usual, otherwise, use the assembly name instead of the path
-        if [ -z "$ASSEMBLY_NAME" ]; then
-            juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} ${pairs_file} inter_${quality}.hic ${chrsz_}
-        else
-            juicer_tools pre -s stats_${quality}.txt -g stats_${quality}_hists.m -q ${quality} -y $ASSEMBLY_NAME ${pairs_file} inter_${quality}.hic ${chrsz_}
-        fi
+        juicer_tools pre \
+            -s stats_${quality}.txt \
+            -g stats_${quality}_hists.m \
+            -q ${quality} \
+            ~{if defined(assembly_name) then "-y " + assembly_name else ""} \
+            $MERGED_PAIRS_FILE \
+            inter_${quality}.hic \
+            ${chrsz_}
         python3 $(which jsonify_stats.py) --alignment-stats stats_${quality}.txt
     }
 
@@ -479,11 +507,13 @@ task arrowhead {
     }
 
     command {
+        set -euo pipefail
         juicer_tools arrowhead ${hic_file} contact_domains
+        gzip -n contact_domains/*
     }
 
     output {
-        File out_file = glob('contact_domains/*.bedpe')[0]
+        File out_file = glob('contact_domains/*.bedpe.gz')[0]
     }
 
     runtime {
@@ -496,11 +526,13 @@ task hiccups{
     }
 
     command {
+        set -euo pipefail
         java -jar -Ddevelopment=false /opt/scripts/common/juicer_tools.jar hiccups --ignore_sparsity ${hic_file} loops
+        gzip -n loops/*.bedpe
     }
 
     output {
-        File out_file = glob("loops/*.bedpe")[0]
+        File out_file = glob("loops/*.bedpe.gz")[0]
     }
 
     runtime {

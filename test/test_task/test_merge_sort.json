@@ -1,6 +1,6 @@
 {
   "test_merge_sort.sort_files": [
-    "test/test_data/sort_200.txt",
-    "test/test_data/sort_400.txt"
+    "test/test_data/sort_200.txt.gz",
+    "test/test_data/sort_400.txt.gz"
   ]
 }

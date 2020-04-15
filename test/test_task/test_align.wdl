@@ -28,8 +28,6 @@ workflow test_align {
     }
 
     Array[File] bams = [
-        test_fragment.collisions,
-        test_fragment.collisions_low_mapq,
         test_fragment.unmapped,
         test_fragment.mapq0,
         test_fragment.alignable
@@ -43,11 +41,9 @@ workflow test_align {
     }
 
     output {
-        File collisions = strip_headers.no_header[0]
-        File collisions_low_mapq = strip_headers.no_header[1]
-        File unmapped = strip_headers.no_header[2]
-        File mapq0 = strip_headers.no_header[3]
-        File alignable = strip_headers.no_header[4]
+        File unmapped = strip_headers.no_header[0]
+        File mapq0 = strip_headers.no_header[1]
+        File alignable = strip_headers.no_header[2]
 
         File sort_file = test_fragment.sort_file
         File norm_res = test_fragment.norm_res
