@@ -6,11 +6,11 @@
     tests/integration/wdl/test_create_hic.wdl
     tests/integration/json/test_create_hic.json
   files:
-    - path: "test-output/inter_30.hic"
+    - path: "test-output/inter.hic"
       md5sum: ad1bba8a156904354b5cbebce068105a
-    - path: "test-output/stats_30.json"
+    - path: "test-output/stats.json"
       md5sum: 2ae6a8e57e31f58ac4dcd5c56be885fb
-    - path: "test-output/stats_30.txt"
+    - path: "test-output/stats.txt"
       md5sum: b95e8a1cb00a36bb52bdc48c0c5fc75a
-    - path: "test-output/stats_30_hists.m"
+    - path: "test-output/stats_hists.m"
       md5sum: f25ab376533919ab689255e2a2c96ea5

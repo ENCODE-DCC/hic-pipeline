@@ -20,6 +20,18 @@ To run a WDL test with a specific tag:
     $ tox -e py37 -- --tag test_align
     ```
 
+To preserve the output logs and files from running a WDL test, pass the `--kwd` flag:
+
+    ```bash
+    $ tox -e py37 -- --tag test_align --kwd
+    ```
+
+To run WDL tests in parallel, pass the `--wt` flag, here `4` indicates we want to allow a maximum of 4 workflows to execute at a time:
+
+    ```bash
+    $ tox -e py37 -- --tag integration --wt 4
+    ```
+
 To run Rust tests (requires `cargo`, easiest way to install is with [rustup](https://rustup.rs/)):
 
     ```bash
