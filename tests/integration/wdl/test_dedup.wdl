@@ -1,6 +1,6 @@
 version 1.0
 
-import "../../hic.wdl" as hic
+import "../../../hic.wdl" as hic
 
 workflow test_dedup {
     input {
