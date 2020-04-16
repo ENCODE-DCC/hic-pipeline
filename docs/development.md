@@ -1,0 +1,35 @@
+# Developer Documentation
+
+In order to develop this pipeline, you will first need to install the `tox` Python package. We recommend using a virtual environment to do this, such as the Python built-in library `venv`:
+
+    ```bash
+    $ pip install tox
+    ```
+
+## Running tests
+
+To run all of the Python and WDL tests:
+
+    ```bash
+    $ tox -e py37
+    ```
+
+To run a WDL test with a specific tag:
+
+    ```bash
+    $ tox -e py37 -- --tag test_align
+    ```
+
+To run Rust tests (requires `cargo`, easiest way to install is with [rustup](https://rustup.rs/)):
+
+    ```bash
+    $ cargo test
+    ```
+
+## Linting
+
+To lint and format code, run the following:
+
+    ```bash
+    $ tox -e lint
+    ```

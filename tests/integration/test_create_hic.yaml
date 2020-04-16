@@ -2,9 +2,9 @@
   tags:
     - integration
   command: >-
-    tests/caper_run.sh \
-    tests/wdl/integration/wdl/test_create_hic.wdl \
-    tests/wdl/integration/json/test_create_hic.json
+    tests/caper_run.sh
+    tests/integration/wdl/test_create_hic.wdl
+    tests/integration/json/test_create_hic.json
   files:
     - path: "test-output/inter_30.hic"
       md5sum: ad1bba8a156904354b5cbebce068105a

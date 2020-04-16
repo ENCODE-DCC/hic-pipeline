@@ -277,14 +277,14 @@ task fragment {
     }
 
     output {
-        File unmapped = glob("unmapped.bam")[0]
+        File unmapped = "unmapped.bam"
         # TODO: change this to bam when mapq0 sam headers are fixed
-        File mapq0 = glob("result_mapq0.sam")[0]
-        File alignable = glob("alignable.bam")[0]
-        File sort_file = glob("sort.txt.gz")[0]
-        File norm_res = glob("result.res.txt")[0]
-        File alignment_stats = glob("alignment_stats.txt")[0]
-        File alignment_stats_json = glob("alignment_stats.json")[0]
+        File mapq0 = "result_mapq0.sam"
+        File alignable = "alignable.bam"
+        File sort_file = "sort.txt.gz"
+        File norm_res = "result.res.txt"
+        File alignment_stats = "alignment_stats.txt"
+        File alignment_stats_json = "alignment_stats.json"
     }
 
     runtime {
@@ -305,7 +305,7 @@ task merge {
     }
 
     output {
-        File merged_output= glob('merged_bam_files.bam')[0]
+        File merged_output= "merged_bam_files.bam"
     }
 
     runtime {
@@ -333,7 +333,7 @@ task merge_sort {
     >>>
 
     output {
-        File out_file = glob('merged_sort.txt.gz')[0]
+        File out_file = "merged_sort.txt.gz"
     }
 
     runtime {
@@ -376,13 +376,13 @@ task dedup {
     >>>
 
     output {
-        File deduped_bam = glob('result_alignable_dedup.bam')[0]
-        File out_file = glob('merged_nodups.txt.gz')[0]
-        File library_complexity = glob('library_complexity.txt')[0]
-        File library_complexity_json = glob('library_complexity.json')[0]
-        File stats = glob('stats.txt')[0]
-        File stats_json = glob('stats.json')[0]
-        File stats_hists = glob('stats_hists.m')[0]
+        File deduped_bam = "result_alignable_dedup.bam"
+        File out_file = "merged_nodups.txt.gz"
+        File library_complexity = "library_complexity.txt"
+        File library_complexity_json = "library_complexity.json"
+        File stats = "stats.txt"
+        File stats_json = "stats.json"
+        File stats_hists = "stats_hists.m"
     }
 
     runtime {
@@ -403,8 +403,8 @@ task bam2pairs {
     }
 
     output {
-        File out_file = glob('pairix.*.pairs.gz')[0]
-        File pairs_index = glob('pairix.*.pairs.gz.px2')[0]
+        File out_file = "pairix.bsorted.pairs.gz"
+        File pairs_index = "pairix.bsorted.pairs.gz.px2"
     }
 
     runtime {
@@ -430,7 +430,7 @@ task merge_pairs_file {
     >>>
 
     output {
-        File out_file = glob('merged_pairs.txt.gz')[0]
+        File out_file = "merged_pairs.txt.gz"
     }
 
     runtime {
@@ -454,8 +454,8 @@ task merge_stats {
     }
 
     output {
-        File merged_stats = glob('merged_stats.txt')[0]
-        File merged_stats_json = glob("merged_stats.json")[0]
+        File merged_stats = "merged_stats.txt"
+        File merged_stats_json = "merged_stats.json"
     }
 }
 

@@ -47,5 +47,5 @@ def skip_n_lines_md5_is_expected():
     return _skip_n_lines_md5_is_expected
 
 
-def md5sum(file: str, chunksize: int = 4096) -> str:
+def md5sum(file: str) -> str:
     return hashlib.md5(file.encode()).hexdigest()

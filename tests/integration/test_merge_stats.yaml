@@ -2,9 +2,9 @@
   tags:
     - integration
   command: >-
-    tests/caper_run.sh \
-    tests/wdl/integration/wdl/test_merge_stats.wdl \
-    tests/wdl/integration/json/test_merge_stats.json
+    tests/caper_run.sh
+    tests/integration/wdl/test_merge_stats.wdl
+    tests/integration/json/test_merge_stats.json
   files:
     - path: "test-output/merged_stats.json"
       md5sum: 649bcda18c289776802def2f023cc065

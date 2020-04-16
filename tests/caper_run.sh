@@ -3,7 +3,7 @@
 set -euo pipefail
 
 if [ -z "$(command -v caper)" ]; then
-    echo "caper not installed, install with `pip install caper`"
+    echo "caper not installed, install with 'pip install caper'"
     exit 1
 fi
 
@@ -12,7 +12,7 @@ if [ $# -lt 2 ]; then
     exit 1
 fi
 
-if [ -z "${DOCKER_IMAGE}" ]; then
+if [ -z "${HIC_DOCKER_IMAGE}" ]; then
     echo "Must specify HIC_DOCKER_IMAGE via environment variable."
     exit 1
 fi
@@ -20,6 +20,6 @@ fi
 WDL=$1
 INPUT=$2
 
-echo "Running caper with WDL ${WDL}, input ${INPUT}, and image ${HIC_DOCKER_IMAGE_TAG}"
+echo "Running caper with WDL ${WDL}, input ${INPUT}, and image ${HIC_DOCKER_IMAGE}"
 
-caper run "${WDL}" -i "${INPUT}" --docker "${HIC_DOCKER_IMAGE}" -o ./tests/cromwell_options.json
+caper run "${WDL}" -i "${INPUT}" --docker "${HIC_DOCKER_IMAGE}" -o ./tests/pytest_workflow_options.json

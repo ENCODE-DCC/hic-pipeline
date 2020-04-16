@@ -2,9 +2,9 @@
   tags:
     - integration
   command: >-
-    tests/caper_run.sh \
-    tests/wdl/integration/wdl/test_dedup.wdl \
-    tests/wdl/integration/json/test_dedup.json
+    tests/caper_run.sh
+    tests/integration/wdl/test_dedup.wdl
+    tests/integration/json/test_dedup.json
   files:
     - path: "test-output/result_alignable_dedup.bam"
     - path: "test-output/library_complexity.json"

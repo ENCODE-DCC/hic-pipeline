@@ -2,9 +2,9 @@
   tags:
     - integration
   command: >-
-    tests/caper_run.sh \
-    tests/wdl/integration/wdl/test_align.wdl \
-    tests/wdl/integration/json/test_align.json
+    tests/caper_run.sh
+    tests/integration/wdl/test_align.wdl
+    tests/integration/json/test_align.json
   files:
     - path: "test-output/alignable.bam"
     - path: "test-output/unmapped.bam"
@@ -15,6 +15,6 @@
     - path: "test-output/result.res.txt"
       md5sum: 14f58726cb5b11009ba69e9fd3755c86
     - path: "test-output/result_mapq0.sam"
-      md5sum: d41d8cd98f00b204e9800998ecf8427e
+      md5sum: 729cf387cfe1add67525dba4f384baf4
     - path: "test-output/sort.txt.gz"
       md5sum: 594005a83043e6ecc3be735f6c01bd4a
