@@ -1,0 +1,9 @@
+- name: test_merge
+  tags:
+    - integration
+  command: >-
+    tests/caper_run.sh \
+    tests/wdl/integration/wdl/test_merge.wdl \
+    tests/wdl/integration/json/test_merge.json
+  files:
+    - path: "test-output/merged_bam_files.bam"

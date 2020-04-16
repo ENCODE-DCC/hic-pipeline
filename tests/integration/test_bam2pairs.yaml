@@ -1,0 +1,9 @@
+- name: test_bam2pairs
+  tags:
+    - integration
+  command: >-
+    tests/caper_run.sh \
+    tests/wdl/integration/wdl/test_bam2pairs.wdl \
+    tests/wdl/integration/json/test_bam2pairs.json
+  files:
+    - path: "test-output/pairix.bsorted.pairs.gz"

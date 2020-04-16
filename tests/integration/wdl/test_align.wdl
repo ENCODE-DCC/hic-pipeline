@@ -27,43 +27,14 @@ workflow test_align {
         norm_res_input = test_align_task.norm_res
     }
 
-    Array[File] bams = [
-        test_fragment.unmapped,
-        test_fragment.mapq0,
-        test_fragment.alignable
-    ]
-
-    Int bams_len = length(bams)
-    scatter(i in range(bams_len)){
-        call strip_headers { input:
-            bam = bams[i]
-        }
-    }
-
     output {
-        File unmapped = strip_headers.no_header[0]
-        File mapq0 = strip_headers.no_header[1]
-        File alignable = strip_headers.no_header[2]
+        File unmapped = test_fragment.unmapped
+        File mapq0 = test_fragment.mapq0
+        File alignable = test_fragment.alignable
 
         File sort_file = test_fragment.sort_file
         File norm_res = test_fragment.norm_res
         File alignment_stats = test_fragment.alignment_stats
         File alignment_stats_json = test_fragment.alignment_stats_json
-    }
-}
-
-task strip_headers {
-    input {
-        File bam
-    }
-
-    #it messes up with compare_md5.py since all the files with stripped header are having the same name
-    command {
-        FILE=$(basename "${bam}" ".bam")
-        samtools view -h ${bam} | samtools view - > $FILE.no_header.sam
-    }
-
-    output{
-        File no_header = glob("*.no_header.sam")[0]
     }
 }

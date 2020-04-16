@@ -1,0 +1,10 @@
+- name: test_arrowhead
+  tags:
+    - integration
+  command: >-
+    tests/caper_run.sh \
+    tests/wdl/integration/wdl/test_arrowhead.wdl \
+    tests/wdl/integration/json/test_arrowhead.json
+  files:
+    - path: "test-output/5000_blocks.bedpe.gz"
+      md5sum: a260f695b86099971970daab97958409

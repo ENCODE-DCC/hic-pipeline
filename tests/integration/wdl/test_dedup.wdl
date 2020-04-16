@@ -20,30 +20,10 @@ workflow test_dedup {
         alignable_bam = alignable_bam
     }
 
-    call strip_headers { input:
-        bam = test_dedup_task.deduped_bam
-    }
-
     output{
         File deduped = test_dedup_task.out_file
-        File deduped_no_header = strip_headers.no_header
+        File deduped_no_header = test_dedup_task.deduped_bam
         File library_complexity_json = test_dedup_task.library_complexity_json
         File stats_json = test_dedup_task.stats_json
-    }
-}
-
-task strip_headers {
-    input {
-        File bam
-    }
-
-    #it messes up with compare_md5.py since all the files with stripped header are having the same name
-    command {
-        FILE=$(basename "${bam}" ".bam")
-        samtools view -h ${bam} | samtools view - > $FILE.no_header.sam
-    }
-
-    output{
-        File no_header = glob("*.no_header.sam")[0]
     }
 }
