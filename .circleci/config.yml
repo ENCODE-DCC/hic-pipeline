@@ -202,7 +202,7 @@ workflows:
             - lint
       - test_wdl:
           name: test_wdl_functional
-          resource_class: large
+          resource_class: xlarge
           tag: "functional"
           num_parallel_workflows: 8
           requires:
