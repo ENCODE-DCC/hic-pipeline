@@ -204,7 +204,7 @@ workflows:
           name: test_wdl_functional
           resource_class: large
           tag: "functional"
-          num_parallel_workflows: 4
+          num_parallel_workflows: 8
           requires:
             - build
             - lint
@@ -215,6 +215,7 @@ workflows:
                 - dev
           requires:
             - build_hiccups
+            # Currently no unit tests, TODO add back when unit tests are added.
             # - test_wdl_unit
             - test_wdl_integration
             - test_wdl_functional
