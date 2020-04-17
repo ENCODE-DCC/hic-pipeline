@@ -105,7 +105,7 @@ jobs:
             pyenv global 3.7.0
             pip install --upgrade pip
             pip install tox
-            tox -e wdl-test -- --tag << parameters.tag >> --wt << parameters.num_parallel_workflows >>
+            tox -e wdl -- --tag << parameters.tag >> --wt << parameters.num_parallel_workflows >>
 
   build:
     <<: *defaults
