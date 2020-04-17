@@ -35,7 +35,7 @@ commands:
         type: string
         default: ""
     steps:
-      - run: sudo pip install tox
+      - run: pip install tox
       - run: tox -e << parameters.toxenv >> -- << parameters.extra_args >>
 
   set_environment_variables:
