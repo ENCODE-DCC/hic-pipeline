@@ -35,7 +35,7 @@ commands:
         type: string
         default: ""
     steps:
-      - run: pip install tox
+      - run: sudo pip install tox
       - run: tox -e << parameters.toxenv >> -- << parameters.extra_args >>
 
   set_environment_variables:
@@ -100,12 +100,12 @@ jobs:
       - checkout
       - set_environment_variables
       - run:
+          name: Run pytest-workflow WDL tests using tox
           command: |
             pyenv global 3.7.0
             pip install --upgrade pip
-      - run_tox:
-          toxenv: "wdl-test"
-          extra_args: "--tag << parameters.tag >> --wt << parameters.num_parallel_workflows >>"
+            pip install tox
+            tox -e wdl-test --tag << parameters.tag >> --wt << parameters.num_parallel_workflows >>
 
   build:
     <<: *defaults
