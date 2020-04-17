@@ -99,6 +99,10 @@ jobs:
     steps:
       - checkout
       - set_environment_variables
+      - run:
+          command: |
+            pyenv global 3.7.0
+            pip install --upgrade pip
       - run_tox:
           toxenv: "wdl-test"
           extra_args: "--tag << parameters.tag >> --wt << parameters.num_parallel_workflows >>"
