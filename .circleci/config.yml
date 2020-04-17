@@ -23,23 +23,6 @@ rust: &rust
     - image: circleci/rust:1.42.0-stretch
   working_directory: ~/ENCODE-DCC/hic-pipeline
 
-get_caper: &get_caper
-  name: get caper
-  command: |
-    pyenv global 3.7.0
-    pip install caper
-
-get_md5_script: &get_md5_script
-  name: get compare_md5.py script
-  command: |
-    curl -O https://raw.githubusercontent.com/ENCODE-DCC/rna-seq-pipeline/master/src/compare_md5.py
-
-get_pipeline_version: &get_pipeline_version
-  name: get pipeline version from __init__.py
-  command: |
-    PIPELINE_VERSION=$(python -c "import hic_pipeline;print(hic_pipeline.__version__)")
-    echo "export PIPELINE_VERSION=${PIPELINE_VERSION}" >> ${BASH_ENV}
-
 commands:
   run_tox:
     description: "Install and run tox with a given environment"
@@ -56,11 +39,24 @@ commands:
       - run: tox -e << parameters.toxenv >> -- << parameters.extra_args >>
 
   set_environment_variables:
-    description: "Set docker image env var for builds and WDL test runs"
+    description: "Set docker image env vars for builds and WDL test runs"
     steps:
       - run:
           command: |
             echo "export HIC_DOCKER_IMAGE_TAG=quay.io/encode-dcc/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}" >> ${BASH_ENV}
+            echo "export QUAY_REPO=hic-pipeline" >> ${BASH_ENV}
+            echo "export DOCKERFILE_DIR=docker_image" >> ${BASH_ENV}
+            echo "export HICCUPS_DOCKER_IMAGE_TAG=quay.io/encode-dcc/hiccups:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}" >> ${BASH_ENV}
+            echo "export HICCUPS_QUAY_REPO=hiccups" >> ${BASH_ENV}
+            echo "export HICCUPS_DOCKERFILE_DIR=nvidia_docker_image" >> ${BASH_ENV}
+
+  get_pipeline_version:
+    description: get pipeline version from __init__.py
+    steps:
+      - run:
+          command: |
+            PIPELINE_VERSION=$(python -c "import hic_pipeline;print(hic_pipeline.__version__)")
+            echo "export PIPELINE_VERSION=${PIPELINE_VERSION}" >> ${BASH_ENV}
 
 version: 2.1
 jobs:
@@ -110,70 +106,72 @@ jobs:
 
   build:
     <<: *defaults
-    parameters:
-      is_hiccups_image:
-        description: "Determines if the job is building a hiccups Docker image"
-        type: boolean
-        default: false
-      push_template:
-        description: "Determines whether or not to push images with template tag."
-        type: boolean
-        default: false
     steps:
       - checkout
       - setup_remote_docker
-      - when:
-          condition: << parameters.is_hiccups_image >>
-          steps:
-            - run:
-                command: |
-                  echo "export TAG=quay.io/encode-dcc/hiccups:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}" >> ${BASH_ENV}
-                  echo "export QUAY_REPO=hiccups" >> ${BASH_ENV}
-                  echo "export DOCKERFILE_DIR=nvidia_docker_image" >> ${BASH_ENV}
-      - unless:
-          condition: << parameters.is_hiccups_image >>
-          steps:
-            - set_environment_variables
-            - run:
-                name: set environ
-                command: |
-                  echo "export QUAY_REPO=hic-pipeline" >> ${BASH_ENV}
-                  echo "export DOCKERFILE_DIR=docker_image" >> ${BASH_ENV}
+      - set_environment_variables
       - run:
-          name: build image
+          name: build main docker image
           command: |
-            source ${BASH_ENV}
-            echo "pulling template!"
-            docker pull quay.io/encode-dcc/${QUAY_REPO}:template
             docker login -u=${QUAY_ROBOT_USER} -p=${QUAY_ROBOT_USER_TOKEN} quay.io
-            docker build --cache-from quay.io/encode-dcc/${QUAY_REPO}:template --build-arg GIT_COMMIT_HASH=${CIRCLE_SHA1} --build-arg BRANCH=${CIRCLE_BRANCH} --build-arg BUILD_TAG=${TAG} -t $TAG -t quay.io/encode-dcc/${QUAY_REPO}:template -f ${DOCKERFILE_DIR}/Dockerfile .
-            docker push $TAG
+            docker pull quay.io/encode-dcc/${QUAY_REPO}:template
+            docker build \
+              --cache-from quay.io/encode-dcc/${QUAY_REPO}:template \
+              --build-arg GIT_COMMIT_HASH=${CIRCLE_SHA1} \
+              --build-arg BRANCH=${CIRCLE_BRANCH} \
+              --build-arg BUILD_TAG=${HIC_DOCKER_IMAGE_TAG} \
+              -t ${HIC_DOCKER_IMAGE_TAG} \
+              -t quay.io/encode-dcc/${QUAY_REPO}:template \
+              -f ${DOCKERFILE_DIR}/Dockerfile .
+            docker push ${HIC_DOCKER_IMAGE_TAG}
             docker logout
-      - when:
-          condition: << parameters.push_template >>
-          steps:
-            - run: *get_pipeline_version
-            - run:
-                name: push template
-                command: |
-                  source ${BASH_ENV}
-                  docker tag quay.io/encode-dcc/${QUAY_REPO}:template quay.io/encode-dcc/${QUAY_REPO}:${PIPELINE_VERSION}
-                  docker push quay.io/encode-dcc/${QUAY_REPO}:template
-                  docker push quay.io/encode-dcc/${QUAY_REPO}:${PIPELINE_VERSION}
 
+  build_hiccups:
+    <<: *defaults
+    steps:
+      - checkout
+      - setup_remote_docker
+      - set_environment_variables
+      - run:
+          name: build hiccups docker image
+          command: |
+            docker login -u=${QUAY_ROBOT_USER} -p=${QUAY_ROBOT_USER_TOKEN} quay.io
+            docker pull quay.io/encode-dcc/${HICCUPS_QUAY_REPO}:template
+            docker build \
+              --cache-from quay.io/encode-dcc/${HICCUPS_QUAY_REPO}:template \
+              --build-arg GIT_COMMIT_HASH=${CIRCLE_SHA1} \
+              --build-arg BRANCH=${CIRCLE_BRANCH} \
+              --build-arg BUILD_TAG=${HICCUPS_DOCKER_IMAGE_TAG} \
+              -t ${HICCUPS_DOCKER_IMAGE_TAG} \
+              -t quay.io/encode-dcc/${HICCUPS_QUAY_REPO}:template \
+              -f ${HICCUPS_DOCKERFILE_DIR}/Dockerfile .
+            docker push ${HICCUPS_DOCKER_IMAGE_TAG}
+            docker logout
+
+  push_template:
+    <<: *defaults
+    steps:
+      - checkout
+      - setup_remote_docker
+      - set_environment_variables
+      - get_pipeline_version
+      - run:
+          command: |
+            docker login -u=${QUAY_ROBOT_USER} -p=${QUAY_ROBOT_USER_TOKEN} quay.io
+            docker pull ${HIC_DOCKER_IMAGE_TAG}
+            docker tag ${HIC_DOCKER_IMAGE_TAG} quay.io/encode-dcc/hic-pipeline:${PIPELINE_VERSION}
+            docker tag ${HIC_DOCKER_IMAGE_TAG} quay.io/encode-dcc/hic-pipeline:template
+            docker push quay.io/encode-dcc/hic-pipeline:${PIPELINE_VERSION}
+            docker push quay.io/encode-dcc/hic-pipeline:template
+            docker logout
+          no_output_timeout: 30m
 
 workflows:
   version: 2
   build_workflow:
     jobs:
       - build
-      - build:
-          name: build_hiccups
-          is_hiccups_image: true
-          filters:
-            branches:
-              only:
-                - /.*hiccups-image-update$/
+      - build_hiccups
       - lint
       - test_py37:
           requires:
@@ -183,13 +181,14 @@ workflows:
           requires:
             - build
             - lint
-      - test_wdl:
-          name: test_wdl_unit
-          tag: "unit"
-          num_parallel_workflows: 8
-          requires:
-            - build
-            - lint
+      # Currently no unit tests, TODO add back when unit tests are added.
+      # - test_wdl:
+      #     name: test_wdl_unit
+      #     tag: "unit"
+      #     num_parallel_workflows: 8
+      #     requires:
+      #       - build
+      #       - lint
       - test_wdl:
           name: test_wdl_integration
           resource_class: large
@@ -206,15 +205,13 @@ workflows:
           requires:
             - build
             - lint
-      - build:
-          name: push_template
-          push_template: true
+      - push_template:
           filters:
             branches:
               only:
                 - dev
-                - /.*hiccups-image-update$/
           requires:
+            - build_hiccups
             - test_wdl_unit
             - test_wdl_integration
             - test_wdl_functional
