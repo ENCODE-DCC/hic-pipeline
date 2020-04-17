@@ -31,10 +31,10 @@ def skip_n_lines_md5():
     def _skip_n_lines_md5(file_path: Path, n_lines: int) -> str:
         try:
             with gzip.open(str(file_path), "rt") as f:
-                lines = "\n".join(f.readlines()[n_lines:])
+                lines = "".join(f.readlines()[n_lines:])
         except OSError:
             with open(str(file_path)) as f:
-                lines = "\n".join(f.readlines()[n_lines:])
+                lines = "".join(f.readlines()[n_lines:])
         return md5sum(lines)
 
     return _skip_n_lines_md5
