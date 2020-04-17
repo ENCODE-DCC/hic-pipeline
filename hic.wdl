@@ -473,24 +473,24 @@ task create_hic {
         set -euo pipefail
         MERGED_PAIRS_FILE=merged_pairs.txt
         gzip -dc ~{pairs_file} > $MERGED_PAIRS_FILE
-        statistics.pl -q ${quality} -o stats.txt -s ${restriction_sites} -l ${sep=' ' ligation_junctions} $MERGED_PAIRS_FILE
+        statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l ${sep=' ' ligation_junctions} $MERGED_PAIRS_FILE
         # If the assembly name is empty, then we write chrsz path into file as usual, otherwise, use the assembly name instead of the path
         juicer_tools pre \
-            -s stats.txt \
-            -g stats_hists.m \
+            -s stats_${quality}.txt \
+            -g stats_${quality}_hists.m \
             -q ${quality} \
             ~{if defined(assembly_name) then "-y " + assembly_name else ""} \
             $MERGED_PAIRS_FILE \
-            inter.hic \
+            inter_${quality}.hic \
             ${chrsz_}
-        python3 $(which jsonify_stats.py) --alignment-stats stats.txt
+        python3 $(which jsonify_stats.py) --alignment-stats stats_${quality}.txt
     }
 
     output {
-        File inter = "inter.hic"
-        File stats = "stats.txt"
-        File stats_json = "stats.json"
-        File stats_hists = "stats_hists.m"
+        File inter = glob('inter*.hic')[0]
+        File stats = glob('stats*.txt')[0]
+        File stats_json = glob('stats*.json')[0]
+        File stats_hists = glob('stats*hists.m')[0]
     }
 
     runtime {

@@ -23,11 +23,6 @@ rust: &rust
     - image: circleci/rust:1.42.0-stretch
   working_directory: ~/ENCODE-DCC/hic-pipeline
 
-make_tag: &make_tag
-  name: make docker image tag
-  command: |
-    echo "export TAG=quay.io/encode-dcc/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}" >> ${BASH_ENV}
-
 get_caper: &get_caper
   name: get caper
   command: |
@@ -60,6 +55,13 @@ commands:
       - run: sudo pip install tox
       - run: tox -e << parameters.toxenv >> -- << parameters.extra_args >>
 
+  set_environment_variables:
+    description: "Set docker image env var for builds and WDL test runs"
+    steps:
+      - run:
+          command: |
+            echo "export HIC_DOCKER_IMAGE_TAG=quay.io/encode-dcc/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}" >> ${BASH_ENV}
+
 version: 2.1
 jobs:
   lint:
@@ -69,44 +71,42 @@ jobs:
       - run: cat "${HOME}/.cargo/env" >> ${BASH_ENV}
       - run_tox:
           toxenv: "lint"
+
   test_py37:
     <<: *py37
     steps:
       - checkout
       - run_tox:
           toxenv: "py37"
+          extra_args: "-m not workflow"
+
   test_rust:
     <<: *rust
     steps:
       - checkout
       - run: cargo test
+
   test_wdl:
     <<: *machine_defaults
     description: Generic testing protocol for wdl tasks
     parameters:
-      test_name:
-        description: "The name of the test being performed, like hic, align, merge, etc."
+      tag:
+        description: "pytest-workflow tag, e.g. functional, integration, test_align"
         type: string
-      test_type:
-        default: "task"
-        description: "Describes if the test is for a task or for a workflow"
-        type: enum
-        enum: ["task", "workflow"]
-      keys_to_inspect:
-        description: "The key(s) of the output(s) in metadata.json for which md5sum is to be computed, space delimited"
+      num_parallel_workflows:
+        description: "Max number of tests to execute in parallel"
+        type: integer
+      resource_class:
+        description: "The machine resource class to run the test with"
         type: string
+        default: medium
+    resource_class: << parameters.resource_class >>
     steps:
       - checkout
-      - run: *make_tag
-      - run: *get_caper
-      - run: *get_md5_script
-      - run:
-          command: |
-            source ${BASH_ENV}
-            tests/test_task/test.sh tests/test_<< parameters.test_type >>/test_<< parameters.test_name >>.wdl tests/test_<< parameters.test_type >>/test_<< parameters.test_name >>.json $TAG docker
-            python3 compare_md5.py --keys_to_inspect << parameters.keys_to_inspect >> --metadata_json test_<< parameters.test_name >>.metadata.json --reference_json tests/test_<< parameters.test_type >>/ref_output/test_<< parameters.test_name >>_output_md5.json --outfile result.json
-            cat result.json
-            python3 -c "import sys; import json; data=json.loads(sys.stdin.read()); sys.exit(int(not data['match_overall']))" < result.json
+      - set_environment_variables
+      - run_tox:
+          toxenv: "py37"
+          extra_args: "--tags << parameters.tag >> --wt << parameters.num_parallel_workflows >>"
 
   build:
     <<: *defaults
@@ -133,7 +133,7 @@ jobs:
       - unless:
           condition: << parameters.is_hiccups_image >>
           steps:
-            - run: *make_tag
+            - set_environment_variables
             - run:
                 name: set environ
                 command: |
@@ -161,7 +161,7 @@ jobs:
                   docker push quay.io/encode-dcc/${QUAY_REPO}:template
                   docker push quay.io/encode-dcc/${QUAY_REPO}:${PIPELINE_VERSION}
 
-# Define workflow here
+
 workflows:
   version: 2
   build_workflow:
@@ -184,88 +184,28 @@ workflows:
             - build
             - lint
       - test_wdl:
-          name: test_align
+          name: test_wdl_unit
+          tag: "unit"
+          num_parallel_workflows: 8
           requires:
             - build
-          test_name: "align"
-          keys_to_inspect: "test_align.unmapped test_align.mapq0 test_align.alignable test_align.sort_file test_align.norm_res test_align.alignment_stats test_align.alignment_stats_json"
+            - lint
       - test_wdl:
-          name: test_bam2pairs
+          name: test_wdl_integration
+          resource_class: large
+          tag: "integration"
+          num_parallel_workflows: 8
           requires:
             - build
-          test_name: "bam2pairs"
-          keys_to_inspect: "test_bam2pairs.pairs_no_header"
+            - lint
       - test_wdl:
-          name: test_merge_sort
+          name: test_wdl_functional
+          resource_class: large
+          tag: "functional"
+          num_parallel_workflows: 4
           requires:
             - build
-          test_name: "merge_sort"
-          keys_to_inspect: "test_merge_sort.merged"
-      - test_wdl:
-          name: test_dedup
-          requires:
-            - build
-          test_name: "dedup"
-          keys_to_inspect: "test_dedup.deduped test_dedup.library_complexity_json test_dedup.stats_json"
-      - test_wdl:
-          name: test_merge
-          requires:
-            - build
-          test_name: "merge"
-          keys_to_inspect: "test_merge.merged_no_header"
-      - test_wdl:
-          name: test_merge_stats
-          requires:
-            - build
-          test_name: "merge_stats"
-          keys_to_inspect: "test_merge_stats.merged_stats test_merge_stats.merged_stats_json"
-      - test_wdl:
-          name: test_arrowhead
-          requires:
-            - build
-          test_name: "arrowhead"
-          keys_to_inspect: "test_arrowhead.arrowhead_out"
-      - test_wdl:
-          name: test_create_hic
-          requires:
-            - build
-          test_name: "create_hic"
-          keys_to_inspect: "test_create_hic.hic_file test_create_hic.stats test_create_hic.stats_json test_create_hic.stats_hists"
-      - test_wdl:
-          name: test_hic
-          requires:
-            - build
-          test_name: "hic"
-          test_type: "workflow"
-          keys_to_inspect: "test_hic.library_complexity test_hic.stats test_hic.alignments_stats test_hic.no_header_alignable_sam test_hic.out_pairs test_hic.out_dedup test_hic.no_header_hic_1 test_hic.no_header_hic_30"
-      - test_wdl:
-          name: test_multiple_libraries
-          requires:
-            - build
-          test_name: "multiple_libraries"
-          test_type: "workflow"
-          keys_to_inspect: "test_multiple_libraries.no_header_alignable_sam test_multiple_libraries.out_pairs test_multiple_libraries.out_dedup test_multiple_libraries.no_header_hic_1 test_multiple_libraries.no_header_hic_30"
-      - test_wdl:
-          name: test_no_call_loops
-          requires:
-            - build
-          test_name: "no_call_loops"
-          test_type: "workflow"
-          keys_to_inspect: "test_no_call_loops.domains"
-      - test_wdl:
-          name: test_hic_from_libraries
-          requires:
-            - build
-          test_name: "hic_from_libraries"
-          test_type: "workflow"
-          keys_to_inspect: "test_hic_from_libraries.inter_1_no_header test_hic_from_libraries.inter_30_no_header"
-      - test_wdl:
-          name: test_no_bam2pairs
-          requires:
-            - build
-          test_name: "no_bam2pairs"
-          test_type: "workflow"
-          keys_to_inspect: "test_no_bam2pairs.inter_1 test_no_bam2pairs.inter_30"
+            - lint
       - build:
           name: push_template
           push_template: true
@@ -275,16 +215,8 @@ workflows:
                 - dev
                 - /.*hiccups-image-update$/
           requires:
-            - build
-            - test_align
-            - test_arrowhead
-            - test_bam2pairs
-            - test_create_hic
-            - test_dedup
-            - test_merge
-            - test_merge_stats
-            - test_merge_sort
-            - test_hic
-            - test_multiple_libraries
-            - test_no_call_loops
-            - test_hic_from_libraries
+            - test_wdl_unit
+            - test_wdl_integration
+            - test_wdl_functional
+            - test_rust
+            - test_py37

@@ -1,6 +1,6 @@
 version 1.0
 
-import "test_hic.wdl" as hic
+import "../../../hic.wdl" as hic
 
 workflow test_multiple_libraries {
     input {
@@ -12,20 +12,22 @@ workflow test_multiple_libraries {
         File reference_index
     }
 
-    call hic.test_hic as test { input:
+    call hic.hic { input:
         fastq = fastq,
         chrsz = chrsz,
         restriction_sites = restriction_sites,
         reference_index = reference_index,
         restriction_enzyme = restriction_enzyme,
-        assembly_name = assembly_name
+        assembly_name = assembly_name,
+        no_call_loops = true,
+        no_call_tads = true,
     }
 
     output{
-        File no_header_alignable_sam = test.no_header_alignable_sam
-        File out_pairs = test.out_pairs
-        File out_dedup = test.out_dedup
-        File no_header_hic_1 = test.no_header_hic_1
-        File no_header_hic_30 = test.no_header_hic_30
+        File alignable_bam = select_first([hic.alignable_bam])[0]
+        File out_pairs = select_first([select_first([hic.out_pairs])[0]])
+        File out_dedup = select_first([hic.out_dedup])[0]
+        File hic_1 = select_first([hic.out_hic_1])
+        File hic_30 = select_first([hic.out_hic_30])
     }
 }

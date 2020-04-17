@@ -1,6 +1,6 @@
 version 1.0
 
-import "../../hic.wdl" as hic
+import "../../../hic.wdl" as hic
 
 workflow test_no_bam2pairs {
     input {
@@ -30,19 +30,8 @@ workflow test_no_bam2pairs {
 
     Array[File?] hic_files = [hic.out_hic_1, hic.out_hic_30]
 
-    # Ensure this output is null to check the flag works properly
-    if (length(select_all(select_first([hic.out_pairs]))) > 0) {
-        call raise_error
-    }
-
     output {
         File? inter_1 = hic_files[0]
         File? inter_30 = hic_files[1]
-    }
-}
-
-task raise_error {
-    command {
-        exit 1
     }
 }
