@@ -211,7 +211,7 @@ workflows:
                 - dev
           requires:
             - build_hiccups
-            - test_wdl_unit
+            # - test_wdl_unit
             - test_wdl_integration
             - test_wdl_functional
             - test_rust
