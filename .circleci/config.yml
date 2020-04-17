@@ -74,7 +74,6 @@ jobs:
       - checkout
       - run_tox:
           toxenv: "py37"
-          extra_args: "-m not workflow"
 
   test_rust:
     <<: *rust
@@ -101,8 +100,8 @@ jobs:
       - checkout
       - set_environment_variables
       - run_tox:
-          toxenv: "py37"
-          extra_args: "--tags << parameters.tag >> --wt << parameters.num_parallel_workflows >>"
+          toxenv: "wdl-test"
+          extra_args: "--tag << parameters.tag >> --wt << parameters.num_parallel_workflows >>"
 
   build:
     <<: *defaults

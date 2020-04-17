@@ -7,11 +7,6 @@ import pytest
 
 
 @pytest.fixture
-def test_data_dir():
-    return Path("tests/data")
-
-
-@pytest.fixture
 def bam_md5():
     """
     Bams often don't match due to nondeterministic insertion of paths into the headers.
