@@ -1,0 +1,16 @@
+- name: test_create_hic
+  tags:
+    - integration
+  command: >-
+    tests/caper_run.sh
+    tests/integration/wdl/test_create_hic.wdl
+    tests/integration/json/test_create_hic.json
+  files:
+    - path: "test-output/glob-6a31d38462145ec363d0f357468a1d26/inter_30.hic"
+      md5sum: ad1bba8a156904354b5cbebce068105a
+    - path: "test-output/glob-9f289113d3bb22188a0edb09671b53c9/stats_30.json"
+      md5sum: 2ae6a8e57e31f58ac4dcd5c56be885fb
+    - path: "test-output/glob-99337e4489e6770f13efce4511e65f90/stats_30.txt"
+      md5sum: b95e8a1cb00a36bb52bdc48c0c5fc75a
+    - path: "test-output/glob-fd83f1511bc15e82fc96eb2a2b99b8d3/stats_30_hists.m"
+      md5sum: f25ab376533919ab689255e2a2c96ea5

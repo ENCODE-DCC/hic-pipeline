@@ -1,0 +1,14 @@
+- name: test_no_bam2pairs
+  tags:
+    - functional
+  command: >-
+    tests/caper_run.sh
+    tests/functional/wdl/test_no_bam2pairs.wdl
+    tests/functional/json/test_no_bam2pairs.json
+  files:
+    - path: "test-output/glob-6a31d38462145ec363d0f357468a1d26/inter_1.hic"
+      md5sum: 0e04f8745f3e0a143c8d01846cca5bae
+    - path: "test-output/glob-6a31d38462145ec363d0f357468a1d26/inter_30.hic"
+      md5sum: 028c162dd3922c4cbd7f1ebfb8ebf415
+    - path: "test-output/pairix.bsorted.pairs.gz"
+      should_exist: false

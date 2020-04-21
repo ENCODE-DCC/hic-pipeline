@@ -1,14 +1,14 @@
 {
-  "hic.chrsz": "test/test_data/ce10_selected.chrom.sizes.tsv",
+  "hic.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
   "hic.fastq": [
     [
       [
-        "test/test_data/merged_read1.fastq.gz",
-        "test/test_data/merged_read2.fastq.gz"
+        "tests/data/merged_read1.fastq.gz",
+        "tests/data/merged_read2.fastq.gz"
       ]
     ]
   ],
-  "hic.reference_index": "test/test_data/ce10_selected.tar.gz",
+  "hic.reference_index": "tests/data/ce10_selected.tar.gz",
   "hic.restriction_enzyme": "MboI",
-  "hic.restriction_sites": "test/test_data/ce10_selected_MboI.txt"
+  "hic.restriction_sites": "tests/data/ce10_selected_MboI.txt"
 }

@@ -28,18 +28,18 @@ Let us take a close look at the following template JSON. Comments are not allowe
 {
     ////////// 1) Input FASTQ files //////////
     "hic.fastq": [[[
-        "test/test_data/merged_read1.fastq.gz",
-        "test/test_data/merged_read2.fastq.gz"
+        "tests/data/merged_read1.fastq.gz",
+        "tests/data/merged_read2.fastq.gz"
     ]]],
 
     ////////// 2) Reference genome chromosome sizes//////////
-    "hic.chrsz": "test/test_data/ce10_selected.chrom.sizes.tsv",
+    "hic.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
 
     ////////// 3) Restriction sites locations in the reference genome sequence //////////
-    "hic.restriction_sites": "test/test_data/ce10_selected_MboI.txt",
+    "hic.restriction_sites": "tests/data/ce10_selected_MboI.txt",
 
     ////////// 4) Reference genome index //////////
-    "hic.reference_index": "test/test_data/ce10_selected.tar.gz",
+    "hic.reference_index": "tests/data/ce10_selected.tar.gz",
 
     ////////// 5) Ligation site sequence //////////
     "hic.restriction_enzyme": "MboI"
