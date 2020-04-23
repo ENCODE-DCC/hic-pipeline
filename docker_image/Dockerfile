@@ -1,9 +1,3 @@
-############################################################
-# Dockerfile to build Juicer container image
-# Based on Ubuntu
-############################################################
-
-# Set the base image to Ubuntu
 FROM ubuntu:16.04@sha256:e9938f45e51d9ff46e2b05a62e0546d0f07489b7f22fbc5288defe760599e38a as main
 
 LABEL maintainer "Paul Sud"
@@ -64,7 +58,7 @@ RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     cd juicer && \
     git checkout "${JUICER_COMMIT_SHA}" && \
     chmod +x CPU/* CPU/common/* && \
-    find . -d 1 -type d -not -iname "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
+    find . -d 1 -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
 
 # Install Juicer tools
 RUN curl -L "http://s3.amazonaws.com/hicfiles.tc4ga.com/public/juicer/juicer_tools_${JUICER_TOOLS_VERSION}.jar" -o /opt/juicer/CPU/common/juicer_tools.jar && \
