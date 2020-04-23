@@ -11,9 +11,10 @@ LABEL maintainer.email "encode-help@lists.stanford.edu"
 
 # Package versions
 ENV BWA_VERSION=0.7.17
-ENV SAMTOOLS_VERSION=1.6
+ENV JUICER_COMMIT_SHA=07992b14b24a12b29fda3cf7abc6af1465ea5018
 ENV JUICER_TOOLS_VERSION=1.11.09_jcuda.0.8
 ENV PAIRIX_VERSION=0.3.6
+ENV SAMTOOLS_VERSION=1.6
 
 RUN apt-get update && apt-get install -y \
     bzip2 \
@@ -61,8 +62,9 @@ RUN curl -OL "https://github.com/samtools/samtools/releases/download/${SAMTOOLS_
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     cd juicer && \
-    git checkout 2fff94b9b4e2b961d856c17a01e6751f3e042926 && \
-    chmod +x CPU/* CPU/common/*
+    git checkout "${JUICER_COMMIT_SHA}" && \
+    chmod +x CPU/* CPU/common/* && \
+    find . -d 1 -type d -not -iname "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
 
 # Install Juicer tools
 RUN curl -L "http://s3.amazonaws.com/hicfiles.tc4ga.com/public/juicer/juicer_tools_${JUICER_TOOLS_VERSION}.jar" -o /opt/juicer/CPU/common/juicer_tools.jar && \
