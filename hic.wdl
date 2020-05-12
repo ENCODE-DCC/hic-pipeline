@@ -100,9 +100,9 @@ workflow hic {
             # TODO: add back when chimeric_blacklist fixed
             Array[Array[File]] bams_to_merge = [unmapped, alignable]
 
-            scatter(i in range(length(bams_to_merge))){
+            scatter(j in range(length(bams_to_merge))){
                 call merge { input:
-                    bam_files = bams_to_merge[i]
+                    bam_files = bams_to_merge[j]
                 }
             }
 
