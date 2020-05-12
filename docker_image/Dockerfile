@@ -5,7 +5,6 @@ LABEL maintainer.email "encode-help@lists.stanford.edu"
 
 # Package versions
 ENV BWA_VERSION=0.7.17
-ENV JUICER_COMMIT_SHA=07992b14b24a12b29fda3cf7abc6af1465ea5018
 ENV JUICER_TOOLS_VERSION=1.11.09_jcuda.0.8
 ENV PAIRIX_VERSION=0.3.6
 ENV SAMTOOLS_VERSION=1.6
@@ -53,19 +52,7 @@ RUN curl -OL "https://github.com/samtools/samtools/releases/download/${SAMTOOLS_
     cd .. && \
     rm -rf "samtools-${SAMTOOLS_VERSION}" "samtools-${SAMTOOLS_VERSION}.tar"
 
-# Install Juicer
-RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
-    cd juicer && \
-    git checkout "${JUICER_COMMIT_SHA}" && \
-    chmod +x CPU/* CPU/common/* && \
-    find . -d 1 -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
-
-# Install Juicer tools
-RUN curl -L "http://s3.amazonaws.com/hicfiles.tc4ga.com/public/juicer/juicer_tools_${JUICER_TOOLS_VERSION}.jar" -o /opt/juicer/CPU/common/juicer_tools.jar && \
-    chmod 666 /opt/juicer/CPU/common/juicer_tools.jar && \
-    ln -s juicer/CPU scripts
-
-# Install pairix, only need bam2pairs
+# Install pairix, only need bam2pairs + deps
 RUN curl -OL "https://github.com/4dn-dcic/pairix/archive/${PAIRIX_VERSION}.zip" && \
     unzip "${PAIRIX_VERSION}.zip" && \
     cd "pairix-${PAIRIX_VERSION}/" && \
@@ -74,6 +61,18 @@ RUN curl -OL "https://github.com/4dn-dcic/pairix/archive/${PAIRIX_VERSION}.zip" 
     cp util/bam2pairs/bam2pairs /opt && \
     cd .. && \
     rm -rf "${PAIRIX_VERSION}.zip" "pairix-${PAIRIX_VERSION}"
+
+# Install Juicer
+RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
+    cd juicer && \
+    git checkout da9b33227756f8b00d831fc52f951baa984a68aa && \
+    chmod +x CPU/* CPU/common/* && \
+    find . -d 1 -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
+
+# Install Juicer tools
+RUN curl -L "http://s3.amazonaws.com/hicfiles.tc4ga.com/public/juicer/juicer_tools_${JUICER_TOOLS_VERSION}.jar" -o /opt/juicer/CPU/common/juicer_tools.jar && \
+    chmod 666 /opt/juicer/CPU/common/juicer_tools.jar && \
+    ln -s juicer/CPU scripts
 
 # For sorting, LC_ALL is C
 ENV LC_ALL C
