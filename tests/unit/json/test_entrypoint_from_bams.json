@@ -5,12 +5,12 @@
     ]
   ],
   "hic.chrsz": "tests/data/dummy.txt",
-  "hic.reference_index": "tests/data/dummy.txt",
   "hic.ligation_counts": [
     [
       "tests/data/dummy.txt"
     ]
   ],
-  "hic.restriction_sites":"tests/data/dummy.txt",
-  "hic.restriction_enzyme": "MboI"
+  "hic.reference_index": "tests/data/dummy.txt",
+  "hic.restriction_enzyme": "MboI",
+  "hic.restriction_sites": "tests/data/dummy.txt"
 }
