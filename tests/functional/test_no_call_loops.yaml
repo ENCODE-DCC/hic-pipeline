@@ -1,13 +1,14 @@
-- name: test_no_call_loops
-  tags:
-    - functional
-  command: >-
-    tests/caper_run.sh
-    tests/functional/wdl/test_no_call_loops.wdl
-    tests/functional/json/test_no_call_loops.json
-  files:
-    - path: "test-output/glob-e2daa478343b5e646c0d76e6f98bd592/5000_blocks.bedpe.gz"
-      md5sum: a260f695b86099971970daab97958409
+---
+  - name: test_no_call_loops
+    tags:
+      - functional
+    command: >-
+      tests/caper_run.sh
+      tests/functional/wdl/test_no_call_loops.wdl
+      tests/functional/json/test_no_call_loops.json
+    files:
+      - path: test-output/glob-e2daa478343b5e646c0d76e6f98bd592/5000_blocks.bedpe.gz
+        md5sum: a260f695b86099971970daab97958409
     # Corresponds to hiccups glob "loops/*.bedpe.gz"
-    - path: "test-output/glob-a8e00cfc86ff50e90ca86748e6d157cf"
-      should_exist: false
+      - path: test-output/glob-a8e00cfc86ff50e90ca86748e6d157cf
+        should_exist: false

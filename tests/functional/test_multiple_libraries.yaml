@@ -1,16 +1,17 @@
-- name: test_multiple_libraries
-  tags:
-    - functional
-  command: >-
-    tests/caper_run.sh
-    tests/functional/wdl/test_multiple_libraries.wdl
-    tests/functional/json/test_multiple_libraries.json
-  files:
-    - path: "test-output/result_alignable_dedup.bam"
-    - path: "test-output/pairix.bsorted.pairs.gz"
-    - path: "test-output/glob-6a31d38462145ec363d0f357468a1d26/inter_1.hic"
-      md5sum: 651bd544a86311c76b2e8d19fb5ee6dd
-    - path: "test-output/glob-6a31d38462145ec363d0f357468a1d26/inter_30.hic"
-      md5sum: 5bd1b5db042496b2be5f168b1ae1426d
-    - path: "test-output/merged_nodups.txt.gz"
-      md5sum: 732861f1392940e9efa84d55b282022a
+---
+  - name: test_multiple_libraries
+    tags:
+      - functional
+    command: >-
+      tests/caper_run.sh
+      tests/functional/wdl/test_multiple_libraries.wdl
+      tests/functional/json/test_multiple_libraries.json
+    files:
+      - path: test-output/result_alignable_dedup.bam
+      - path: test-output/pairix.bsorted.pairs.gz
+      - path: test-output/glob-6a31d38462145ec363d0f357468a1d26/inter_1.hic
+        md5sum: 651bd544a86311c76b2e8d19fb5ee6dd
+      - path: test-output/glob-6a31d38462145ec363d0f357468a1d26/inter_30.hic
+        md5sum: 5bd1b5db042496b2be5f168b1ae1426d
+      - path: test-output/merged_nodups.txt.gz
+        md5sum: 732861f1392940e9efa84d55b282022a

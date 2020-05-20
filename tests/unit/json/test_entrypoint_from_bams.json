@@ -1,0 +1,16 @@
+{
+  "hic.bams": [
+    [
+      "tests/data/dummy.txt"
+    ]
+  ],
+  "hic.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
+  "hic.idx_tar": "tests/data/ce10_selected.tar.gz",
+  "hic.ligation_counts": [
+    [
+      10
+    ]
+  ],
+  "hic.restriction": "tests/data/ce10_selected_MboI.txt",
+  "hic.restriction_enzyme": "MboI"
+}

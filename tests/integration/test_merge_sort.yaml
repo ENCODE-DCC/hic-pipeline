@@ -1,10 +1,11 @@
-- name: test_merge_sort
-  tags:
-    - integration
-  command: >-
-    tests/caper_run.sh
-    tests/integration/wdl/test_merge_sort.wdl
-    tests/integration/json/test_merge_sort.json
-  files:
-    - path: "test-output/merged_sort.txt.gz"
-      md5sum: 99a59f60c201f6361b997ecef268b134
+---
+  - name: test_merge_sort
+    tags:
+      - integration
+    command: >-
+      tests/caper_run.sh
+      tests/integration/wdl/test_merge_sort.wdl
+      tests/integration/json/test_merge_sort.json
+    files:
+      - path: test-output/merged_sort.txt.gz
+        md5sum: 99a59f60c201f6361b997ecef268b134

@@ -1,3 +1,4 @@
+---
 exclude: ^tests/data/
 repos:
   - repo: https://github.com/psf/black
@@ -44,7 +45,13 @@ repos:
       - id: debug-statements
       - id: check-json
       - id: pretty-format-json
-        exclude: 'test\/wdl\/test_data\/.+\.json$'
+        exclude: test\/wdl\/test_data\/.+\.json$
         args:
           - --autofix
       - id: check-yaml
+
+  - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+    rev: 0.0.10
+    hooks:
+      - id: yamlfmt
+        args: [--mapping, '2', --sequence, '4', --offset, '2']
