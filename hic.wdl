@@ -24,13 +24,11 @@ workflow hic {
 
         # Inputs and logic for entrypoint after library processing
         Array[File]? input_dedup_pairs
-        Array[File?] library_stats = []
-        Array[File?] library_stats_hists = []
 
-        Boolean? no_bam2pairs = false
-        Boolean? no_call_loops = false
-        Boolean? no_call_tads = false
-        Boolean? include_mapq0_reads = false
+        Boolean no_bam2pairs = false
+        Boolean no_call_loops = false
+        Boolean no_call_tads = false
+        Boolean include_mapq0_reads = false
         Array[String]? input_ligation_junctions
         Int cpu = 32
         String? assembly_name
@@ -149,7 +147,7 @@ workflow hic {
         }
     }
 
-    if (defined(fragment.alignment_stats) && defined(dedup.library_complexity)) {
+    if (defined(fragment.alignment_stats) && defined(dedup.library_complexity) && !defined(input_dedup_pairs)) {
         call merge_stats { input:
             alignment_stats = flatten(select_first([fragment.alignment_stats])),
             library_stats = select_first([dedup.library_complexity])

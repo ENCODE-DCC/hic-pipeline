@@ -1,20 +1,12 @@
 {
-  "test_hic_from_libraries.assembly_name": "ce10",
-  "test_hic_from_libraries.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
-  "test_hic_from_libraries.input_dedup_pairs": [
+  "hic.assembly_name": "ce10",
+  "hic.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
+  "hic.input_dedup_pairs": [
     "tests/data/merged_nodups_lib1.txt.gz",
     "tests/data/merged_nodups_lib2.txt.gz"
   ],
-  "test_hic_from_libraries.library_stats": [
-    "tests/data/stats_lib1.txt",
-    "tests/data/stats_lib2.txt"
-  ],
-  "test_hic_from_libraries.library_stats_hists": [
-    "tests/data/stats_hists_lib1.m",
-    "tests/data/stats_hists_lib2.m"
-  ],
-  "test_hic_from_libraries.no_call_loops": true,
-  "test_hic_from_libraries.no_call_tads": true,
-  "test_hic_from_libraries.restriction_enzyme": "MboI",
-  "test_hic_from_libraries.restriction_sites": "tests/data/ce10_selected_MboI.txt"
+  "hic.no_call_loops": true,
+  "hic.no_call_tads": true,
+  "hic.restriction_enzyme": "MboI",
+  "hic.restriction_sites": "tests/data/ce10_selected_MboI.txt"
 }

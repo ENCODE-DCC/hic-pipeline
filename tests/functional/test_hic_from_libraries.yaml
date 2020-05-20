@@ -4,7 +4,7 @@
       - functional
     command: >-
       tests/caper_run.sh
-      tests/functional/wdl/test_hic_from_libraries.wdl
+      hic.wdl
       tests/functional/json/test_hic_from_libraries.json
     files:
       - path: test-output/glob-6a31d38462145ec363d0f357468a1d26/inter_1.hic
