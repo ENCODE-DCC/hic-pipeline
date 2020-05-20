@@ -12,6 +12,10 @@ workflow hic {
         File? chrsz
         File? reference_index
 
+        # Entrypoint from aligned bam
+        Array[Array[File]]? bams
+        Array[Array[File]]? ligation_counts
+
         # Entrypoint right before hic generation
         File? input_pairs
 
@@ -38,6 +42,8 @@ workflow hic {
         restriction_sites: "A text file containing cut sites for the given restriction enzyme. You should generate this file using this script: https://github.com/aidenlab/juicer/blob/encode/misc/generate_site_positions.py"
         chrsz: "A chromosome sizes file for the desired assembly, this is a tab-separated text file whose rows take the form [chromosome] [size]"
         reference_index: "A pregenerated BWA index for the desired assembly"
+        bams: "Aligned, unfiltered bams, organized by [biorep[techrep]]. If specified, the `ligation_counts` array must also be specified"
+        ligation_counts: "Text files containing ligation counts for the fastq pair, organized by [biorep[techrep]]. Has no meaning if the `bams` array is not also be specified. These should be calculated from fastqs using the Juicer countligations script: https://github.com/aidenlab/juicer/blob/encode/CPU/common/countligations.sh"
         input_pairs: "A text file containing the paired fragments to use to generate the .hic contact maps, a detailed format description can be found here: https://github.com/aidenlab/juicer/wiki/Pre#long-format"
         input_hic: "An input .hic file for which to call loops and domains"
         input_dedup_pairs: "An array consisting of text files of paired fragments, one per library, same format as input_pairs"
@@ -74,19 +80,27 @@ workflow hic {
         File chrsz_ = select_first([chrsz])
         File reference_index_ = select_first([reference_index])
 
-        scatter(i in range(length(fastq))) {
-            scatter(j in range(length(fastq[i]))) {
-                call align { input:
-                    fastqs = fastq[i][j],
-                    chrsz = chrsz_,
-                    idx_tar = reference_index_,
-                    ligation_site = ligation_site,
-                    cpu = cpu,
+        Int num_bioreps = if defined(bams) then length(select_first([bams])) else length(fastq)
+
+        scatter(i in range(num_bioreps)) {
+            Int num_techreps = if defined(bams) then length(select_first([bams])[i]) else length(fastq[i])
+            scatter(j in range(num_techreps)) {
+                if (!defined(bams)) {
+                    call align { input:
+                        fastqs = fastq[i][j],
+                        chrsz = chrsz_,
+                        idx_tar = reference_index_,
+                        ligation_site = ligation_site,
+                        cpu = cpu,
+                    }
                 }
 
+                File bam_file = select_first([align.result, select_first([bams])[i][j]])
+                File ligation_count = select_first([align.norm_res, select_first([ligation_counts])[i][j]])
+
                 call fragment { input:
-                    bam_file = align.result,
-                    norm_res_input = align.norm_res,
+                    bam_file = bam_file,
+                    norm_res_input = ligation_count,
                     restriction = select_first([restriction_sites])
                 }
             }
