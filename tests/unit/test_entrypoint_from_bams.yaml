@@ -1,0 +1,13 @@
+---
+  - name: test_entrypoint_from_bams_unit
+    tags:
+      - unit
+    command: >-
+      tests/caper_run.sh
+      hic.wdl
+      tests/unit/json/test_entrypoint_from_bams.json
+    stdout:
+      contains:
+        - fragment result_norm.txt
+      must_not_contain:
+        - bwa mem

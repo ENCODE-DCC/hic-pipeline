@@ -12,6 +12,10 @@ workflow hic {
         File? chrsz
         File? reference_index
 
+        # Entrypoint from aligned bam
+        Array[Array[File]]? bams
+        Array[Array[File]]? ligation_counts
+
         # Entrypoint right before hic generation
         File? input_pairs
 
@@ -20,13 +24,11 @@ workflow hic {
 
         # Inputs and logic for entrypoint after library processing
         Array[File]? input_dedup_pairs
-        Array[File?] library_stats = []
-        Array[File?] library_stats_hists = []
 
-        Boolean? no_bam2pairs = false
-        Boolean? no_call_loops = false
-        Boolean? no_call_tads = false
-        Boolean? include_mapq0_reads = false
+        Boolean no_bam2pairs = false
+        Boolean no_call_loops = false
+        Boolean no_call_tads = false
+        Boolean include_mapq0_reads = false
         Array[String]? input_ligation_junctions
         Int cpu = 32
         String? assembly_name
@@ -38,6 +40,8 @@ workflow hic {
         restriction_sites: "A text file containing cut sites for the given restriction enzyme. You should generate this file using this script: https://github.com/aidenlab/juicer/blob/encode/misc/generate_site_positions.py"
         chrsz: "A chromosome sizes file for the desired assembly, this is a tab-separated text file whose rows take the form [chromosome] [size]"
         reference_index: "A pregenerated BWA index for the desired assembly"
+        bams: "Aligned, unfiltered bams, organized by [biorep[techrep]]. If specified, the `ligation_counts` array must also be specified"
+        ligation_counts: "Text files containing ligation counts for the fastq pair, organized by [biorep[techrep]]. Has no meaning if the `bams` array is not also be specified. These should be calculated from fastqs using the Juicer countligations script: https://github.com/aidenlab/juicer/blob/encode/CPU/common/countligations.sh"
         input_pairs: "A text file containing the paired fragments to use to generate the .hic contact maps, a detailed format description can be found here: https://github.com/aidenlab/juicer/wiki/Pre#long-format"
         input_hic: "An input .hic file for which to call loops and domains"
         input_dedup_pairs: "An array consisting of text files of paired fragments, one per library, same format as input_pairs"
@@ -69,24 +73,32 @@ workflow hic {
     Array[String] ligation_junctions = select_first([input_ligation_junctions, [ligation_site]])
 
     # scatter over libraries
-    if (defined(chrsz) && defined(reference_index) && defined(restriction_sites)) {
-        # A WDL technicality here.
+    if (defined(restriction_sites) && defined(chrsz)) {
         File chrsz_ = select_first([chrsz])
-        File reference_index_ = select_first([reference_index])
+        Int num_bioreps = if defined(bams) then length(select_first([bams])) else length(fastq)
 
-        scatter(i in range(length(fastq))) {
-            scatter(j in range(length(fastq[i]))) {
-                call align { input:
-                    fastqs = fastq[i][j],
-                    chrsz = chrsz_,
-                    idx_tar = reference_index_,
-                    ligation_site = ligation_site,
-                    cpu = cpu,
+        scatter(i in range(num_bioreps)) {
+            # Align fastqs if input bams were not provided
+            if (!defined(bams) && defined(reference_index)) {
+                scatter(j in range(length(fastq[i]))) {
+                    call align { input:
+                        fastqs = fastq[i][j],
+                        chrsz = chrsz_,
+                        idx_tar = select_first([reference_index]),
+                        ligation_site = ligation_site,
+                        cpu = cpu,
+                    }
                 }
+            }
 
+            Array[File] rep_bam_files = if defined(bams) then select_first([bams])[i] else select_first([align.result])
+            Array[File] rep_ligation_counts = if defined(ligation_counts) then select_first([ligation_counts])[i] else select_first([align.norm_res])
+
+            # Scatter across all the bams in the biorep (one per tech rep)
+            scatter(j in range(length(rep_bam_files))) {
                 call fragment { input:
-                    bam_file = align.result,
-                    norm_res_input = align.norm_res,
+                    bam_file = rep_bam_files[j],
+                    norm_res_input = rep_ligation_counts[j],
                     restriction = select_first([restriction_sites])
                 }
             }
@@ -135,7 +147,7 @@ workflow hic {
         }
     }
 
-    if (defined(fragment.alignment_stats) && defined(dedup.library_complexity)) {
+    if (defined(fragment.alignment_stats) && defined(dedup.library_complexity) && !defined(input_dedup_pairs)) {
         call merge_stats { input:
             alignment_stats = flatten(select_first([fragment.alignment_stats])),
             library_stats = select_first([dedup.library_complexity])
