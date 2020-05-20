@@ -4,13 +4,13 @@
       "tests/data/dummy.txt"
     ]
   ],
-  "hic.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
-  "hic.idx_tar": "tests/data/ce10_selected.tar.gz",
+  "hic.chrsz": "tests/data/dummy.txt",
+  "hic.reference_index": "tests/data/dummy.txt",
   "hic.ligation_counts": [
     [
-      10
+      "tests/data/dummy.txt"
     ]
   ],
-  "hic.restriction": "tests/data/ce10_selected_MboI.txt",
+  "hic.restriction_sites":"tests/data/dummy.txt",
   "hic.restriction_enzyme": "MboI"
 }

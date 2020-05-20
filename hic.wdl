@@ -75,32 +75,32 @@ workflow hic {
     Array[String] ligation_junctions = select_first([input_ligation_junctions, [ligation_site]])
 
     # scatter over libraries
-    if (defined(chrsz) && defined(reference_index) && defined(restriction_sites)) {
-        # A WDL technicality here.
+    if (defined(restriction_sites) && defined(chrsz)) {
         File chrsz_ = select_first([chrsz])
-        File reference_index_ = select_first([reference_index])
-
         Int num_bioreps = if defined(bams) then length(select_first([bams])) else length(fastq)
 
         scatter(i in range(num_bioreps)) {
-            Int num_techreps = if defined(bams) then length(select_first([bams])[i]) else length(fastq[i])
-            scatter(j in range(num_techreps)) {
-                if (!defined(bams)) {
+            # Align fastqs if input bams were not provided
+            if (!defined(bams) && defined(reference_index)) {
+                scatter(j in range(length(fastq[i]))) {
                     call align { input:
                         fastqs = fastq[i][j],
                         chrsz = chrsz_,
-                        idx_tar = reference_index_,
+                        idx_tar = select_first([reference_index]),
                         ligation_site = ligation_site,
                         cpu = cpu,
                     }
                 }
+            }
 
-                File bam_file = select_first([align.result, select_first([bams])[i][j]])
-                File ligation_count = select_first([align.norm_res, select_first([ligation_counts])[i][j]])
+            Array[File] rep_bam_files = if defined(bams) then select_first([bams])[i] else select_first([align.result])
+            Array[File] rep_ligation_counts = if defined(ligation_counts) then select_first([ligation_counts])[i] else select_first([align.norm_res])
 
+            # Scatter across all the bams in the biorep (one per tech rep)
+            scatter(j in range(length(rep_bam_files))) {
                 call fragment { input:
-                    bam_file = bam_file,
-                    norm_res_input = ligation_count,
+                    bam_file = rep_bam_files[j],
+                    norm_res_input = rep_ligation_counts[j],
                     restriction = select_first([restriction_sites])
                 }
             }

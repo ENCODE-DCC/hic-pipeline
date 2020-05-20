@@ -1,0 +1,14 @@
+{
+    "hic.assembly_name": "ce10",
+    "hic.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
+    "hic.bams": [
+      [
+        "tests/data/result.bam"
+      ]
+    ],
+    "hic.ligation_counts": [["tests/data/result_norm.txt.res.txt"]],
+    "hic.restriction_enzyme": "MboI",
+    "hic.restriction_sites": "tests/data/ce10_selected_MboI.txt",
+    "hic.no_call_loops": true,
+    "hic.no_call_tads": true
+}
