@@ -1,0 +1,6 @@
+{
+  "hic.assembly_name": "lambda",
+  "hic.reference_fasta": "tests/data/lambda.fasta.gz",
+  "hic.restriction_enzyme": "MboI",
+  "hic.restriction_site_locations_only": true
+}

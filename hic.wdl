@@ -25,6 +25,10 @@ workflow hic {
         # Inputs and logic for entrypoint after library processing
         Array[File]? input_dedup_pairs
 
+        # Input to build restriction site locations
+        File? reference_fasta
+        Boolean restriction_site_locations_only = false
+
         Boolean no_bam2pairs = false
         Boolean no_call_loops = false
         Boolean no_call_tads = false
@@ -48,6 +52,8 @@ workflow hic {
         library_stats: "An array of library statistics text files, one per library"
         library_stats_hists: "An array of library statistics .m files, one per library"
         input_ligation_junctions: "An array of ligation sites, useful for megamaps"
+        reference_fasta: "FASTA file for the genome of interest to be used for generating restriction site locations. For the output locations file to have a descriptive filename it is also recommended to specify the `assembly_name`. Has no use if a pregenerated restriction site locations file is provided."
+        restriction_site_locations_only: "If `true`, then will only generate the restriction site locations file."
         no_bam2pairs: "If set to `true`, avoid generating .pairs files, defaults to false"
         no_call_loops: "If set to `true`, avoid calling loops with hiccups, defaults to false"
         no_call_tads: "If set to `true`, avoid calling domains with arrowhead, defaults to false"
@@ -72,9 +78,20 @@ workflow hic {
     # Prepare array of restriction sites for megamap
     Array[String] ligation_junctions = select_first([input_ligation_junctions, [ligation_site]])
 
+    if (defined(reference_fasta) && !defined(restriction_sites)) {
+        call make_restriction_site_locations { input:
+            reference_fasta = select_first([reference_fasta]),
+            assembly_name = select_first([assembly_name, "unknown_assembly"]),
+            restriction_enzyme = restriction_enzyme,
+        }
+    }
+
+    Boolean has_restriction_sites = defined(restriction_sites) || defined(make_restriction_site_locations.restriction_site_locations)
+
     # scatter over libraries
-    if (defined(restriction_sites) && defined(chrsz)) {
+    if (has_restriction_sites && defined(chrsz)) {
         File chrsz_ = select_first([chrsz])
+        File restriction_sites_ = if defined(restriction_sites) then select_first([restriction_sites]) else select_first([make_restriction_site_locations.restriction_site_locations])
         Int num_bioreps = if defined(bams) then length(select_first([bams])) else length(fastq)
 
         scatter(i in range(num_bioreps)) {
@@ -99,7 +116,7 @@ workflow hic {
                 call fragment { input:
                     bam_file = rep_bam_files[j],
                     norm_res_input = rep_ligation_counts[j],
-                    restriction = select_first([restriction_sites])
+                    restriction = restriction_sites_
                 }
             }
 
@@ -126,7 +143,7 @@ workflow hic {
             call dedup { input:
                 merged_sort = merge_sort.out_file,
                 ligation_site = ligation_site,
-                restriction_sites = select_first([restriction_sites]),
+                restriction_sites = restriction_sites_,
                 # TODO: change the index from 1 to 2 when mapq sam headers are fixed
                 alignable_bam = merge.merged_output[1]
             }
@@ -155,11 +172,11 @@ workflow hic {
     }
 
     Array[String] qualities = if !defined(input_hic) then DEFAULT_HIC_QUALITIES else []
-    if (defined(chrsz) && defined(restriction_sites)) {
+    if (defined(chrsz) && has_restriction_sites) {
         scatter(i in range(length(qualities))) {
             call create_hic { input:
                 pairs_file = select_first([input_pairs, merge_pairs_file.out_file]),
-                restriction_sites = select_first([restriction_sites]),
+                restriction_sites = if defined(restriction_sites) then select_first([restriction_sites]) else select_first([make_restriction_site_locations.restriction_site_locations]),
                 ligation_junctions = ligation_junctions,
                 chrsz_ = select_first([chrsz]),
                 quality = qualities[i],
@@ -181,6 +198,7 @@ workflow hic {
     }
 
     output {
+        File? restriction_site_locations = make_restriction_site_locations.restriction_site_locations
         Array[File]? alignable_bam = dedup.deduped_bam
         Array[File?]? out_pairs = bam2pairs.out_file
         Array[File]? out_dedup =  dedup.out_file
@@ -191,6 +209,23 @@ workflow hic {
         File? out_hic_1 = if defined(create_hic.inter) then select_first([create_hic.inter])[0] else input_hic
         File? out_hic_30 = if defined(create_hic.inter) then select_first([create_hic.inter])[1] else input_hic
         File? out_tads = arrowhead.out_file
+    }
+}
+
+task make_restriction_site_locations {
+    input {
+        File reference_fasta
+        String assembly_name
+        String restriction_enzyme
+    }
+
+    command <<<
+        python3 "$(which generate_site_positions.py)" ~{restriction_enzyme} ~{assembly_name} ~{reference_fasta}
+        gzip -n "~{assembly_name}_~{restriction_enzyme}.txt"
+    >>>
+
+    output {
+        File restriction_site_locations = "~{assembly_name}_~{restriction_enzyme}.txt.gz"
     }
 }
 

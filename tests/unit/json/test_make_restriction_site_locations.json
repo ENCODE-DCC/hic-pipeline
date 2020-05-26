@@ -1,0 +1,5 @@
+{
+  "test_make_restriction_site_locations.assembly_name": "lambda",
+  "test_make_restriction_site_locations.reference_fasta": "tests/data/dummy.txt",
+  "test_make_restriction_site_locations.restriction_enzyme": "MboI"
+}

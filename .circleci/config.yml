@@ -196,7 +196,7 @@ workflows:
           name: test_wdl_integration
           resource_class: large
           tag: integration
-          num_parallel_workflows: 8
+          num_parallel_workflows: 12
           requires:
             - build
             - lint

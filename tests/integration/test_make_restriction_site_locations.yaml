@@ -1,0 +1,11 @@
+---
+  - name: test_make_restriction_site_locations
+    tags:
+      - integration
+    command: >-
+      tests/caper_run.sh
+      tests/integration/wdl/test_make_restriction_site_locations.wdl
+      tests/integration/json/test_make_restriction_site_locations.json
+    files:
+      - path: test-output/lambda_MboI.txt.gz
+        md5sum: 7029066c27ac6f5ef18d660d5741979a
