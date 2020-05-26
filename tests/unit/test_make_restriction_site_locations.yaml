@@ -1,0 +1,12 @@
+---
+  - name: test_make_restriction_site_locations_unit
+    tags:
+      - unit
+    command: >-
+      tests/caper_run.sh
+      tests/unit/wdl/test_make_restriction_site_locations.wdl
+      tests/unit/json/test_make_restriction_site_locations.json
+    stdout:
+      contains:
+        - MboI lambda
+        - gzip -n "lambda_MboI.txt"

@@ -66,8 +66,8 @@ RUN curl -OL "https://github.com/4dn-dcic/pairix/archive/${PAIRIX_VERSION}.zip" 
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     cd juicer && \
     git checkout da9b33227756f8b00d831fc52f951baa984a68aa && \
-    chmod +x CPU/* CPU/common/* && \
-    find . -d 1 -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
+    chmod +x CPU/* CPU/common/* misc/* && \
+    find -mindepth 1 -maxdepth 1  -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
 
 # Install Juicer tools
 RUN curl -L "http://s3.amazonaws.com/hicfiles.tc4ga.com/public/juicer/juicer_tools_${JUICER_TOOLS_VERSION}.jar" -o /opt/juicer/CPU/common/juicer_tools.jar && \
@@ -76,7 +76,7 @@ RUN curl -L "http://s3.amazonaws.com/hicfiles.tc4ga.com/public/juicer/juicer_too
 
 # For sorting, LC_ALL is C
 ENV LC_ALL C
-ENV PATH=/opt:/opt/scripts:/opt/scripts/common:$PATH
+ENV PATH=/opt:/opt/scripts:/opt/scripts/common:/opt/juicer/misc:$PATH
 
 # Use multistage build for fragment
 FROM rust:1.42.0-slim-stretch@sha256:1201e100253c82c4accd19c649d187ab741b89954397dcdddb792008f898f93a as builder
