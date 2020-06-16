@@ -1,14 +1,14 @@
 [![CircleCI](https://circleci.com/gh/ENCODE-DCC/hic-pipeline/tree/dev.svg?style=svg)](https://circleci.com/gh/ENCODE-DCC/hic-pipeline/tree/dev)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![MIT License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 HiC uniform processing pipeline
 ===================================================
 
 # Directories
-* `backends/` : Backend configuration files (`.conf`)
 * `workflow_opts/` : Workflow option files (`.json`)
 * `examples/` : input JSON examples
-* `docker_image/` : Dockerfile
-* `nvidia_docker_image/` : Dockerfile for Nvidia Docker: to use pipeline with GPU
+* `docker/` : Dockerfiles to build images for running pipelines, including GPU-enabled image for running `hiccups`
 * `tests/` : test code, including WDL tests, see the [developer docs](docs/development.md) for more details on running them.
 
 # Installation and tutorial

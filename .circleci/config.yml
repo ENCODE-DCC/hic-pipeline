@@ -11,7 +11,7 @@ machine_defaults: &machine_defaults
 
 lint: &lint
   docker:
-    - image: quay.io/encode-dcc/hic-pipeline:circleci-lint
+    - image: encodedcc/hic-pipeline:circleci-lint
   working_directory: ~/ENCODE-DCC/hic-pipeline
 
 py37: &py37
@@ -44,12 +44,10 @@ commands:
     steps:
       - run:
           command: |
-            echo "export HIC_DOCKER_IMAGE_TAG=quay.io/encode-dcc/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}" >> ${BASH_ENV}
-            echo "export QUAY_REPO=hic-pipeline" >> ${BASH_ENV}
-            echo "export DOCKERFILE_DIR=docker_image" >> ${BASH_ENV}
-            echo "export HICCUPS_DOCKER_IMAGE_TAG=quay.io/encode-dcc/hiccups:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}" >> ${BASH_ENV}
-            echo "export HICCUPS_QUAY_REPO=hiccups" >> ${BASH_ENV}
-            echo "export HICCUPS_DOCKERFILE_DIR=nvidia_docker_image" >> ${BASH_ENV}
+            echo "export HIC_DOCKER_IMAGE_TAG=encodedcc/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}" >> ${BASH_ENV}
+            echo "export DOCKERFILE_DIR=docker/hic-pipeline" >> ${BASH_ENV}
+            echo "export HICCUPS_DOCKER_IMAGE_TAG=encodedcc/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}_hiccups" >> ${BASH_ENV}
+            echo "export HICCUPS_DOCKERFILE_DIR=docker/hiccups" >> ${BASH_ENV}
 
   get_pipeline_version:
     description: get pipeline version from __init__.py
@@ -117,15 +115,12 @@ jobs:
       - run:
           name: build main docker image
           command: |
-            docker login -u=${QUAY_ROBOT_USER} -p=${QUAY_ROBOT_USER_TOKEN} quay.io
-            docker pull quay.io/encode-dcc/${QUAY_REPO}:template
+            docker login -u=${DOCKERHUB_USER} -p=${DOCKERHUB_PASS}
+            docker pull encodedcc/${CIRCLE_PROJECT_REPONAME}:template
             docker build \
-              --cache-from quay.io/encode-dcc/${QUAY_REPO}:template \
-              --build-arg GIT_COMMIT_HASH=${CIRCLE_SHA1} \
-              --build-arg BRANCH=${CIRCLE_BRANCH} \
-              --build-arg BUILD_TAG=${HIC_DOCKER_IMAGE_TAG} \
+              --cache-from encodedcc/${CIRCLE_PROJECT_REPONAME}:template \
               -t ${HIC_DOCKER_IMAGE_TAG} \
-              -t quay.io/encode-dcc/${QUAY_REPO}:template \
+              -t encodedcc/${CIRCLE_PROJECT_REPONAME}:template \
               -f ${DOCKERFILE_DIR}/Dockerfile .
             docker push ${HIC_DOCKER_IMAGE_TAG}
             docker logout
@@ -139,15 +134,12 @@ jobs:
       - run:
           name: build hiccups docker image
           command: |
-            docker login -u=${QUAY_ROBOT_USER} -p=${QUAY_ROBOT_USER_TOKEN} quay.io
-            docker pull quay.io/encode-dcc/${HICCUPS_QUAY_REPO}:template
+            docker login -u=${DOCKERHUB_USER} -p=${DOCKERHUB_PASS}
+            docker pull encodedcc/${CIRCLE_PROJECT_REPONAME}:template_hiccups
             docker build \
-              --cache-from quay.io/encode-dcc/${HICCUPS_QUAY_REPO}:template \
-              --build-arg GIT_COMMIT_HASH=${CIRCLE_SHA1} \
-              --build-arg BRANCH=${CIRCLE_BRANCH} \
-              --build-arg BUILD_TAG=${HICCUPS_DOCKER_IMAGE_TAG} \
+              --cache-from encodedcc/${CIRCLE_PROJECT_REPONAME}:template_hiccups \
               -t ${HICCUPS_DOCKER_IMAGE_TAG} \
-              -t quay.io/encode-dcc/${HICCUPS_QUAY_REPO}:template \
+              -t encodedcc/${CIRCLE_PROJECT_REPONAME}:template_hiccups \
               -f ${HICCUPS_DOCKERFILE_DIR}/Dockerfile .
             docker push ${HICCUPS_DOCKER_IMAGE_TAG}
             docker logout
@@ -161,12 +153,17 @@ jobs:
       - get_pipeline_version
       - run:
           command: |
-            docker login -u=${QUAY_ROBOT_USER} -p=${QUAY_ROBOT_USER_TOKEN} quay.io
+            docker login -u=${DOCKERHUB_USER} -p=${DOCKERHUB_PASS}
             docker pull ${HIC_DOCKER_IMAGE_TAG}
-            docker tag ${HIC_DOCKER_IMAGE_TAG} quay.io/encode-dcc/hic-pipeline:${PIPELINE_VERSION}
-            docker tag ${HIC_DOCKER_IMAGE_TAG} quay.io/encode-dcc/hic-pipeline:template
-            docker push quay.io/encode-dcc/hic-pipeline:${PIPELINE_VERSION}
-            docker push quay.io/encode-dcc/hic-pipeline:template
+            docker pull ${HICCUPS_DOCKER_IMAGE_TAG}
+            docker tag ${HIC_DOCKER_IMAGE_TAG} encodedcc/hic-pipeline:${PIPELINE_VERSION}
+            docker tag ${HIC_DOCKER_IMAGE_TAG} encodedcc/hic-pipeline:template
+            docker tag ${HICCUPS_DOCKER_IMAGE_TAG} encodedcc/hic-pipeline:${PIPELINE_VERSION}_hiccups
+            docker tag ${HICCUPS_DOCKER_IMAGE_TAG} encodedcc/hic-pipeline:template_hiccups
+            docker push encodedcc/hic-pipeline:${PIPELINE_VERSION}
+            docker push encodedcc/hic-pipeline:template
+            docker push encodedcc/hic-pipeline:${PIPELINE_VERSION}_hiccups
+            docker push encodedcc/hic-pipeline:template_hiccups
             docker logout
           no_output_timeout: 30m
 
