@@ -16,7 +16,7 @@ $ tox -e py37
 
 ### Running WDL tests
 
-Make sure to set the environment variable `HIC_DOCKER_IMAGE_TAG` to point to the pipeline's docker image. Usually `quay.io/encode-dcc/hic-pipeline:template` will suffice, if your code changes require rebuilding then you will need to set this to point to the newly tagged image.
+Make sure to set the environment variable `HIC_DOCKER_IMAGE_TAG` to point to the pipeline's docker image. Usually `encodedcc/hic-pipeline:template` will suffice, if your code changes require rebuilding then you will need to set this to point to the newly tagged image.
 
 To run a WDL test with a specific tag:
 

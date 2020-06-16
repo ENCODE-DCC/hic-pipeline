@@ -1,6 +1,6 @@
 # Defines image for running linting
 # You should never need to use this directly.
-# Builds with docker build -t quay.io/encode-dcc/hic-pipeline:circleci-lint - < Dockerfile
+# Builds with docker build -t encodedcc/hic-pipeline:circleci-lint - < Dockerfile
 FROM circleci/python:3.7.3-stretch
 
 # Installs rust with cargo clippy and rustfmt
