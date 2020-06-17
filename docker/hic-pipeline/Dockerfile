@@ -89,5 +89,8 @@ FROM main
 RUN mkdir -p hic-pipeline/hic_pipeline
 COPY hic_pipeline hic-pipeline/hic_pipeline/
 # Add compiled binary from other stage of build
-COPY --from=builder /hic-pipeline/target/release/fragment hic-pipeline/hic_pipeline/
+# For some reason what we were doing previously does not work using DOCKER_BUILDKIT=1:
+# COPY --from=builder /hic-pipeline/target/release/fragment hic-pipeline/hic_pipeline/
+# See https://github.com/moby/buildkit/issues/1260. Copying file to file works though.
+COPY --from=builder /hic-pipeline/target/release/fragment hic-pipeline/hic_pipeline/fragment
 ENV PATH="/opt/hic-pipeline/hic_pipeline:${PATH}"
