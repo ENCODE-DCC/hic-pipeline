@@ -1,7 +1,7 @@
 ---
 defaults: &defaults
   docker:
-    - image: circleci/buildpack-deps:xenial-scm
+    - image: cimg/base:2020.01
   working_directory: ~/ENCODE-DCC/hic-pipeline
 
 machine_defaults: &machine_defaults
