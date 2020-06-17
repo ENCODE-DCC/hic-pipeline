@@ -54,7 +54,7 @@ commands:
     steps:
       - run:
           command: |
-            PIPELINE_VERSION=$(python -c "import hic_pipeline;print(hic_pipeline.__version__)")
+            PIPELINE_VERSION=$(python3 -c "import hic_pipeline;print(hic_pipeline.__version__)")
             echo "export PIPELINE_VERSION=${PIPELINE_VERSION}" >> ${BASH_ENV}
 
 version: 2.1
