@@ -88,6 +88,7 @@ FROM main
 
 RUN mkdir -p hic-pipeline/hic_pipeline
 COPY hic_pipeline hic-pipeline/hic_pipeline/
+RUN rm -rf hic-pipeline/hic_pipeline/fragment
 # Add compiled binary from other stage of build
-COPY --from=builder /hic-pipeline/target/release/fragment hic-pipeline/hic_pipeline/
+COPY --from=builder /hic-pipeline/target/release/fragment hic-pipeline/hic_pipeline
 ENV PATH="/opt/hic-pipeline/hic_pipeline:${PATH}"
