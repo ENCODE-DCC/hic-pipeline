@@ -110,18 +110,19 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.8
       - set_environment_variables
       - run:
           name: build main docker image
           command: |
             docker login -u=${DOCKERHUB_USER} -p=${DOCKERHUB_PASS}
             docker pull encodedcc/${CIRCLE_PROJECT_REPONAME}:template
-            docker build \
+            DOCKER_BUILDKIT=1 docker build . --build-arg BUILDKIT_INLINE_CACHE=1 \
               --cache-from encodedcc/${CIRCLE_PROJECT_REPONAME}:template \
               -t ${HIC_DOCKER_IMAGE_TAG} \
               -t encodedcc/${CIRCLE_PROJECT_REPONAME}:template \
-              -f ${DOCKERFILE_DIR}/Dockerfile .
+              -f ${DOCKERFILE_DIR}/Dockerfile
             docker push ${HIC_DOCKER_IMAGE_TAG}
             docker logout
 
@@ -129,18 +130,19 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.8
       - set_environment_variables
       - run:
           name: build hiccups docker image
           command: |
             docker login -u=${DOCKERHUB_USER} -p=${DOCKERHUB_PASS}
             docker pull encodedcc/${CIRCLE_PROJECT_REPONAME}:template_hiccups
-            docker build \
+            DOCKER_BUILDKIT=1 docker build . --build-arg BUILDKIT_INLINE_CACHE=1 \
               --cache-from encodedcc/${CIRCLE_PROJECT_REPONAME}:template_hiccups \
               -t ${HICCUPS_DOCKER_IMAGE_TAG} \
               -t encodedcc/${CIRCLE_PROJECT_REPONAME}:template_hiccups \
-              -f ${HICCUPS_DOCKERFILE_DIR}/Dockerfile .
+              -f ${HICCUPS_DOCKERFILE_DIR}/Dockerfile
             docker push ${HICCUPS_DOCKER_IMAGE_TAG}
             docker logout
 
@@ -148,7 +150,8 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.8
       - set_environment_variables
       - get_pipeline_version
       - run:
