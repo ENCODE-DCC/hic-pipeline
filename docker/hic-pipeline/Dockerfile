@@ -65,7 +65,7 @@ RUN curl -OL "https://github.com/4dn-dcic/pairix/archive/${PAIRIX_VERSION}.zip" 
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     cd juicer && \
-    git checkout da9b33227756f8b00d831fc52f951baa984a68aa && \
+    git checkout f4cc8e4684fb55934581b5efe9827dce5e7267ae && \
     chmod +x CPU/* CPU/common/* misc/* && \
     find -mindepth 1 -maxdepth 1  -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
 
