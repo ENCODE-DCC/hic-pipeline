@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 
-@pytest.mark.workflow(name="test_merge")
+@pytest.mark.workflow("test_merge")
 def test_merge_bam_match(workflow_dir, bam_md5):
     bam_path = workflow_dir / Path("test-output/merged_bam_files.bam")
     bam_md5sum = bam_md5(bam_path)

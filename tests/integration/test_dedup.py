@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 
-@pytest.mark.workflow(name="test_dedup")
+@pytest.mark.workflow("test_dedup")
 def test_dedup_alignable_bam_match(workflow_dir, bam_md5):
     bam_path = workflow_dir / Path("test-output/result_alignable_dedup.bam")
     bam_md5sum = bam_md5(bam_path)
