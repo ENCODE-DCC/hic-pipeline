@@ -124,10 +124,7 @@ workflow hic {
             Array[File] mapq0 = fragment.mapq0
             Array[File] alignable = fragment.alignable
 
-            # Array[Array[File]] bams_to_merge = [unmapped, mapq0, alignable]
-            # mapq0 temporarily dropped since bam conversion fails
-            # TODO: add back when chimeric_blacklist fixed
-            Array[Array[File]] bams_to_merge = [unmapped, alignable]
+            Array[Array[File]] bams_to_merge = [unmapped, mapq0, alignable]
 
             scatter(j in range(length(bams_to_merge))){
                 call merge { input:
@@ -144,8 +141,7 @@ workflow hic {
                 merged_sort = merge_sort.out_file,
                 ligation_site = ligation_site,
                 restriction_sites = restriction_sites_,
-                # TODO: change the index from 1 to 2 when mapq sam headers are fixed
-                alignable_bam = merge.merged_output[1]
+                alignable_bam = merge.merged_output[2]
             }
 
             # convert alignable bam to pairs to be consistent with 4DN
@@ -304,10 +300,8 @@ task fragment {
         echo "Converting sam to bam"
         samtools view -hb result_unmapped.sam > unmapped.bam
         rm result_unmapped.sam
-        # Mapq0 sam from chimeric doesn’t have SAM headers, can’t convert to bam
-        # TODO: fix this
-        # samtools view -hb result_mapq0.sam > mapq0.bam
-        # rm result_mapq0.sam
+        samtools view -hb result_mapq0.sam > mapq0.bam
+        rm result_mapq0.sam
         samtools view -hb result_alignable.sam > alignable.bam
         rm result_alignable.sam
         #removed all sam files
@@ -325,8 +319,7 @@ task fragment {
 
     output {
         File unmapped = "unmapped.bam"
-        # TODO: change this to bam when mapq0 sam headers are fixed
-        File mapq0 = "result_mapq0.sam"
+        File mapq0 = "mapq0.bam"
         File alignable = "alignable.bam"
         File sort_file = "sort.txt.gz"
         File norm_res = "result.res.txt"
