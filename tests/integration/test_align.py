@@ -21,4 +21,4 @@ def test_align_unmapped_bam_match(workflow_dir, bam_md5):
 def test_align_mapq0_bam_match(workflow_dir, bam_md5):
     bam_path = workflow_dir / Path("test-output/mapq0.bam")
     bam_md5sum = bam_md5(bam_path)
-    assert bam_md5sum == "e24ff1e0d5e6471fec6976d0aeaa1061"
+    assert bam_md5sum == "729cf387cfe1add67525dba4f384baf4"
