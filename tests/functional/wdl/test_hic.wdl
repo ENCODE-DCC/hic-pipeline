@@ -31,6 +31,6 @@ workflow test_hic {
         File hic_30 = select_first([hic.out_hic_30])
         File library_complexity = select_first([hic.library_complexity_stats_json])[0]
         File stats = select_first([hic.stats])[0]
-        File alignments_stats = select_first([hic.alignment_stats])[0][0]
+        File alignments_stats = select_first([hic.alignment_stats_])[0][0]
     }
 }
