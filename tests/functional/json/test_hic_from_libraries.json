@@ -6,12 +6,12 @@
   "hic.assembly_name": "ce10",
   "hic.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
   "hic.input_dedup_pairs": [
-    "tests/data/merged_nodups_lib1.txt.gz",
-    "tests/data/merged_nodups_lib2.txt.gz"
+    "tests/data/merged_nodups_lib1.txt",
+    "tests/data/merged_nodups_lib2.txt"
   ],
   "hic.library_stats": [
-    "tests/data/library_complexity_1.txt.gz",
-    "tests/data/library_complexity_2.txt.gz"
+    "tests/data/library_complexity_1.txt",
+    "tests/data/library_complexity_2.txt"
   ],
   "hic.no_call_loops": true,
   "hic.no_call_tads": true,
