@@ -1,9 +1,17 @@
 {
+  "hic.alignment_stats": [
+    "tests/data/alignment_stats_1.txt.gz",
+    "tests/data/alignment_stats_2.txt.gz"
+  ],
   "hic.assembly_name": "ce10",
   "hic.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
   "hic.input_dedup_pairs": [
     "tests/data/merged_nodups_lib1.txt.gz",
     "tests/data/merged_nodups_lib2.txt.gz"
+  ],
+  "hic.library_stats": [
+    "tests/data/library_complexity_1.txt.gz",
+    "tests/data/library_complexity_2.txt.gz"
   ],
   "hic.no_call_loops": true,
   "hic.no_call_tads": true,

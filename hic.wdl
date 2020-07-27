@@ -22,8 +22,10 @@ workflow hic {
         # Entrypoint for loop and TAD calls
         File? input_hic
 
-        # Inputs and logic for entrypoint after library processing
+        # Inputs for entrypoint after library processing
         Array[File]? input_dedup_pairs
+        Array[File]? alignment_stats
+        Array[File]? library_stats
 
         # Input to build restriction site locations
         File? reference_fasta
@@ -48,9 +50,9 @@ workflow hic {
         ligation_counts: "Text files containing ligation counts for the fastq pair, organized by [biorep[techrep]]. Has no meaning if the `bams` array is not also be specified. These should be calculated from fastqs using the Juicer countligations script: https://github.com/aidenlab/juicer/blob/encode/CPU/common/countligations.sh"
         input_pairs: "A text file containing the paired fragments to use to generate the .hic contact maps, a detailed format description can be found here: https://github.com/aidenlab/juicer/wiki/Pre#long-format"
         input_hic: "An input .hic file for which to call loops and domains"
-        input_dedup_pairs: "An array consisting of text files of paired fragments, one per library, same format as input_pairs"
-        library_stats: "An array of library statistics text files, one per library"
-        library_stats_hists: "An array of library statistics .m files, one per library"
+        input_dedup_pairs: "An optional array consisting of text files of paired fragments, one per library, same format as input_pairs, used for merging libraries"
+        alignment_stats: "An optional array consisting of text files of alignment stats, one per library, only has meaning when used in combination with `input_dedup_pairs`. Use is recommended but not required when merging libraries in order to calculate quality metrics on the merged libraries."
+        library_stats: "An optional array consisting of text files of library stats, one per library, only has meaning when used in combination with `input_dedup_pairs`. Use is recommended but not required when merging libraries in order to calculate quality metrics on the merged libraries."
         input_ligation_junctions: "An array of ligation sites, useful for megamaps"
         reference_fasta: "FASTA file for the genome of interest to be used for generating restriction site locations. For the output locations file to have a descriptive filename it is also recommended to specify the `assembly_name`. Has no use if a pregenerated restriction site locations file is provided."
         restriction_site_locations_only: "If `true`, then will only generate the restriction site locations file."
@@ -167,6 +169,13 @@ workflow hic {
         }
     }
 
+    if (defined(input_dedup_pairs) && defined(alignment_stats) && defined(library_stats)) {
+        call merge_stats as merge_stats_from_library_entrypoint { input:
+            alignment_stats = select_first([alignment_stats]),
+            library_stats = select_first([library_stats]),
+        }
+    }
+
     Array[String] qualities = if !defined(input_hic) then DEFAULT_HIC_QUALITIES else []
     if (defined(chrsz) && has_restriction_sites) {
         scatter(i in range(length(qualities))) {
@@ -200,7 +209,7 @@ workflow hic {
         Array[File]? out_dedup =  dedup.out_file
         Array[File]? library_complexity_stats_json = dedup.library_complexity_json
         Array[File]? stats = dedup.stats_json
-        Array[Array[File]]? alignment_stats = fragment.alignment_stats
+        Array[Array[File]]? alignment_stats_ = fragment.alignment_stats
         Array[Array[File]]? alignment_stats_json = fragment.alignment_stats_json
         File? out_hic_1 = if defined(create_hic.inter) then select_first([create_hic.inter])[0] else input_hic
         File? out_hic_30 = if defined(create_hic.inter) then select_first([create_hic.inter])[1] else input_hic
@@ -309,11 +318,6 @@ task fragment {
 
         # sort by chromosome, fragment, strand, and position
         sort -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 90% result_frag.txt > sort.txt
-        if [ $? -ne 0 ]
-        then
-            echo "***! Failure during sort"
-            exit 1
-        fi
         gzip -n sort.txt
     }
 
