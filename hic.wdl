@@ -2,6 +2,7 @@ version 1.0
 
 #CAPER docker encodedcc/hic-pipeline:0.1.0
 #CAPER singularity docker://encodedcc/hic-pipeline:0.1.0
+#CROO out_def https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json
 
 workflow hic {
     input {
