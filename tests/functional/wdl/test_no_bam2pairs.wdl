@@ -5,7 +5,7 @@ import "../../../hic.wdl" as hic
 workflow test_no_bam2pairs {
     input {
         Array[Array[Array[File]]] fastq = []
-        String restriction_enzyme
+        Array[String] restriction_enzymes
         String assembly_name
         File restriction_sites
         File reference_index
@@ -17,10 +17,9 @@ workflow test_no_bam2pairs {
 
     call hic.hic { input:
         fastq = fastq,
-        restriction_enzyme = restriction_enzyme,
+        restriction_enzymes = restriction_enzymes,
         restriction_sites = restriction_sites,
         reference_index = reference_index,
-        restriction_sites = restriction_sites,
         chrsz = chrsz,
         no_call_loops = no_call_loops,
         no_call_tads = no_call_tads,

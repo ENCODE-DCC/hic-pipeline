@@ -10,6 +10,8 @@
     ]
   ],
   "test_hic.reference_index": "tests/data/ce10_selected.tar.gz",
-  "test_hic.restriction_enzyme": "MboI",
+  "test_hic.restriction_enzymes": [
+    "MboI"
+  ],
   "test_hic.restriction_sites": "tests/data/ce10_selected_MboI.txt"
 }

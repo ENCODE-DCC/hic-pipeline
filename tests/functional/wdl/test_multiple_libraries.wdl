@@ -5,7 +5,7 @@ import "../../../hic.wdl" as hic
 workflow test_multiple_libraries {
     input {
         Array[Array[Array[File]]] fastq
-        String restriction_enzyme
+        Array[String] restriction_enzymes
         String assembly_name
         File restriction_sites
         File chrsz
@@ -17,7 +17,7 @@ workflow test_multiple_libraries {
         chrsz = chrsz,
         restriction_sites = restriction_sites,
         reference_index = reference_index,
-        restriction_enzyme = restriction_enzyme,
+        restriction_enzymes = restriction_enzymes,
         assembly_name = assembly_name,
         no_call_loops = true,
         no_call_tads = true,
