@@ -10,8 +10,4 @@ workflow test_get_ligation_site_regex {
     call hic.get_ligation_site_regex as get_ligation_site_regex { input:
         restriction_enzymes = restriction_enzymes,
     }
-
-    output {
-        File ligation_site_regex = get_ligation_site_regex.ligation_site_regex_file
-    }
 }
