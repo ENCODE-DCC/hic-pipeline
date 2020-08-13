@@ -37,7 +37,7 @@ def get_ligation_site_regex(enzymes):
                 )
             )
         sites.append(site)
-    sites = list(set(sites))
+    sites = sorted(list(set(sites)))
     if len(sites) == 1:
         return sites[0]
     return "({})".format("|".join(sites))
