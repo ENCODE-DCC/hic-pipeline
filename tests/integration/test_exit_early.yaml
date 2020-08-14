@@ -6,4 +6,6 @@
       tests/caper_run.sh
       tests/integration/wdl/test_exit_early.wdl
       tests/integration/json/test_exit_early.json
-    exit_code: 1
+    stdout:
+      contains:
+        - workflow finished with status 'Failed'
