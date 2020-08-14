@@ -20,6 +20,8 @@
     ]
   ],
   "test_multiple_libraries.reference_index": "tests/data/ce10_selected.tar.gz",
-  "test_multiple_libraries.restriction_enzyme": "MboI",
+  "test_multiple_libraries.restriction_enzymes": [
+    "MboI"
+  ],
   "test_multiple_libraries.restriction_sites": "tests/data/ce10_selected_MboI.txt"
 }

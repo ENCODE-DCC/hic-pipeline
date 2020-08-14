@@ -1,0 +1,12 @@
+---
+  - name: test_get_ligation_site_regex
+    tags:
+      - integration
+    command: >-
+      tests/caper_run.sh
+      tests/integration/wdl/test_get_ligation_site_regex.wdl
+      tests/integration/json/test_get_ligation_site_regex.json
+    files:
+      - path: test-output/ligation_site_regex.txt
+        # Corrsponds to file contents "GATCGATC" with no newline (MboI as input)
+        md5sum: ef01fdc5f380481569eb70dc1ca66275

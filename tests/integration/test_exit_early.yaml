@@ -1,0 +1,11 @@
+---
+  - name: test_exit_early
+    tags:
+      - integration
+    command: >-
+      tests/caper_run.sh
+      tests/integration/wdl/test_exit_early.wdl
+      tests/integration/json/test_exit_early.json
+    stdout:
+      contains:
+        - workflow finished with status 'Failed'

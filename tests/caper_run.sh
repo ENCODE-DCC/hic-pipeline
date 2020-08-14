@@ -23,3 +23,7 @@ INPUT=$2
 echo "Running caper with WDL ${WDL}, input ${INPUT}, and image ${HIC_DOCKER_IMAGE_TAG}"
 
 caper run "${WDL}" -i "${INPUT}" --docker "${HIC_DOCKER_IMAGE_TAG}" -o ./tests/pytest_workflow_options.json
+
+if [[ -f "cromwell.out" ]]; then
+    cat cromwell.out
+fi

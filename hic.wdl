@@ -8,7 +8,7 @@ workflow hic {
     input {
         # Main entrypoint, need to specify all five of these values when running from fastqs
         Array[Array[Array[File]]] fastq = []
-        String restriction_enzyme
+        Array[String] restriction_enzymes
         File? restriction_sites
         File? chrsz
         File? reference_index
@@ -36,14 +36,13 @@ workflow hic {
         Boolean no_call_loops = false
         Boolean no_call_tads = false
         Boolean include_mapq0_reads = false
-        Array[String]? input_ligation_junctions
         Int cpu = 32
         String? assembly_name
     }
 
     parameter_meta {
         fastq: "Twice nested array of input fastqs, takes form of [lib_id][fastq_id][read_end_id]"
-        restriction_enzyme: "The name of the restriction enzyme used to generate the Hi-C libraries"
+        restriction_enzyme: "An array of names containing the restriction enzyme(s) used to generate the Hi-C libraries"
         restriction_sites: "A text file containing cut sites for the given restriction enzyme. You should generate this file using this script: https://github.com/aidenlab/juicer/blob/encode/misc/generate_site_positions.py"
         chrsz: "A chromosome sizes file for the desired assembly, this is a tab-separated text file whose rows take the form [chromosome] [size]"
         reference_index: "A pregenerated BWA index for the desired assembly"
@@ -54,7 +53,6 @@ workflow hic {
         input_dedup_pairs: "An optional array consisting of text files of paired fragments, one per library, same format as input_pairs, used for merging libraries"
         alignment_stats: "An optional array consisting of text files of alignment stats, one per library, only has meaning when used in combination with `input_dedup_pairs`. Use is recommended but not required when merging libraries in order to calculate quality metrics on the merged libraries."
         library_stats: "An optional array consisting of text files of library stats, one per library, only has meaning when used in combination with `input_dedup_pairs`. Use is recommended but not required when merging libraries in order to calculate quality metrics on the merged libraries."
-        input_ligation_junctions: "An array of ligation sites, useful for megamaps"
         reference_fasta: "FASTA file for the genome of interest to be used for generating restriction site locations. For the output locations file to have a descriptive filename it is also recommended to specify the `assembly_name`. Has no use if a pregenerated restriction site locations file is provided."
         restriction_site_locations_only: "If `true`, then will only generate the restriction site locations file."
         no_bam2pairs: "If set to `true`, avoid generating .pairs files, defaults to false"
@@ -65,34 +63,34 @@ workflow hic {
         assembly_name: "Name of assembly to insert into hic file header, recommended to specify for reproducbility otherwise hic file will be nondeterministic"
     }
 
-    # Pipeline internal "global" variables: do not specify as input
-    # These ligation junctions are consistent with mega.sh
-    Map[String, String] RESTRICTION_ENZYME_TO_SITE = {
-        "HindIII": "AAGCTAGCTT",
-        "DpnII": "GATCGATC",
-        "MboI": "GATCGATC",
-    }
-
     # Default MAPQ thresholds for generating .hic contact maps
     Array[String] DEFAULT_HIC_QUALITIES = ["1", "30"]
 
-    # Determine ligation site from enzyme name
-    String ligation_site = RESTRICTION_ENZYME_TO_SITE[restriction_enzyme]
-    # Prepare array of restriction sites for megamap
-    Array[String] ligation_junctions = select_first([input_ligation_junctions, [ligation_site]])
+    if (length(restriction_enzymes) > 1 && !defined(restriction_sites)) {
+        call exit_early { input:
+            message = "To use multiple restriction enzymes you must generate the restriction sites file manually"
+        }
+    }
 
-    if (defined(reference_fasta) && !defined(restriction_sites)) {
+    call get_ligation_site_regex { input:
+        restriction_enzymes = restriction_enzymes
+    }
+
+    String ligation_site = get_ligation_site_regex.ligation_site_regex
+
+    # make_restriction_site_locations currently supports only supports one enzyme
+    if (defined(reference_fasta) && !defined(restriction_sites) && length(restriction_enzymes) == 1) {
         call make_restriction_site_locations { input:
             reference_fasta = select_first([reference_fasta]),
             assembly_name = select_first([assembly_name, "unknown_assembly"]),
-            restriction_enzyme = restriction_enzyme,
+            restriction_enzyme = restriction_enzymes[0],
         }
     }
 
     Boolean has_restriction_sites = defined(restriction_sites) || defined(make_restriction_site_locations.restriction_site_locations)
 
     # scatter over libraries
-    if (has_restriction_sites && defined(chrsz)) {
+    if (has_restriction_sites && defined(chrsz) && !restriction_site_locations_only) {
         File chrsz_ = select_first([chrsz])
         File restriction_sites_ = if defined(restriction_sites) then select_first([restriction_sites]) else select_first([make_restriction_site_locations.restriction_site_locations])
         Int num_bioreps = if defined(bams) then length(select_first([bams])) else length(fastq)
@@ -119,7 +117,8 @@ workflow hic {
                 call fragment { input:
                     bam_file = rep_bam_files[j],
                     norm_res_input = rep_ligation_counts[j],
-                    restriction = restriction_sites_
+                    restriction = restriction_sites_,
+                    include_mapq0_reads = include_mapq0_reads,
                 }
             }
 
@@ -183,7 +182,7 @@ workflow hic {
             call create_hic { input:
                 pairs_file = select_first([input_pairs, merge_pairs_file.out_file]),
                 restriction_sites = if defined(restriction_sites) then select_first([restriction_sites]) else select_first([make_restriction_site_locations.restriction_site_locations]),
-                ligation_junctions = ligation_junctions,
+                ligation_site = ligation_site,
                 chrsz_ = select_first([chrsz]),
                 quality = qualities[i],
                 assembly_name = assembly_name
@@ -233,6 +232,32 @@ task make_restriction_site_locations {
 
     output {
         File restriction_site_locations = "~{assembly_name}_~{restriction_enzyme}.txt.gz"
+    }
+}
+
+task get_ligation_site_regex {
+    input {
+        Array[String] restriction_enzymes
+    }
+
+    String output_path = "ligation_site_regex.txt"
+
+    command <<<
+        set -euo pipefail
+        python3 "$(which get_ligation_site_regex.py)" \
+            --enzymes ~{sep=" " restriction_enzymes} \
+            --outfile ~{output_path}
+    >>>
+
+    output {
+        String ligation_site_regex = read_string("~{output_path}")
+        # Surface the original file for testing purposes
+        File ligation_site_regex_file = "~{output_path}"
+    }
+
+    runtime {
+        cpu : "1"
+        memory: "500 MB"
     }
 }
 
@@ -507,7 +532,7 @@ task merge_stats {
 
 task create_hic {
     input {
-        Array[String] ligation_junctions
+        String ligation_site
         File pairs_file
         File chrsz_
         File restriction_sites
@@ -519,7 +544,7 @@ task create_hic {
         set -euo pipefail
         MERGED_PAIRS_FILE=merged_pairs.txt
         gzip -dc ~{pairs_file} > $MERGED_PAIRS_FILE
-        statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l ${sep=' ' ligation_junctions} $MERGED_PAIRS_FILE
+        statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l ${ligation_site} $MERGED_PAIRS_FILE
         # If the assembly name is empty, then we write chrsz path into file as usual, otherwise, use the assembly name instead of the path
         juicer_tools pre \
             -s stats_${quality}.txt \
@@ -587,4 +612,17 @@ task hiccups{
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
     }
+}
+
+
+task exit_early {
+    input {
+        String message
+    }
+
+    command <<<
+        set -euo pipefail
+        echo ~{message}
+        exit 1
+    >>>
 }

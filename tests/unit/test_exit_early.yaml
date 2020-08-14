@@ -1,0 +1,11 @@
+---
+  - name: test_exit_early_unit
+    tags:
+      - unit
+    command: >-
+      tests/caper_run.sh
+      tests/unit/wdl/test_exit_early.wdl
+      tests/unit/json/test_exit_early.json
+    stdout:
+      contains:
+        - hello

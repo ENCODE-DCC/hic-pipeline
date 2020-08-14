@@ -42,7 +42,7 @@ Let us take a close look at the following template JSON. Comments are not allowe
     "hic.reference_index": "tests/data/ce10_selected.tar.gz",
 
     ////////// 5) Ligation site sequence //////////
-    "hic.restriction_enzyme": "MboI"
+    "hic.restriction_enzymes": ["MboI"]
 
 }
 ```

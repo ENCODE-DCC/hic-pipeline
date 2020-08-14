@@ -1,0 +1,11 @@
+---
+  - name: test_get_ligation_site_regex_unit
+    tags:
+      - unit
+    command: >-
+      tests/caper_run.sh
+      tests/unit/wdl/test_get_ligation_site_regex.wdl
+      tests/unit/json/test_get_ligation_site_regex.json
+    stdout:
+      contains:
+        - --enzymes foo bar

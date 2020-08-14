@@ -15,6 +15,8 @@
   ],
   "hic.no_call_loops": true,
   "hic.no_call_tads": true,
-  "hic.restriction_enzyme": "MboI",
+  "hic.restriction_enzymes": [
+    "MboI"
+  ],
   "hic.restriction_sites": "tests/data/ce10_selected_MboI.txt"
 }

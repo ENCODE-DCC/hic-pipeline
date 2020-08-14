@@ -6,7 +6,7 @@ workflow test_hic {
     input {
         Array[Array[Array[File]]] fastq
         String assembly_name
-        String restriction_enzyme
+        Array[String] restriction_enzymes
         File restriction_sites
         File chrsz
         File reference_index
@@ -14,7 +14,7 @@ workflow test_hic {
 
     call hic.hic { input:
         fastq = fastq,
-        restriction_enzyme = restriction_enzyme,
+        restriction_enzymes = restriction_enzymes,
         restriction_sites = restriction_sites,
         reference_index = reference_index,
         chrsz = chrsz,

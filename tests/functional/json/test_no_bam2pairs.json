@@ -13,6 +13,8 @@
   "test_no_bam2pairs.no_call_loops": true,
   "test_no_bam2pairs.no_call_tads": true,
   "test_no_bam2pairs.reference_index": "tests/data/ce10_selected.tar.gz",
-  "test_no_bam2pairs.restriction_enzyme": "MboI",
+  "test_no_bam2pairs.restriction_enzymes": [
+    "MboI"
+  ],
   "test_no_bam2pairs.restriction_sites": "tests/data/ce10_selected_MboI.txt"
 }
