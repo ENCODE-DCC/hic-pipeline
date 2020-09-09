@@ -459,6 +459,7 @@ task dedup {
     runtime {
         cpu : "8"
         disks: "local-disk 1000 HDD"
+        memory: "16 GB"
     }
 }
 
