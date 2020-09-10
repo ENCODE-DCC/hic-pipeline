@@ -311,6 +311,8 @@ task fragment {
         File norm_res_input
         File restriction    # restriction enzyme sites in the reference genome
         Boolean include_mapq0_reads = false
+        Int ram_gb = 16
+        Float ram_pct = 0.9
     }
 
     command {
@@ -344,7 +346,7 @@ task fragment {
         ##restriction used to be site_file
 
         # sort by chromosome, fragment, strand, and position
-        sort -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 90% result_frag.txt > sort.txt
+        sort -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S "~{round(ram_pct * ram_gb)}G" result_frag.txt > sort.txt
         gzip -n sort.txt
     }
 
@@ -361,7 +363,7 @@ task fragment {
     runtime {
         cpu : "1"
         disks: "local-disk 1000 HDD"
-        memory: "16 GB"
+        memory: "~{ram_gb} GB"
     }
 }
 
@@ -389,6 +391,8 @@ task merge {
 task merge_sort {
     input {
         Array[File] sort_files_
+        Int ram_gb = 16
+        Float ram_pct = 0.9
     }
 
     command <<<
@@ -399,7 +403,7 @@ task merge_sort {
         for i in ~{sep=' ' sort_files_}; do mv $i "${SORT_FILES}/sort_${RANDOM}.txt.gz"; done
         # Task test doesn't pass consistently without force option -f due to symlinking
         gzip -df "${SORT_FILES}"/*
-        sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S 90% "${SORT_FILES}"/* > merged_sort.txt
+        sort -m -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S "~{round(ram_pct * ram_gb)}G" "${SORT_FILES}"/* > merged_sort.txt
         gzip -n merged_sort.txt
     >>>
 
@@ -410,7 +414,7 @@ task merge_sort {
     runtime {
         cpu : "8"
         disks: "local-disk 1000 HDD"
-        memory: "16 GB"
+        memory: "~{ram_gb} GB"
     }
 }
 
@@ -489,6 +493,8 @@ task bam2pairs {
 task merge_pairs_file {
     input {
         Array[File] not_merged_pe
+        Int ram_gb = 16
+        Float ram_pct = 0.9
     }
 
     command <<<
@@ -497,7 +503,7 @@ task merge_pairs_file {
         mkdir "${NOT_MERGED_PE_FILES}"
         for i in ~{sep=' ' not_merged_pe}; do mv $i "${NOT_MERGED_PE_FILES}/merged_nodups_${RANDOM}.txt.gz"; done
         gzip -df "${NOT_MERGED_PE_FILES}"/*
-        sort -m -k2,2d -k6,6d --parallel=8 -S 10% "${NOT_MERGED_PE_FILES}"/* > merged_pairs.txt
+        sort -m -k2,2d -k6,6d --parallel=8 -S "~{round(ram_pct * ram_gb)}G" "${NOT_MERGED_PE_FILES}"/* > merged_pairs.txt
         gzip -n merged_pairs.txt
     >>>
 
@@ -508,6 +514,7 @@ task merge_pairs_file {
     runtime {
         cpu : "8"
         disks: "local-disk 1000 HDD"
+        memory: "~{ram_gb} GB"
     }
 }
 
