@@ -8,5 +8,5 @@
       tests/unit/json/test_add_read_group_to_bam.json
     stdout:
       contains:
-        - -r foo
-        - --threads 41
+        - -r "foo"
+        - --threads "41"
