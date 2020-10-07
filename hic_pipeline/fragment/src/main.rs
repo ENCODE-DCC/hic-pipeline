@@ -45,6 +45,7 @@ fn process_site_file_line(
     let values: Vec<i64> = split_line.map(|x| x.parse::<i64>().unwrap()).collect();
     // I have no idea why 14 is special cased, doesn't apply to human chrom sizes files
     if chr == "14" {
+        sites_by_chr.insert(chr.to_string(), values.clone());
         sites_by_chr.insert(
             format!("{}{}", chr, "m"),
             // Can't use values twice, so need to copy
@@ -140,7 +141,8 @@ mod test {
         let line = Ok("14 1 2".to_string());
         process_site_file_line(&mut sites_by_chr, &line);
         assert_eq!(sites_by_chr["14m"], [1, 2]);
-        assert_eq!(sites_by_chr["14p"], [1, 2])
+        assert_eq!(sites_by_chr["14p"], [1, 2]);
+        assert_eq!(sites_by_chr["14"], [1, 2]);
     }
 
     #[test]
