@@ -9,6 +9,8 @@
       ]
     ]
   ],
+  "hic.no_call_loops": true,
+  "hic.no_call_tads": true,
   "hic.read_groups": [
     [
       "ID:foo"
