@@ -219,6 +219,7 @@ workflow hic {
         Array[File]? library_complexity_stats_json = dedup.library_complexity_json
         Array[File]? stats = dedup.stats_json
         Array[Array[File]]? alignment_stats_ = fragment.alignment_stats
+        Array[Array[File?]?]? bams_with_read_group = add_read_group_to_bam.bam_with_read_group
         File? merged_stats = merge_stats_from_library_entrypoint.merged_stats
         File? merged_stats_json = merge_stats_from_library_entrypoint.merged_stats_json
         File? out_hic_1 = if defined(create_hic.inter) then select_first([create_hic.inter])[0] else input_hic
