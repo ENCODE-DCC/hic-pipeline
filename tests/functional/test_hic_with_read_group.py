@@ -4,13 +4,9 @@ import pysam
 import pytest
 
 
-@pytest.fixture
-def bam_path(workflow_dir):
-    return workflow_dir / Path("test-output/with_read_group.bam")
-
-
 @pytest.mark.workflow("test_hic_with_read_group")
-def test_read_group_added_to_bam_header(workflow_dir, bam_path):
+def test_read_group_added_to_bam_header(workflow_dir):
+    bam_path = workflow_dir / Path("test-output/with_read_group.bam")
     with pysam.AlignmentFile(str(bam_path)) as bam:
         assert bam.header.get("RG")[0]["ID"] == "foo"
 
