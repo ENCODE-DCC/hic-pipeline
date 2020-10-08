@@ -1,0 +1,24 @@
+{
+  "test_hic.assembly_name": "ce10",
+  "test_hic.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
+  "test_hic.fastq": [
+    [
+      [
+        "tests/data/merged_read1.fastq.gz",
+        "tests/data/merged_read2.fastq.gz"
+      ]
+    ]
+  ],
+  "test_hic.read_groups": [
+    [
+      [
+        "ID:foo"
+      ]
+    ]
+  ],
+  "test_hic.reference_index": "tests/data/ce10_selected.tar.gz",
+  "test_hic.restriction_enzymes": [
+    "MboI"
+  ],
+  "test_hic.restriction_sites": "tests/data/ce10_selected_MboI.txt"
+}
