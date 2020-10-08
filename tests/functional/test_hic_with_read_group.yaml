@@ -19,6 +19,6 @@
       - path: test-output/library_complexity.json
         md5sum: 64ed2a3f04117f1ee2392ba9ea072f3c
       - path: test-output/merged_nodups.txt.gz
-        md5sum: fa81df09bc8ffcb3b96758295b8761c6
+        md5sum: f94ce837695062ab0a157b5ee935d4f1
       - path: test-output/stats.json
         md5sum: 269844316f24280db0fc502bfebda2aa

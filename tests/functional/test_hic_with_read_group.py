@@ -16,9 +16,10 @@ def test_read_group_added_to_bam_header(workflow_dir, bam_path):
 
 
 @pytest.mark.workflow("test_hic_with_read_group")
-def test_hic_with_read_group_alignable_bam_match(workflow_dir, bam_path, bam_md5):
+def test_hic_with_read_group_alignable_bam_match(workflow_dir, bam_md5):
+    bam_path = workflow_dir / Path("test-output/result_alignable_dedup.bam")
     bam_md5sum = bam_md5(bam_path)
-    assert bam_md5sum == "8cb6f293859775fdee81a51c73f51c1e"
+    assert bam_md5sum == "0bc6522586908f128d0f24a4dafe4065"
 
 
 @pytest.mark.workflow("test_hic_with_read_group")
