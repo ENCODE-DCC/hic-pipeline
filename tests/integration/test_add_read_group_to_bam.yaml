@@ -1,0 +1,10 @@
+---
+  - name: test_add_read_group_to_bam
+    tags:
+      - integration
+    command: >-
+      tests/caper_run.sh
+      tests/integration/wdl/test_add_read_group_to_bam.wdl
+      tests/integration/json/test_add_read_group_to_bam.json
+    files:
+      - path: test-output/with_read_group.bam

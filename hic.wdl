@@ -8,6 +8,7 @@ workflow hic {
     input {
         # Main entrypoint, need to specify all five of these values when running from fastqs
         Array[Array[Array[File]]] fastq = []
+        Array[Array[String]] read_groups = []
         Array[String] restriction_enzymes
         File? restriction_sites
         File? chrsz
@@ -42,6 +43,7 @@ workflow hic {
 
     parameter_meta {
         fastq: "Twice nested array of input fastqs, takes form of [lib_id][fastq_id][read_end_id]"
+        read_groups: "Optional strings to be inserted into the BAM as the read group (@RG), passed via `samtools addreplacerg` `-r` option. One per SE read/read pair with nested array structure mirroring the `fastq` input"
         restriction_enzyme: "An array of names containing the restriction enzyme(s) used to generate the Hi-C libraries"
         restriction_sites: "A text file containing cut sites for the given restriction enzyme. You should generate this file using this script: https://github.com/aidenlab/juicer/blob/encode/misc/generate_site_positions.py"
         chrsz: "A chromosome sizes file for the desired assembly, this is a tab-separated text file whose rows take the form [chromosome] [size]"
@@ -106,10 +108,17 @@ workflow hic {
                         ligation_site = ligation_site,
                         cpu = cpu,
                     }
+                    if (length(read_groups) > 0) {
+                        call add_read_group_to_bam { input:
+                            bam = align.result,
+                            read_group = read_groups[i][j],
+                        }
+                    }
                 }
+                Array[File] aligned_bams = select_all(if length(read_groups) > 0 then add_read_group_to_bam.bam_with_read_group else align.result)
             }
 
-            Array[File] rep_bam_files = if defined(bams) then select_first([bams])[i] else select_first([align.result])
+            Array[File] rep_bam_files = if defined(bams) then select_first([bams])[i] else select_first([aligned_bams])
             Array[File] rep_ligation_counts = if defined(ligation_counts) then select_first([ligation_counts])[i] else select_first([align.norm_res])
 
             # Scatter across all the bams in the biorep (one per tech rep)
@@ -210,6 +219,7 @@ workflow hic {
         Array[File]? library_complexity_stats_json = dedup.library_complexity_json
         Array[File]? stats = dedup.stats_json
         Array[Array[File]]? alignment_stats_ = fragment.alignment_stats
+        Array[Array[File?]?]? bams_with_read_group = add_read_group_to_bam.bam_with_read_group
         File? merged_stats = merge_stats_from_library_entrypoint.merged_stats
         File? merged_stats_json = merge_stats_from_library_entrypoint.merged_stats_json
         File? out_hic_1 = if defined(create_hic.inter) then select_first([create_hic.inter])[0] else input_hic
@@ -301,6 +311,28 @@ task align {
     runtime {
         cpu : "32"
         memory: "64 GB"
+        disks: "local-disk 1000 HDD"
+    }
+}
+
+task add_read_group_to_bam {
+    input {
+        File bam
+        String read_group
+        Int? num_cpus = 8
+    }
+
+    command {
+        samtools addreplacerg -r "~{read_group}" -o with_read_group.bam --threads "~{num_cpus - 1}" "~{bam}"
+    }
+
+    output {
+        File bam_with_read_group = "with_read_group.bam"
+    }
+
+    runtime {
+        cpu : "~{num_cpus}"
+        memory: "32 GB"
         disks: "local-disk 1000 HDD"
     }
 }

@@ -1,0 +1,5 @@
+{
+  "test_add_read_group_to_bam.bam": "tests/data/result.bam",
+  "test_add_read_group_to_bam.num_cpus": 1,
+  "test_add_read_group_to_bam.read_group": "ID:foo\tDS:cool"
+}
