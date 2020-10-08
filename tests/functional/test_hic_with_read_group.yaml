@@ -1,11 +1,11 @@
 ---
-  - name: test_hic
+  - name: test_hic_with_read_group
     tags:
       - functional
     command: >-
       tests/caper_run.sh
-      tests/functional/wdl/test_hic.wdl
-      tests/functional/json/test_hic.json
+      hic.wdl
+      tests/functional/json/test_hic_with_read_group.json
     files:
       - path: test-output/with_read_group.bam
       - path: test-output/result_alignable_dedup.bam
