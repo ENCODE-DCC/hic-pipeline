@@ -2,11 +2,6 @@
   "test_create_hic.assembly_name": "ce10",
   "test_create_hic.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
   "test_create_hic.ligation_site": "GATCGATC",
-  "test_create_hic.normalization_methods": [
-    "VC",
-    "VC_SQRT",
-    "KR"
-  ],
   "test_create_hic.pairs_file": "tests/data/merged_nodups.txt.gz",
   "test_create_hic.restriction_sites": "tests/data/ce10_selected_MboI.txt"
 }

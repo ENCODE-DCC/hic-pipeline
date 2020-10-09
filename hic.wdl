@@ -9,13 +9,15 @@ workflow hic {
     }
 
     input {
-        # Main entrypoint, need to specify all five of these values when running from fastqs
+        # Main entrypoint, need to specify all five of these values except read_groups when running from fastqs
         Array[Array[Array[File]]] fastq = []
         Array[Array[String]] read_groups = []
         Array[String] restriction_enzymes
         File? restriction_sites
         File? chrsz
         File? reference_index
+
+        Array[String] normalization_methods = []
 
         # Entrypoint from aligned bam
         Array[Array[File]]? bams
@@ -51,6 +53,7 @@ workflow hic {
         restriction_sites: "A text file containing cut sites for the given restriction enzyme. You should generate this file using this script: https://github.com/aidenlab/juicer/blob/encode/misc/generate_site_positions.py"
         chrsz: "A chromosome sizes file for the desired assembly, this is a tab-separated text file whose rows take the form [chromosome] [size]"
         reference_index: "A pregenerated BWA index for the desired assembly"
+        normalization_methods: "An array of normalization methods to use for .hic file generation as per Juicer Tools `pre`, if not specified then will use `pre` defaults of VC, VC_SQRT, KR, and SCALE. Valid methods are VC, VC_SQRT, KR, SCALE, GW_KR, GW_SCALE, GW_VC, INTER_KR, INTER_SCALE, and INTER_VC."
         bams: "Aligned, unfiltered bams, organized by [biorep[techrep]]. If specified, the `ligation_counts` array must also be specified"
         ligation_counts: "Text files containing ligation counts for the fastq pair, organized by [biorep[techrep]]. Has no meaning if the `bams` array is not also be specified. These should be calculated from fastqs using the Juicer countligations script: https://github.com/aidenlab/juicer/blob/encode/CPU/common/countligations.sh"
         input_pairs: "A text file containing the paired fragments to use to generate the .hic contact maps, a detailed format description can be found here: https://github.com/aidenlab/juicer/wiki/Pre#long-format"
@@ -197,7 +200,8 @@ workflow hic {
                 ligation_site = ligation_site,
                 chrsz_ = select_first([chrsz]),
                 quality = qualities[i],
-                assembly_name = assembly_name
+                assembly_name = assembly_name,
+                normalization_methods = normalization_methods,
             }
         }
     }

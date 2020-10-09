@@ -9,7 +9,6 @@ workflow test_create_hic {
         File restriction_sites
         File chrsz
         String assembly_name
-        Array[String] normalization_methods
     }
 
     call hic.create_hic as test_create_hic_task { input:
@@ -19,7 +18,6 @@ workflow test_create_hic {
         chrsz_ = chrsz,
         quality = "30",
         assembly_name = assembly_name,
-        normalization_methods = normalization_methods,
     }
 
     output {
