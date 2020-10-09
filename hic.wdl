@@ -593,6 +593,7 @@ task create_hic {
         File chrsz_
         File restriction_sites
         String quality
+        Array[String] normalization_methods = []
         String? assembly_name
     }
 
@@ -607,6 +608,7 @@ task create_hic {
             -g stats_${quality}_hists.m \
             -q ${quality} \
             ~{if defined(assembly_name) then "-y " + assembly_name else ""} \
+            ~{if length(normalization_methods) > 0 then "-k" else ""} ~{sep="," normalization_methods} \
             $MERGED_PAIRS_FILE \
             inter_${quality}.hic \
             ${chrsz_}

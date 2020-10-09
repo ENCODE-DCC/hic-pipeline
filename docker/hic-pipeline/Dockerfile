@@ -5,7 +5,6 @@ LABEL maintainer.email "encode-help@lists.stanford.edu"
 
 # Package versions
 ENV BWA_VERSION=0.7.17
-ENV JUICER_TOOLS_VERSION=1.11.09_jcuda.0.8
 ENV PAIRIX_VERSION=0.3.6
 ENV SAMTOOLS_VERSION=1.6
 
@@ -70,6 +69,7 @@ RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     find -mindepth 1 -maxdepth 1  -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
 
 # Install Juicer tools
+ENV JUICER_TOOLS_VERSION=1.22.01
 RUN curl -L "http://s3.amazonaws.com/hicfiles.tc4ga.com/public/juicer/juicer_tools_${JUICER_TOOLS_VERSION}.jar" -o /opt/juicer/CPU/common/juicer_tools.jar && \
     chmod 666 /opt/juicer/CPU/common/juicer_tools.jar && \
     ln -s juicer/CPU scripts
