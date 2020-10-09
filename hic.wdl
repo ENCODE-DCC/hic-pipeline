@@ -13,6 +13,7 @@ workflow hic {
         Array[Array[Array[File]]] fastq = []
         Array[Array[String]] read_groups = []
         Array[String] restriction_enzymes
+        String? ligation_site_regex
         File? restriction_sites
         File? chrsz
         File? reference_index
@@ -50,6 +51,7 @@ workflow hic {
         read_groups: "Optional strings to be inserted into the BAM as the read group (@RG), passed via `samtools addreplacerg` `-r` option. One per SE read/read pair with nested array structure mirroring the `fastq` input"
         restriction_enzyme: "An array of names containing the restriction enzyme(s) used to generate the Hi-C libraries"
         restriction_sites: "A text file containing cut sites for the given restriction enzyme. You should generate this file using this script: https://github.com/aidenlab/juicer/blob/encode/misc/generate_site_positions.py"
+        ligation_site_regex: "A custom regex to use for counting ligation site, if specified then restriction_sites file must be manually specified. Can be just a single site, e.g. ATGC, or several sites wrapped in parentheses and separated by pipes, e.g. `(ATGC|CTAG)`"
         chrsz: "A chromosome sizes file for the desired assembly, this is a tab-separated text file whose rows take the form [chromosome] [size]"
         reference_index: "A pregenerated BWA index for the desired assembly"
         normalization_methods: "An array of normalization methods to use for .hic file generation as per Juicer Tools `pre`, if not specified then will use `pre` defaults of VC, VC_SQRT, KR, and SCALE. Valid methods are VC, VC_SQRT, KR, SCALE, GW_KR, GW_SCALE, GW_VC, INTER_KR, INTER_SCALE, and INTER_VC."
@@ -79,11 +81,13 @@ workflow hic {
         }
     }
 
-    call get_ligation_site_regex { input:
-        restriction_enzymes = restriction_enzymes
+    if (!defined(ligation_site_regex)) {
+        call get_ligation_site_regex { input:
+            restriction_enzymes = restriction_enzymes
+        }
     }
 
-    String ligation_site = get_ligation_site_regex.ligation_site_regex
+    String ligation_site = if defined(ligation_site_regex) then select_first([ligation_site_regex]) else select_first([get_ligation_site_regex.ligation_site_regex])
 
     # make_restriction_site_locations currently supports only supports one enzyme
     if (defined(reference_fasta) && !defined(restriction_sites) && length(restriction_enzymes) == 1) {
