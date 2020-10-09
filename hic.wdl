@@ -293,7 +293,7 @@ task align {
 
         usegzip=1
         curr_ostem="result"
-        ligation=${ligation_site}
+        ligation="${ligation_site}"
         file1=${fastqs[0]}
         file2=${fastqs[1]}
         #count ligations
@@ -471,7 +471,7 @@ task dedup {
         unique=$(wc -l merged_nodups.txt | awk '{print $1}')
         opt=$(wc -l optdups.txt | awk '{print $1}')
         java -jar -Ddevelopment=false /opt/scripts/common/juicer_tools.jar LibraryComplexity $unique $pcr $opt > library_complexity.txt
-        /opt/scripts/common/statistics.pl -s ~{restriction_sites} -l ~{ligation_site} merged_nodups.txt
+        /opt/scripts/common/statistics.pl -s ~{restriction_sites} -l "~{ligation_site}" merged_nodups.txt
         python3 $(which jsonify_stats.py) --library-complexity library_complexity.txt
         python3 $(which jsonify_stats.py) --library-stats stats.txt
         awk '{split($(NF-1), a, "$"); split($NF, b, "$"); print a[3],b[3] > a[2]"_dedup"}' merged_nodups.txt
@@ -584,7 +584,7 @@ task create_hic {
         set -euo pipefail
         MERGED_PAIRS_FILE=merged_pairs.txt
         gzip -dc ~{pairs_file} > $MERGED_PAIRS_FILE
-        statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l ${ligation_site} $MERGED_PAIRS_FILE
+        statistics.pl -q ${quality} -o stats_${quality}.txt -s ${restriction_sites} -l "${ligation_site}" $MERGED_PAIRS_FILE
         # If the assembly name is empty, then we write chrsz path into file as usual, otherwise, use the assembly name instead of the path
         juicer_tools pre \
             -s stats_${quality}.txt \

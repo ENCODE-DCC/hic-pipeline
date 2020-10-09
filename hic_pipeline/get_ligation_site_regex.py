@@ -5,6 +5,7 @@ RESTRICTION_ENZYME_TO_SITE = {
     "HindIII": "AAGCTAGCTT",
     "DpnII": "GATCGATC",
     "MboI": "GATCGATC",
+    "none": "XXXX",
 }
 
 
@@ -14,6 +15,7 @@ def get_parser():
         "--enzymes",
         required=True,
         nargs="+",
+        choices=list(RESTRICTION_ENZYME_TO_SITE.keys()),
         help="The names of retriction enzymes to use to generate the regex",
     )
     parser.add_argument(
@@ -27,16 +29,15 @@ def get_parser():
 
 
 def get_ligation_site_regex(enzymes):
-    sites = []
-    for enzyme in enzymes:
-        site = RESTRICTION_ENZYME_TO_SITE.get(enzyme)
-        if site is None:
-            raise ValueError(
-                "Restriction enzyme not recognized, valid options are {}".format(
-                    list(RESTRICTION_ENZYME_TO_SITE.keys())
-                )
-            )
-        sites.append(site)
+    """
+    If only one enzyme is inputted, then will return a single ligation site with no
+    pipe (`|`), otherwise will return a regex suitable for use with `grep -E` containing
+    the sites separated by pipes and surrounded in parentheses, e.g. `(AT|GC)`.
+
+    The sites are already checked to be in the dict by the argument parser. We need to
+    sort the list so the regex is the same if the list is shuffled.
+    """
+    sites = [RESTRICTION_ENZYME_TO_SITE[enzyme] for enzyme in enzymes]
     sites = sorted(list(set(sites)))
     if len(sites) == 1:
         return sites[0]
