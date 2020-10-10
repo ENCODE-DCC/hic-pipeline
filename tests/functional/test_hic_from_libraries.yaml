@@ -8,9 +8,9 @@
       tests/functional/json/test_hic_from_libraries.json
     files:
       - path: test-output/glob-6a31d38462145ec363d0f357468a1d26/inter_1.hic
-        md5sum: d904d75bb7c83b947ed3fa69bd0fbbd7
+        md5sum: 8c320296a00e08012a02c81863dd7f49
       - path: test-output/glob-6a31d38462145ec363d0f357468a1d26/inter_30.hic
-        md5sum: 68712c507ffe66f630672a0968219080
+        md5sum: a2ab2ce4f5bb1ba319af6d4831af62ef
       - path: test-output/merged_stats.json
         md5sum: 649bcda18c289776802def2f023cc065
       - path: test-output/merged_stats.txt
