@@ -17,8 +17,6 @@ workflow hic {
         File? chrsz
         File? reference_index
 
-        Array[String] normalization_methods = []
-
         # Entrypoint from aligned bam
         Array[Array[File]]? bams
         Array[Array[File]]? ligation_counts
@@ -38,6 +36,7 @@ workflow hic {
         File? reference_fasta
         Boolean restriction_site_locations_only = false
 
+        Array[String] normalization_methods = []
         Boolean no_bam2pairs = false
         Boolean no_call_loops = false
         Boolean no_call_tads = false
