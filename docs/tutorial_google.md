@@ -47,7 +47,7 @@ All testing data is included in the repository. You won't have to download any d
     $ INPUT=examples/google_template.json
     $ PIPELINE_METADATA=metadata.json
 
-    $ caper run run workflow/main_workflow/hic.wdl --use-docker -b gcp --gcp-prj ${PROJECT} --tmp-gcs-bucket ${BUCKET} --out-gcs-bucket ${BUCKET} -i ${INPUT} -o workflow_opts/docker.json -m ${PIPELINE_METADATA}
+    $ caper run run workflow/main_workflow/hic.wdl --use-docker -b gcp --gcp-prj ${PROJECT} --tmp-gcs-bucket ${BUCKET} --out-gcs-bucket ${BUCKET} -i ${INPUT} -m ${PIPELINE_METADATA}
     ```
 
 13. You will be able to find all outputs on your Google Cloud bucket. `gs://[YOUR_BUCKET_NAME] cromwell-executions/hic/[RANDOM_HASH_STRING]/`. See [output directory structure](output.md) for details.
