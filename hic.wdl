@@ -666,10 +666,13 @@ task hiccups{
     }
 
     runtime {
+        cpu : "1"
         bootDiskSizeGb: "20"
+        disks: "local-disk 100 SSD"
         docker: "encodedcc/hic-pipeline:0.1.0_hiccups"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
+        memory: "8 GB"
     }
 }
 
