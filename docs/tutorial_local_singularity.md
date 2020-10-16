@@ -6,7 +6,7 @@
     $ cd hic-pipeline
     ```
 
-2. Install [Caper](https://github.com/ENCODE-DCC/caper), requires Python > 3.4.1
+2. Install [Caper](https://github.com/ENCODE-DCC/caper), requires Python >= 3.6. Caper >= 0.8.2.1 is required to run the pipeline.
     ```bash
     $ pip install caper
     ```

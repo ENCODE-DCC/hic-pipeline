@@ -6,7 +6,7 @@ Using a generic SLURM cluster should be quite similar to Stanford Sherlock, whic
 
 * Singularity version has to be `>=2.5.2`
 
-* Have Java and Python > 3.4.1 installed (installation method will depend on cluster)
+* Have Java and Python >= 3.6 installed (installation method will depend on cluster)
 
 * Check that the file `workflow_opts/slurm.json` is configured correctly. The `slurm.json` template file looks like this:
 
@@ -38,7 +38,7 @@ Set your partition/account in `workflow_opts/slurm.json`. If your SLURM cluster 
   $ cd hic-pipeline
 ```
 
-3. Install [Caper](https://github.com/ENCODE-DCC/caper)
+3. Install [Caper](https://github.com/ENCODE-DCC/caper), requires Python >= 3.6. Caper >= 0.8.2.1 is required to run the pipeline.
 
 ```bash
   $ pip install caper
