@@ -1,10 +1,13 @@
 version 1.0
 
-#CAPER docker encodedcc/hic-pipeline:0.1.0
-#CAPER singularity docker://encodedcc/hic-pipeline:0.1.0
-#CROO out_def https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json
-
 workflow hic {
+    meta {
+        version: "0.1.0"
+        caper_docker: "encodedcc/hic-pipeline:0.1.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:0.1.0"
+        croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
+    }
+
     input {
         # Main entrypoint, need to specify all five of these values when running from fastqs
         Array[Array[Array[File]]] fastq = []
