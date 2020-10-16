@@ -246,6 +246,12 @@ task make_restriction_site_locations {
     output {
         File restriction_site_locations = "~{assembly_name}_~{restriction_enzyme}.txt.gz"
     }
+
+    runtime {
+        cpu : "1"
+        memory: "500 MB"
+        disks: "local-disk 10 SSD"
+    }
 }
 
 task get_ligation_site_regex {
@@ -418,8 +424,8 @@ task merge {
 
     runtime {
         cpu : "8"
+        memory: "16 GB"
         disks: "local-disk 1000 HDD"
-
     }
 }
 
@@ -520,6 +526,7 @@ task bam2pairs {
 
     runtime {
         cpu : "8"
+        memory: "16 GB"
         disks: "local-disk 1000 HDD"
     }
 }
@@ -570,6 +577,12 @@ task merge_stats {
     output {
         File merged_stats = "merged_stats.txt"
         File merged_stats_json = "merged_stats.json"
+    }
+
+    runtime {
+        cpu : "1"
+        disks: "local-disk 1 HDD"
+        memory: "1 GB"
     }
 }
 
@@ -631,6 +644,9 @@ task arrowhead {
     }
 
     runtime {
+        cpu : "1"
+        disks: "local-disk 100 SSD"
+        memory : "16 GB"
     }
 }
 
@@ -668,4 +684,9 @@ task exit_early {
         echo ~{message}
         exit 1
     >>>
+
+    runtime {
+        cpu : "1"
+        memory: "500 MB"
+    }
 }

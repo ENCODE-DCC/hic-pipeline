@@ -6,7 +6,6 @@ HiC uniform processing pipeline
 ===================================================
 
 # Directories
-* `workflow_opts/` : Workflow option files (`.json`)
 * `examples/` : input JSON examples
 * `docker/` : Dockerfiles to build images for running pipelines, including GPU-enabled image for running `hiccups`
 * `tests/` : test code, including WDL tests, see the [developer docs](docs/development.md) for more details on running them.

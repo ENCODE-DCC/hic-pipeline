@@ -1,9 +1,0 @@
-{
-  "default_runtime_attributes": {
-    "bootDiskSizeGb": "10",
-    "docker": "encodedcc/hic-pipeline:0.1.0",
-    "noAddress": "false",
-    "preemptible": "0",
-    "zones": "us-central1-c us-central1-b"
-  }
-}
