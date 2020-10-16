@@ -1,10 +1,21 @@
 # Developer Documentation
 
-In order to develop this pipeline, you will first need to install the `tox` Python package. We recommend using a virtual environment to do this, such as the Python built-in library `venv`:
+To work on this pipeline, you will want to have the following installed:
+* Docker Desktop
+* Java > 1.8
+* Python 3.5.2 or higher, tests might fail with lower versions.
+  * Install the following, we recommend using a virtual environment to do this, such as the Python built-in library `venv`:
 
-```bash
-$ pip install tox
-```
+    ```bash
+    $ pip install caper tox
+    ```
+* Rust 1.42.0 or higher
+  * The easiest way to get up and running is with [rustup](https://rustup.rs/)
+  * Once `rustup` is installed, install `rustfmt` and `clippy`:
+
+    ```bash
+    $ rustup component add clippy
+    $ rustup component add rustfmt
 
 ## Running tests
 
@@ -49,3 +60,14 @@ To lint and format code, run the following:
 ```bash
 $ tox -e lint
 ```
+
+## Developer Guidelines
+
+Before pushing code, ensure lint checks and Python/Rust unit tests pass locally:
+```bash
+$ tox -e lint
+$ tox -e py36
+$ cargo test
+```
+
+Before making a PR, make sure that the CircleCI tests pass with no errors.

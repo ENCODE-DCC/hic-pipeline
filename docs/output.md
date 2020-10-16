@@ -1,1 +1,0 @@
-`Cromwell`: `Cromwell` will store outputs for each task under `cromwell-executions/[WORKFLOW_ID]/call-[TASK_NAME]/shard-[IDX]`.
