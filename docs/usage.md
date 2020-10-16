@@ -32,7 +32,7 @@ Here are some notes on running and using this pipeline. Using [Caper](https://gi
 
 Make sure you have properly installed the pipeline as described in the [installation instructions](usage.md#installation). Make sure to run the following commands from the root of the repository (i.e. `cd hic-pipeline` if you have not done so already).
 
-1. Prepare the input JSON file. This file contains the user-specified files and parameters to run the pipeline with. Different examples of input JSON files are available in `reference.md#inputs`. Details about the different input parameters are available at `reference.md#input-desciptions`. Copy and paste the entirety of the following command into your terminal (uses [heredoc](https://tldp.org/LDP/abs/html/here-docs.html) syntax) and press enter/return to create a file called `input.json` pointing to the test data in this repo as pipeline input:
+1. Prepare the input JSON file. This file contains the user-specified files and parameters to run the pipeline with. Different examples of input JSON files are available [here](./reference.md#inputs). Details about the different input parameters are available [here](./reference.md#input-desciptions). Copy and paste the entirety of the following command into your terminal (uses [heredoc](https://tldp.org/LDP/abs/html/here-docs.html) syntax) and press enter/return to create a file called `input.json` pointing to the test data in this repo as pipeline input:
 
 ```bash
 cat << EOF > input.json

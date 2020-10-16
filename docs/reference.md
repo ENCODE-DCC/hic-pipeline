@@ -29,21 +29,21 @@ Under each individual entrypoint the inputs for that entrypoint are listed. To r
 
 Runs the pipeline from the very beginning starting from `fastq` files. `read_groups` is useful for adding extra metadata into the BAM headers.
 
-**Required inputs**
+*Required inputs*
 * `fastq`
 * `restriction_enzymes`
 * `restriction_sites`
 * `chrsz`
 * `reference_index`
 
-**Optional inputs**
+*Optional inputs*
 * `read_groups`
 
 #### From aligned BAM
 
 Runs the pipeline from starting from `bam` files, skipping `bwa` alignment.
 
-**Required inputs**
+*Required inputs*
 * `bams`
 * `ligation_counts`
 
@@ -51,10 +51,10 @@ Runs the pipeline from starting from `bam` files, skipping `bwa` alignment.
 
 Runs the pipeline from starting with files from libraries that have already been processed by the pipeline. While `alignment_stats` and `library_stats` are optional it is highly recommended to specify them to obtain QC values for the merged libraries.
 
-**Required inputs**
+*Required inputs*
 * `input_dedup_pairs`
 
-**Optional inputs**
+*Optional inputs*
 * `alignment_stats`
 * `library_stats`
 
@@ -62,21 +62,21 @@ Runs the pipeline from starting with files from libraries that have already been
 
 Runs the pipeline starting with single Juicer-format text file.
 
-**Required inputs**
+*Required inputs*
 * `input_pairs`
 
 #### From hic file for loop and TAD calls
 
 Runs the pipeline starting with a `.hic` file for loop and TAD calling.
 
-**Required inputs**
+*Required inputs*
 * `input_hic`
 
 #### Generating restriction site files
 
 Runs the restriction sites file generation step only.
 
-**Required inputs**
+*Required inputs*
 * `reference_fasta`
 * `restriction_site_locations_only`, should be set to `true`
 
