@@ -88,10 +88,10 @@ Runs the restriction sites file generation step only.
 * `restriction_sites` is a text file containing cut sites for the given restriction enzyme. For supported enzymes you can generate this using the [reference building entrypoint](#generating-restriction-site-files). Note that if you need to generate a sites file for a multiple digest or for an unsupported enzyme you will need to edit this script and run it yourself: https://github.com/aidenlab/juicer/blob/encode/misc/generate_site_positions.py
 * `chrsz` is a chromosome sizes file for the desired assembly. It is a tab-separated text file whose rows take the form `[chromosome][TAB][size]`. You can find these on the ENCODE portal for some human and mouse assemblies, see [reference files](#reference-files)
 * `reference_index` is a pre-generated BWA index for the desired assembly. Depending on your assembly you may also be able to find these on the ENCODE portal, see [reference files](#reference-files)
-* `bams` is a nested array of aligned, unfiltered bams, organized by `[replicate][library]`
+* `bams` is a nested array of aligned, unfiltered BAM files, organized by `[replicate][library]`
 * `ligation_counts` is an array of text files containing ligation counts for the `fastq` pair, organized by `[biological replicate][techincal replicate]`. These should be calculated from `fastqs` using the Juicer `countligations` script: https://github.com/aidenlab/juicer/blob/encode/CPU/common/
 countligations.sh
-* `input_pairs` is a text file containing the paired fragments to use to generate `.hic` contact maps, a detailed description of the file format can be found here: https://github.com/aidenlab/juicer/wiki/Pre#long-format
+* `input_pairs` is a text file containing the paired fragments to use to generate `.hic` contact maps, a detailed description of the file format can be found [here](https://github.com/aidenlab/juicer/wiki/Pre#long-format)
 * `input_hic` is an input `.hic` file which will be used to call loops and domains
 * `input_dedup_pairs` is an a array consisting of text files in the [Juicer pre long format](https://github.com/aidenlab/juicer/wiki/Pre#long-format) of paired fragments, one per library.
 * `alignment_stats` is an array consisting of text files of alignment stats, one per library. Use is recommended but not required when merging libraries in order to calculate quality metrics on the merged libraries.
@@ -128,22 +128,21 @@ In most cases you will also need a restriction map file appropriate for the rest
 
 ## Outputs
 
-The exact outputs of the pipeline will depend on the combination of inputs. When the pipeline completes check Caper/Cromwell metadata JSON file, particularly the top-level key `outputs`. Descriptions of the individual outputs are [below](#output-descriptions).
+The exact outputs of the pipeline will depend on the combination of inputs. When the pipeline completes check Caper/Cromwell metadata JSON file, particularly the top-level key `outputs` for values that are not `null`. Descriptions of the individual outputs are [below](#output-descriptions).
 
-A draft document describing the pipeline outputs and QC standard is [available on the ENCODE portal](https://www.encodeproject.org/documents/75926e4b-77aa-4959-8ca7-87efcba39d79/@@download/attachment/comp_doc_7july2018_final.pdf).
+A draft document describing the pipeline outputs and quality control (QC) values is [available on the ENCODE portal](https://www.encodeproject.org/documents/75926e4b-77aa-4959-8ca7-87efcba39d79/@@download/attachment/comp_doc_7july2018_final.pdf).
 
 ### Output descriptions
 
-* `restriction_site_locations`
-* `alignable_bam`
-* `out_pairs`
-* `out_dedup`
-* `library_complexity_stats_json`
-* `stats`
-* `alignment_stats_`
-* `bams_with_read_group`
-* `merged_stats`
-* `merged_stats_json`
-* `out_hic_1`
-* `out_hic_30`
-* `out_tads`
+* `restriction_site_locations` is the generated restriction sites file
+* `alignable_bam` is an array of filtered BAM files, one per biological replicate
+* `out_pairs` is an array of files in [`pairs` format](https://github.com/4dn-dcic/pairix/blob/master/pairs_format_specification.md), one per biological replicate
+* `out_dedup` is an array of files in [Juicer long format](https://github.com/aidenlab/juicer/wiki/Pre#long-format), one per biological replicate
+* `library_complexity_stats_json` is an array of library complexity QC statistics in JSON format, one per biological replicate.
+* `stats` is an array of library QC statistics in JSON format, one per biological replicate. It includes statistics describing the quantity and nature of the Hi-C contacts.
+* `alignment_stats_` is an array of arrays of alignment QC statistics in plain text, one per technical replicate.
+* `bams_with_read_group` is an array of arrays of unfiltered BAM files, one per technical replicate, it is only applicable if `read_groups` was specified as a pipeline input.
+* `merged_stats_json` is a JSON file containing alignment and library statistics for merged libraries
+* `out_hic_1` is a [`.hic` file](https://github.com/aidenlab/juicer/wiki/Data#hic-files) containing the contact matrix filtered by MAPQ >= 1
+* `out_hic_30` is a [`.hic` file](https://github.com/aidenlab/juicer/wiki/Data#hic-files) containing the contact matrix filtered by MAPQ >= 30
+* `out_tads` contains `arrowhead` domain calls in the Juicer format described [here](https://github.com/aidenlab/juicer/wiki/Arrowhead#domain-list-content)
