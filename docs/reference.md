@@ -82,7 +82,27 @@ Runs the restriction sites file generation step only.
 
 ### Input descriptions
 
-* `fastq` is a twice nested array of input fastqs. The outermost level corresponds to the biological replicates. Each biological replicate then contains one or more technical replicates. Each technical replicate is an array containing two paired fastq files.
+* `fastq` is a twice nested array of input fastqs. The outermost level corresponds to the biological replicates. Each biological replicate then contains one or more technical replicates. Each technical replicate is an array containing two paired fastq files. In the example below there are two biological replicates, therefore there are two elements in the outermost array. The first biological replicate has two technical replicates, so it has two arrays of fastqs. The second biological replicate only has one technical replicate so it only has one array of fastqs. In all cases the fastq arrays have two elements corresponding to read one and read two of the paired-end sequencing.
+```json
+"hic.fastq": [
+  [
+    [
+      "biorep1_techrep1_R1.fastq.gz",
+      "biorep1_techrep1_R2.fastq.gz"
+    ],
+    [
+      "biorep1_techrep2_R1.fastq.gz",
+      "biorep1_techrep2_R2.fastq.gz"
+    ]
+  ],
+  [
+    [
+      "biorep2_techrep1_R1.fastq.gz",
+      "biorep2_techrep1_R2.fastq.gz"
+    ]
+  ]
+]
+```
 * `read_groups` is an optional array of strings to be inserted into the BAM as the read group (@RG), passed via `samtools addreplacerg` `-r` option. One per SE read/read pair with nested array structure mirroring the `fastq` input
 * `restriction_enzymes` is an array of names containing the restriction enzyme(s) used to generate the Hi-C libraries. Currently only `MboI`, `HindIII`, `DpnII`, and `none` are supported. `none` is useful for libraries like DNAse produced using a non-specific cutter.
 * `restriction_sites` is a text file containing cut sites for the given restriction enzyme. For supported enzymes you can generate this using the [reference building entrypoint](#generating-restriction-site-files). Note that if you need to generate a sites file for a multiple digest or for an unsupported enzyme you will need to edit this script and run it yourself: https://github.com/aidenlab/juicer/blob/encode/misc/generate_site_positions.py
