@@ -46,6 +46,9 @@ Runs the pipeline from starting from `bam` files, skipping `bwa` alignment.
 *Required inputs*
 * `bams`
 * `ligation_counts`
+* `restriction_enzymes`
+* `restriction_sites`
+* `chrsz`
 
 #### From processed libraries
 
@@ -53,6 +56,10 @@ Runs the pipeline from starting with files from libraries that have already been
 
 *Required inputs*
 * `input_dedup_pairs`
+* `restriction_enzymes`
+* `restriction_sites`
+* `chrsz`
+
 
 *Optional inputs*
 * `alignment_stats`
@@ -64,6 +71,9 @@ Runs the pipeline starting with single Juicer-format text file.
 
 *Required inputs*
 * `input_pairs`
+* `restriction_enzymes`
+* `restriction_sites`
+* `chrsz`
 
 #### From hic file for loop and TAD calls
 
@@ -78,6 +88,7 @@ Runs the restriction sites file generation step only.
 
 *Required inputs*
 * `reference_fasta`
+* `restriction_enzymes`
 * `restriction_site_locations_only`, should be set to `true`
 
 ### Input descriptions
