@@ -42,7 +42,7 @@ workflow hic {
         Boolean no_call_loops = false
         Boolean no_call_tads = false
         Boolean include_mapq0_reads = false
-        Int cpu = 32
+        Int align_num_cpus = 32
         String? assembly_name
     }
 
@@ -68,7 +68,7 @@ workflow hic {
         no_call_loops: "If set to `true`, avoid calling loops with hiccups, defaults to false"
         no_call_tads: "If set to `true`, avoid calling domains with arrowhead, defaults to false"
         include_mapq0_reads: "If set to `true`, chimeric reads (3 alignments) with one MAPQ 0 read will be classified as normal paired reads with the MAPQ 0 read discarded. If `false`, such reads will be classified as low mapq collisions, defaults to false"
-        cpu: "Number of threads to use for bwa alignment"
+        align_num_cpus: "Number of threads to use for bwa alignment"
         assembly_name: "Name of assembly to insert into hic file header, recommended to specify for reproducbility otherwise hic file will be nondeterministic"
     }
 
@@ -115,7 +115,7 @@ workflow hic {
                         chrsz = chrsz_,
                         idx_tar = select_first([reference_index]),
                         ligation_site = ligation_site,
-                        cpu = cpu,
+                        num_cpus = align_num_cpus,
                     }
                     if (length(read_groups) > 0) {
                         call add_read_group_to_bam { input:
@@ -293,7 +293,7 @@ task align {
         Array[File] fastqs  # [read_end_id]
         File chrsz          # chromosome sizes file
         String ligation_site
-        Int? cpu = 32
+        Int? num_cpus = 32
     }
 
     command {
@@ -316,7 +316,8 @@ task align {
         source /opt/scripts/common/countligations.sh
         # Align reads
         echo "Running bwa command"
-        bwa mem -SP5M -t ${cpu} $reference_index_path ${fastqs[0]} ${fastqs[1]} | samtools view -hbS - > result.bam
+        bwa mem -SP5M -t ~{num_cpus} $reference_index_path ${fastqs[0]} ${fastqs[1]} |
+            samtools view -hbS - > result.bam
     }
 
     output {
@@ -325,7 +326,7 @@ task align {
      }
 
     runtime {
-        cpu : "32"
+        cpu : "~{num_cpus}"
         memory: "64 GB"
         disks: "local-disk 1000 HDD"
     }
@@ -359,13 +360,17 @@ task fragment {
         File norm_res_input
         File restriction    # restriction enzyme sites in the reference genome
         Boolean include_mapq0_reads = false
+        Int? num_cpus = 8
         Int ram_gb = 16
         Float ram_pct = 0.9
     }
 
     command {
         set -euo pipefail
-        samtools view -h ${bam_file} | awk -v "fname"=result -v "mapq0_reads_included"=${if include_mapq0_reads then 1 else 0} -f $(which chimeric_blacklist.awk)
+        samtools view -h --threads ~{num_cpus - 1} ${bam_file} |
+            awk -v "fname"=result \
+                -v "mapq0_reads_included"=${if include_mapq0_reads then 1 else 0} \
+                -f $(which chimeric_blacklist.awk)
 
         # if any normal reads were written, find what fragment they correspond
         # to and store that
@@ -384,17 +389,26 @@ task fragment {
 
         # convert sams to bams and delete the sams
         echo "Converting sam to bam"
-        samtools view -hb result_unmapped.sam > unmapped.bam
+        samtools view -hb --threads ~{num_cpus - 1} result_unmapped.sam > unmapped.bam
         rm result_unmapped.sam
-        samtools view -hb result_mapq0.sam > mapq0.bam
+        samtools view -hb --threads ~{num_cpus - 1} result_mapq0.sam > mapq0.bam
         rm result_mapq0.sam
-        samtools view -hb result_alignable.sam > alignable.bam
+        samtools view -hb --threads ~{num_cpus - 1} result_alignable.sam > alignable.bam
         rm result_alignable.sam
         #removed all sam files
         ##restriction used to be site_file
 
         # sort by chromosome, fragment, strand, and position
-        sort -k2,2d -k6,6d -k4,4n -k8,8n -k1,1n -k5,5n -k3,3n --parallel=8 -S "~{round(ram_pct * ram_gb)}G" result_frag.txt > sort.txt
+        sort -k2,2d \
+            -k6,6d \
+            -k4,4n \
+            -k8,8n \
+            -k1,1n \
+            -k5,5n \
+            -k3,3n \
+            --parallel=~{num_cpus} \
+            -S "~{round(ram_pct * ram_gb)}G" \
+            result_frag.txt > sort.txt
         gzip -n sort.txt
     }
 
@@ -409,7 +423,7 @@ task fragment {
     }
 
     runtime {
-        cpu : "1"
+        cpu : "~{num_cpus}"
         disks: "local-disk 1000 HDD"
         memory: "~{ram_gb} GB"
     }
@@ -418,11 +432,15 @@ task fragment {
 task merge {
     input {
         Array[File] bam_files
+        Int? num_cpus = 8
     }
 
     command {
         set -euo pipefail
-        samtools merge merged_bam_files.bam ~{sep=' ' bam_files}
+        samtools merge \
+            --threads "~{num_cpus - 1}" \
+            merged_bam_files.bam \
+            ~{sep=' ' bam_files}
     }
 
     output {
@@ -430,7 +448,7 @@ task merge {
     }
 
     runtime {
-        cpu : "8"
+        cpu : "~{num_cpus}"
         memory: "16 GB"
         disks: "local-disk 1000 HDD"
     }
@@ -472,6 +490,7 @@ task dedup {
         String ligation_site
         File restriction_sites
         File alignable_bam
+        Int? num_cpus = 8
     }
 
     # Can't use regular {} for command block, parser complains once hits awk command
@@ -491,8 +510,12 @@ task dedup {
         python3 $(which jsonify_stats.py) --library-complexity library_complexity.txt
         python3 $(which jsonify_stats.py) --library-stats stats.txt
         awk '{split($(NF-1), a, "$"); split($NF, b, "$"); print a[3],b[3] > a[2]"_dedup"}' merged_nodups.txt
-        samtools view -h ~{alignable_bam} | awk 'BEGIN{OFS="\t"}FNR==NR{for (i=$1; i<=$2; i++){a[i];} next}(!(FNR in a) && $1 !~ /^@/){$2=or($2,1024)}{print}' result_dedup - > result_alignable_dedup.sam
-        samtools view -hb result_alignable_dedup.sam > result_alignable_dedup.bam
+        samtools view -h ~{alignable_bam} --threads ~{num_cpus - 1} |
+            awk 'BEGIN{OFS="\t"}FNR==NR{for (i=$1; i<=$2; i++){a[i];} next}(!(FNR in a) && $1 !~ /^@/){$2=or($2,1024)}{print}' result_dedup - > result_alignable_dedup.sam
+        samtools view \
+            -hb \
+            --threads ~{num_cpus - 1} \
+            result_alignable_dedup.sam > result_alignable_dedup.bam
         rm result_alignable_dedup.sam
         rm ~{alignable_bam}
         gzip -n merged_nodups.txt
@@ -509,7 +532,7 @@ task dedup {
     }
 
     runtime {
-        cpu : "8"
+        cpu : "~{num_cpus}"
         disks: "local-disk 1000 HDD"
         memory: "16 GB"
     }
