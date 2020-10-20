@@ -17,7 +17,7 @@ workflow test_create_hic {
         restriction_sites = restriction_sites,
         chrsz_ = chrsz,
         quality = "30",
-        assembly_name = assembly_name
+        assembly_name = assembly_name,
     }
 
     output {

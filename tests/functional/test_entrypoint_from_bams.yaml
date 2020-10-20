@@ -8,4 +8,4 @@
       tests/functional/json/test_entrypoint_from_bams.json
     files:
       - path: test-output/glob-6a31d38462145ec363d0f357468a1d26/inter_1.hic
-        md5sum: 0e04f8745f3e0a143c8d01846cca5bae
+        md5sum: af461140dfb44fc1a08866d1a1c0dc48

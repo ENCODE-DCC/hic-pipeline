@@ -9,7 +9,7 @@ workflow hic {
     }
 
     input {
-        # Main entrypoint, need to specify all five of these values when running from fastqs
+        # Main entrypoint, need to specify all five of these values except read_groups when running from fastqs
         Array[Array[Array[File]]] fastq = []
         Array[Array[String]] read_groups = []
         Array[String] restriction_enzymes
@@ -36,6 +36,7 @@ workflow hic {
         File? reference_fasta
         Boolean restriction_site_locations_only = false
 
+        Array[String] normalization_methods = []
         Boolean no_bam2pairs = false
         Boolean no_call_loops = false
         Boolean no_call_tads = false
@@ -51,6 +52,7 @@ workflow hic {
         restriction_sites: "A text file containing cut sites for the given restriction enzyme. You should generate this file using this script: https://github.com/aidenlab/juicer/blob/encode/misc/generate_site_positions.py"
         chrsz: "A chromosome sizes file for the desired assembly, this is a tab-separated text file whose rows take the form [chromosome] [size]"
         reference_index: "A pregenerated BWA index for the desired assembly"
+        normalization_methods: "An array of normalization methods to use for .hic file generation as per Juicer Tools `pre`, if not specified then will use `pre` defaults of VC, VC_SQRT, KR, and SCALE. Valid methods are VC, VC_SQRT, KR, SCALE, GW_KR, GW_SCALE, GW_VC, INTER_KR, INTER_SCALE, and INTER_VC."
         bams: "Aligned, unfiltered bams, organized by [biorep[techrep]]. If specified, the `ligation_counts` array must also be specified"
         ligation_counts: "Text files containing ligation counts for the fastq pair, organized by [biorep[techrep]]. Has no meaning if the `bams` array is not also be specified. These should be calculated from fastqs using the Juicer countligations script: https://github.com/aidenlab/juicer/blob/encode/CPU/common/countligations.sh"
         input_pairs: "A text file containing the paired fragments to use to generate the .hic contact maps, a detailed format description can be found here: https://github.com/aidenlab/juicer/wiki/Pre#long-format"
@@ -197,7 +199,8 @@ workflow hic {
                 ligation_site = ligation_site,
                 chrsz_ = select_first([chrsz]),
                 quality = qualities[i],
-                assembly_name = assembly_name
+                assembly_name = assembly_name,
+                normalization_methods = normalization_methods,
             }
         }
     }
@@ -593,6 +596,7 @@ task create_hic {
         File chrsz_
         File restriction_sites
         String quality
+        Array[String] normalization_methods = []
         String? assembly_name
     }
 
@@ -607,6 +611,7 @@ task create_hic {
             -g stats_${quality}_hists.m \
             -q ${quality} \
             ~{if defined(assembly_name) then "-y " + assembly_name else ""} \
+            ~{if length(normalization_methods) > 0 then "-k" else ""} ~{sep="," normalization_methods} \
             $MERGED_PAIRS_FILE \
             inter_${quality}.hic \
             ${chrsz_}
