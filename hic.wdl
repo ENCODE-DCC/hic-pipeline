@@ -87,7 +87,7 @@ workflow hic {
         }
     }
 
-    String ligation_site = if defined(ligation_site_regex) then select_first([ligation_site_regex]) else select_first([get_ligation_site_regex.ligation_site_regex])
+    String ligation_site = select_first([ligation_site_regex, get_ligation_site_regex.ligation_site_regex])
 
     # make_restriction_site_locations currently supports only supports one enzyme
     if (defined(reference_fasta) && !defined(restriction_sites) && length(restriction_enzymes) == 1) {
