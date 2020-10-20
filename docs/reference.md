@@ -124,6 +124,7 @@ Runs the restriction sites file generation step only.
 countligations.sh
 * `input_pairs` is a text file containing the paired fragments to use to generate `.hic` contact maps, a detailed description of the file format can be found [here](https://github.com/aidenlab/juicer/wiki/Pre#long-format)
 * `input_hic` is an input `.hic` file which will be used to call loops and domains
+* `normalization_methods` is an array of normalization methods to use for `.hic` file generation as per Juicer Tools `pre`. If not specified then will use `pre` defaults of `VC`, `VC_SQRT`, `KR`, and `SCALE`. Valid methods are `VC`, `VC_SQRT`, `KR`, `SCALE`, `GW_KR`, `GW_SCALE`, `GW_VC`, `INTER_KR`, `INTER_SCALE`, and `INTER_VC.
 * `input_dedup_pairs` is an a array consisting of text files in the [Juicer pre long format](https://github.com/aidenlab/juicer/wiki/Pre#long-format) of paired fragments, one per library.
 * `alignment_stats` is an array consisting of text files of alignment stats, one per library. Use is recommended but not required when merging libraries in order to calculate quality metrics on the merged libraries.
 * `library_stats` is an array consisting of text files of library stats, one per library. Use is recommended but not required when merging libraries in order to calculate quality metrics on the merged libraries.
