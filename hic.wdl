@@ -317,7 +317,7 @@ task align {
         # Align reads
         echo "Running bwa command"
         bwa mem -SP5M -t ~{num_cpus} $reference_index_path ${fastqs[0]} ${fastqs[1]} |
-            samtools view -hbS --threads "~{num_cpus - 1}" - > result.bam
+            samtools view -hbS - > result.bam
     }
 
     output {
