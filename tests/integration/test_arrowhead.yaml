@@ -13,4 +13,4 @@
     # of the glob pattern. If the pattern changes then this test will need to be updated
     # as well.
       - path: test-output/glob-e2daa478343b5e646c0d76e6f98bd592/5000_blocks.bedpe.gz
-        md5sum: 6f4f7f0ed968c8d0ac6260d25b875a62
+        md5sum: af04bf116ed91de22a2035a8e6539921
