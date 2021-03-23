@@ -9,19 +9,9 @@ machine_defaults: &machine_defaults
     image: ubuntu-1604:201903-01
   working_directory: ~/ENCODE-DCC/hic-pipeline
 
-lint: &lint
-  docker:
-    - image: encodedcc/hic-pipeline:circleci-lint
-  working_directory: ~/ENCODE-DCC/hic-pipeline
-
 py37: &py37
   docker:
     - image: circleci/python:3.7.4-stretch
-  working_directory: ~/ENCODE-DCC/hic-pipeline
-
-rust: &rust
-  docker:
-    - image: circleci/rust:1.42.0-stretch
   working_directory: ~/ENCODE-DCC/hic-pipeline
 
 commands:
@@ -57,13 +47,24 @@ commands:
             PIPELINE_VERSION=$(python3 -c "import hic_pipeline;print(hic_pipeline.__version__)")
             echo "export PIPELINE_VERSION=${PIPELINE_VERSION}" >> ${BASH_ENV}
 
+  install_shellcheck:
+    description: Install shellcheck by downloading the binary, don't want to apt-get update
+    steps:
+      - run:
+          command: |
+            curl \
+              -Ls \
+              https://github.com/koalaman/shellcheck/releases/download/stable/shellcheck-stable.linux.x86_64.tar.xz \
+              | tar xJ
+            sudo mv shellcheck-stable/shellcheck /usr/local/bin
+
 version: 2.1
 jobs:
   lint:
-    <<: *lint
+    <<: *py37
     steps:
       - checkout
-      - run: cat "${HOME}/.cargo/env" >> ${BASH_ENV}
+      - install_shellcheck
       - run_tox:
           toxenv: lint
 
@@ -73,12 +74,6 @@ jobs:
       - checkout
       - run_tox:
           toxenv: py37
-
-  test_rust:
-    <<: *rust
-    steps:
-      - checkout
-      - run: cargo test
 
   test_wdl:
     <<: *machine_defaults
@@ -104,21 +99,20 @@ jobs:
             pyenv global 3.7.0
             pip install --upgrade pip
             pip install tox
-            tox -e wdl -- --tag << parameters.tag >> --wt << parameters.num_parallel_workflows >>
+            tox -e wdl -- --kwd --tag << parameters.tag >> --wt << parameters.num_parallel_workflows >>
 
   build:
     <<: *defaults
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 19.03.8
+      - setup_remote_docker
       - set_environment_variables
       - run:
           name: build main docker image
           command: |
             docker login -u=${DOCKERHUB_USER} -p=${DOCKERHUB_PASS}
             docker pull encodedcc/${CIRCLE_PROJECT_REPONAME}:template
-            DOCKER_BUILDKIT=1 docker build . --build-arg BUILDKIT_INLINE_CACHE=1 \
+            docker build . \
               --cache-from encodedcc/${CIRCLE_PROJECT_REPONAME}:template \
               -t ${HIC_DOCKER_IMAGE_TAG} \
               -t encodedcc/${CIRCLE_PROJECT_REPONAME}:template \
@@ -130,15 +124,14 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 19.03.8
+      - setup_remote_docker
       - set_environment_variables
       - run:
           name: build hiccups docker image
           command: |
             docker login -u=${DOCKERHUB_USER} -p=${DOCKERHUB_PASS}
             docker pull encodedcc/${CIRCLE_PROJECT_REPONAME}:template_hiccups
-            DOCKER_BUILDKIT=1 docker build . --build-arg BUILDKIT_INLINE_CACHE=1 \
+            docker build . \
               --cache-from encodedcc/${CIRCLE_PROJECT_REPONAME}:template_hiccups \
               -t ${HICCUPS_DOCKER_IMAGE_TAG} \
               -t encodedcc/${CIRCLE_PROJECT_REPONAME}:template_hiccups \
@@ -150,8 +143,7 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 19.03.8
+      - setup_remote_docker
       - set_environment_variables
       - get_pipeline_version
       - run:
@@ -181,14 +173,11 @@ workflows:
           requires:
             - build
             - lint
-      - test_rust:
-          requires:
-            - build
-            - lint
       - test_wdl:
           name: test_wdl_unit
+          resource_class: xlarge
           tag: unit
-          num_parallel_workflows: 8
+          num_parallel_workflows: 16
           requires:
             - build
             - lint
@@ -196,7 +185,7 @@ workflows:
           name: test_wdl_integration
           resource_class: xlarge
           tag: integration
-          num_parallel_workflows: 12
+          num_parallel_workflows: 16
           requires:
             - build
             - lint
@@ -204,7 +193,7 @@ workflows:
           name: test_wdl_functional
           resource_class: xlarge
           tag: functional
-          num_parallel_workflows: 8
+          num_parallel_workflows: 16
           requires:
             - build
             - lint
@@ -218,5 +207,4 @@ workflows:
             - test_wdl_unit
             - test_wdl_integration
             - test_wdl_functional
-            - test_rust
             - test_py37

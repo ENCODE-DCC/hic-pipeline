@@ -64,7 +64,7 @@ RUN curl -OL "https://github.com/4dn-dcic/pairix/archive/${PAIRIX_VERSION}.zip" 
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     cd juicer && \
-    git checkout f4cc8e4684fb55934581b5efe9827dce5e7267ae && \
+    git checkout ff481e8c29aba67f69040ff3658199b7d9715096 && \
     chmod +x CPU/* CPU/common/* misc/* && \
     find -mindepth 1 -maxdepth 1  -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
 
@@ -78,17 +78,6 @@ RUN curl -L "http://s3.amazonaws.com/hicfiles.tc4ga.com/public/juicer/juicer_too
 ENV LC_ALL C
 ENV PATH=/opt:/opt/scripts:/opt/scripts/common:/opt/juicer/misc:$PATH
 
-# Use multistage build for fragment
-FROM rust:1.42.0-slim-stretch@sha256:1201e100253c82c4accd19c649d187ab741b89954397dcdddb792008f898f93a as builder
-WORKDIR /hic-pipeline
-COPY . .
-RUN cargo build --release
-
-FROM main
-
 RUN mkdir -p hic-pipeline/hic_pipeline
 COPY hic_pipeline hic-pipeline/hic_pipeline/
-RUN rm -rf hic-pipeline/hic_pipeline/fragment
-# Add compiled binary from other stage of build
-COPY --from=builder /hic-pipeline/target/release/fragment hic-pipeline/hic_pipeline
 ENV PATH="/opt/hic-pipeline/hic_pipeline:${PATH}"

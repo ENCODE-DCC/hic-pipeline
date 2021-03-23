@@ -9,13 +9,6 @@ To work on this pipeline, you will want to have the following installed:
     ```bash
     $ pip install caper tox
     ```
-* Rust 1.42.0 or higher
-  * The easiest way to get up and running is with [rustup](https://rustup.rs/)
-  * Once `rustup` is installed, install `rustfmt` and `clippy`:
-
-    ```bash
-    $ rustup component add clippy
-    $ rustup component add rustfmt
 
 ## Running tests
 
@@ -47,12 +40,6 @@ To run WDL tests in parallel, pass the `--wt` flag, here `4` indicates we want t
 $ tox -e test-wdl -- --tag integration --wt 4
 ```
 
-To run Rust tests (requires `cargo`, easiest way to install is with [rustup](https://rustup.rs/)):
-
-```bash
-$ cargo test
-```
-
 ## Linting
 
 To lint and format code, run the following:
@@ -63,11 +50,10 @@ $ tox -e lint
 
 ## Developer Guidelines
 
-Before pushing code, ensure lint checks and Python/Rust unit tests pass locally:
+Before pushing code, ensure lint checks and Python unit tests pass locally:
 ```bash
 $ tox -e lint
 $ tox -e py36
-$ cargo test
 ```
 
 Before making a PR, make sure that the CircleCI tests pass with no errors.

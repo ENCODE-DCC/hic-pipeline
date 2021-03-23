@@ -7,11 +7,7 @@ workflow test_merge {
         Array[File] bams
     }
 
-	call hic.merge as test_merge_task { input:
-		bam_files = bams
-    }
-
-    output {
-        File merged_no_header = test_merge_task.merged_output
+    call hic.merge { input:
+        bams = bams
     }
 }

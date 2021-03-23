@@ -7,5 +7,5 @@
       hic.wdl
       tests/functional/json/test_entrypoint_from_bams.json
     files:
-      - path: test-output/glob-6a31d38462145ec363d0f357468a1d26/inter_1.hic
-        md5sum: af461140dfb44fc1a08866d1a1c0dc48
+      - path: test-output/inter_1.hic
+        md5sum: 63d7829502c10ad26860c12f2a4b995d

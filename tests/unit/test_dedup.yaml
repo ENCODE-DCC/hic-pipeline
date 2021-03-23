@@ -1,0 +1,12 @@
+---
+  - name: test_dedup_unit
+    tags:
+      - unit
+    command: >-
+      tests/caper_run.sh
+      tests/unit/wdl/test_dedup.wdl
+      tests/unit/json/test_dedup.json
+    stdout:
+      contains:
+        - -@ 3
+        - dummy.txt |

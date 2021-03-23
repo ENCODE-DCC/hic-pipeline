@@ -1,0 +1,5 @@
+{
+  "test_bam_to_pre.bam": "tests/data/dummy.txt",
+  "test_bam_to_pre.num_cpus": 4,
+  "test_bam_to_pre.quality": 99
+}

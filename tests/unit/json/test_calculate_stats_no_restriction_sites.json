@@ -1,0 +1,12 @@
+{
+  "test_calculate_stats.alignment_stats": [
+    "tests/data/dummy.txt",
+    "tests/data/dummy.txt"
+  ],
+  "test_calculate_stats.duplicate_counts": [
+    "tests/data/dummy.txt"
+  ],
+  "test_calculate_stats.ligation_site": "CAT",
+  "test_calculate_stats.pre": "tests/data/dummy.txt",
+  "test_calculate_stats.quality": 30
+}

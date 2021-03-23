@@ -4,7 +4,7 @@ import pytest
 
 
 @pytest.mark.workflow("test_dedup")
-def test_dedup_alignable_bam_match(workflow_dir, bam_md5):
-    bam_path = workflow_dir / Path("test-output/result_alignable_dedup.bam")
+def test_dedup_merged_dedup_match(workflow_dir, bam_md5):
+    bam_path = workflow_dir / Path("test-output/merged_dedup.bam")
     bam_md5sum = bam_md5(bam_path)
-    assert bam_md5sum == "a57b13a066a691628910d11f59e3cf0d"
+    assert bam_md5sum == "58eaeef21ade4eabb71dfa0d3889a3be"

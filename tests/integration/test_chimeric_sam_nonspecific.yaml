@@ -1,0 +1,12 @@
+---
+  - name: test_chimeric_sam_nonspecific
+    tags:
+      - integration
+    command: >-
+      tests/caper_run.sh
+      tests/integration/wdl/test_chimeric_sam_nonspecific.wdl
+      tests/integration/json/test_chimeric_sam_nonspecific.json
+    files:
+      - path: test-output/chimeric_sam_nonspecific.bam
+      - path: test-output/result_norm.txt.res.txt
+        md5sum: ac09e2da6a6e0844e3e874a7c02d0ef9

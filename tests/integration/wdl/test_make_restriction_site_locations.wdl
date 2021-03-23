@@ -1,6 +1,6 @@
 version 1.0
 
-import "../../../hic.wdl" as hic
+import "../../../make_restriction_site_locations.wdl"
 
 workflow test_make_restriction_site_locations {
 
@@ -10,7 +10,7 @@ workflow test_make_restriction_site_locations {
         String restriction_enzyme
     }
 
-    call hic.make_restriction_site_locations { input:
+    call make_restriction_site_locations.make_restriction_site_locations_ { input:
         reference_fasta = reference_fasta,
         assembly_name = assembly_name,
         restriction_enzyme = restriction_enzyme,

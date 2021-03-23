@@ -7,18 +7,13 @@
       hic.wdl
       tests/functional/json/test_hic_with_read_group.json
     files:
-      - path: test-output/with_read_group.bam
-      - path: test-output/result_alignable_dedup.bam
+      - path: test-output/merged_dedup.bam
       - path: test-output/pairix.bsorted.pairs.gz
-      - path: test-output/alignment_stats.txt
-        md5sum: 114926d420451befd6842690467b560d
-      - path: test-output/glob-6a31d38462145ec363d0f357468a1d26/inter_1.hic
-        md5sum: af461140dfb44fc1a08866d1a1c0dc48
-      - path: test-output/glob-6a31d38462145ec363d0f357468a1d26/inter_30.hic
-        md5sum: 6c85500d60cf3f70d71e22a4c497d9ac
-      - path: test-output/library_complexity.json
-        md5sum: 64ed2a3f04117f1ee2392ba9ea072f3c
-      - path: test-output/merged_nodups.txt.gz
-        md5sum: f94ce837695062ab0a157b5ee935d4f1
-      - path: test-output/stats.json
-        md5sum: 269844316f24280db0fc502bfebda2aa
+      - path: test-output/inter_1.hic
+        md5sum: 63d7829502c10ad26860c12f2a4b995d
+      - path: test-output/inter_30.hic
+        md5sum: c43b0ccaad358dd596c2d4442889eb9f
+      - path: test-output/merged_nodups_30.txt.gz
+        md5sum: fa719e3286a68175032500d99c1c53c5
+      - path: test-output/stats_30.json
+        md5sum: 544efbd6f509666bd29315dc33a0acfd

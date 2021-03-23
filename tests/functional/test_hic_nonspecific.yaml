@@ -1,0 +1,16 @@
+---
+  - name: test_hic_nonspecific
+    tags:
+      - functional
+    command: >-
+      tests/caper_run.sh
+      hic.wdl
+      tests/functional/json/test_hic_nonspecific.json
+    files:
+      - path: test-output/inter_30.hic
+        md5sum: 5d559d990b82067d377e5205d70eed3b
+    stdout:
+      contains:
+        - call-chimeric_sam_nonspecific
+      must_not_contain:
+        - call-chimeric_sam_specific

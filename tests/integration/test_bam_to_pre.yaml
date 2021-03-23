@@ -1,0 +1,13 @@
+---
+  - name: test_bam_to_pre
+    tags:
+      - integration
+    command: >-
+      tests/caper_run.sh
+      tests/integration/wdl/test_bam_to_pre.wdl
+      tests/integration/json/test_bam_to_pre.json
+    files:
+      - path: test-output/merged_nodups_30.txt.gz
+        md5sum: 7029066c27ac6f5ef18d660d5741979a
+      - path: test-output/merged_nodups_30_index.txt.gz
+        md5sum: 1725a0c1e3ae4fa255c66d58166a89b9

@@ -1,0 +1,18 @@
+{
+  "hic.assembly_name": "ce10",
+  "hic.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
+  "hic.fastq": [
+    [
+      [
+        "tests/data/merged_read1.fastq.gz",
+        "tests/data/merged_read2.fastq.gz"
+      ]
+    ]
+  ],
+  "hic.no_call_loops": true,
+  "hic.no_call_tads": true,
+  "hic.reference_index": "tests/data/ce10_selected.tar.gz",
+  "hic.restriction_enzymes": [
+    "none"
+  ]
+}

@@ -1,0 +1,13 @@
+---
+  - name: test_merge_unit
+    tags:
+      - unit
+    command: >-
+      tests/caper_run.sh
+      tests/unit/wdl/test_merge.wdl
+      tests/unit/json/test_merge.json
+    stdout:
+      contains:
+        - --threads 3
+      contains_regex:
+        - 'dummy.txt .*dummy.txt'

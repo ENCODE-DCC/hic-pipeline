@@ -1,0 +1,29 @@
+---
+  - name: test_calculate_stats
+    tags:
+      - integration
+    command: >-
+      tests/caper_run.sh
+      tests/integration/wdl/test_calculate_stats.wdl
+      tests/integration/json/test_calculate_stats.json
+    files:
+      - path: test-output/stats_30.txt
+        md5sum: f8d5f31789b6ffcac5e74a24fcce0d22
+      - path: test-output/stats_30.json
+        md5sum: 2c646d665803c256492f1925760932e6
+      - path: test-output/stats_30_hists.m
+        md5sum: ab658688a8ec1bf2d31dd54e146b1e9a
+  - name: test_calculate_stats_no_restriction_sites
+    tags:
+      - integration
+    command: >-
+      tests/caper_run.sh
+      tests/integration/wdl/test_calculate_stats.wdl
+      tests/integration/json/test_calculate_stats_no_restriction_sites.json
+    files:
+      - path: test-output/stats_30.txt
+        md5sum: 2968775edfc3a4cf6cd2acafccdc31fe
+      - path: test-output/stats_30.json
+        md5sum: 48b3c31e704c449a92d8973b454f8837
+      - path: test-output/stats_30_hists.m
+        md5sum: 61ce29adb59c94f3c25deb577e0590d4

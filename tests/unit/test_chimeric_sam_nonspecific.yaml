@@ -1,0 +1,15 @@
+---
+  - name: test_chimeric_sam_nonspecific_unit
+    tags:
+      - unit
+    command: >-
+      tests/caper_run.sh
+      tests/unit/wdl/test_chimeric_sam_nonspecific.wdl
+      tests/unit/json/test_chimeric_sam_nonspecific.json
+    stdout:
+      contains:
+        - -@ 3
+        - dummy.txt > result.sam
+        - --threads 4
+      contains_regex:
+        - 'cp .*dummy.txt result_norm.txt.res.txt'
