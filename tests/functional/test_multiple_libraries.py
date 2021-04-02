@@ -1,17 +1,12 @@
-from pathlib import Path
+import hashlib
 
 import pytest
 
 
 @pytest.mark.workflow("test_multiple_libraries")
-def test_multiple_libraries_alignable_bam_match(workflow_dir, bam_md5):
-    bam_path = workflow_dir / Path("test-output/result_alignable_dedup.bam")
-    bam_md5sum = bam_md5(bam_path)
-    assert bam_md5sum == "1d36f1e13987f5de4df7cd08bcf7982d"
-
-
-@pytest.mark.workflow("test_multiple_libraries")
-def test_multiple_libraries_pairs_match(workflow_dir, skip_n_lines_md5):
-    pairs_path = workflow_dir / Path("test-output/pairix.bsorted.pairs.gz")
-    pairs_md5 = skip_n_lines_md5(pairs_path, n_lines=5)
-    assert pairs_md5 == "c176bc697d89b60e1f8ad916942537db"
+def test_multiple_libraries_hic_match(workflow_dir):
+    hic_path = next(
+        workflow_dir.glob("hic/*/call-create_hic/shard-1/execution/inter_30.hic")
+    )
+    hic_md5sum = hashlib.md5(hic_path.read_bytes()).hexdigest()
+    assert hic_md5sum == "c60274c52dc0f9a0e0fddf7488bf7f9c"

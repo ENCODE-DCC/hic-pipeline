@@ -7,12 +7,3 @@
       hic.wdl
       tests/functional/json/test_multiple_libraries.json
       --no-relative-output-paths
-    files:
-      - path: test-output/result_alignable_dedup.bam
-      - path: test-output/pairix.bsorted.pairs.gz
-      - path: test-output/inter_1.hic
-        md5sum: add9e80e2542635fbdb4177265a1b8b2
-      - path: test-output/inter_30.hic
-        md5sum: 229e92305074af021836fbf84d05a4ac
-      - path: test-output/merged_nodups_30.txt.gz
-        md5sum: 732861f1392940e9efa84d55b282022a
