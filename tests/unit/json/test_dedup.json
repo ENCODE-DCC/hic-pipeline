@@ -1,0 +1,4 @@
+{
+  "test_dedup.bam": "tests/data/dummy.txt",
+  "test_dedup.num_cpus": 4
+}

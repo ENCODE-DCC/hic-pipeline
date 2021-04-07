@@ -1,7 +1,7 @@
 {
-  "test_no_bam2pairs.assembly_name": "ce10",
-  "test_no_bam2pairs.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
-  "test_no_bam2pairs.fastq": [
+  "hic.assembly_name": "ce10",
+  "hic.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
+  "hic.fastq": [
     [
       [
         "tests/data/merged_read1.fastq.gz",
@@ -9,12 +9,12 @@
       ]
     ]
   ],
-  "test_no_bam2pairs.no_bam2pairs": true,
-  "test_no_bam2pairs.no_call_loops": true,
-  "test_no_bam2pairs.no_call_tads": true,
-  "test_no_bam2pairs.reference_index": "tests/data/ce10_selected.tar.gz",
-  "test_no_bam2pairs.restriction_enzymes": [
+  "hic.no_bam2pairs": true,
+  "hic.no_call_loops": true,
+  "hic.no_call_tads": true,
+  "hic.reference_index": "tests/data/ce10_selected.tar.gz",
+  "hic.restriction_enzymes": [
     "MboI"
   ],
-  "test_no_bam2pairs.restriction_sites": "tests/data/ce10_selected_MboI.txt"
+  "hic.restriction_sites": "tests/data/ce10_selected_MboI.txt"
 }

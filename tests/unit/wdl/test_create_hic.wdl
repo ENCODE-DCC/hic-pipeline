@@ -4,22 +4,24 @@ import "../../../hic.wdl" as hic
 
 workflow test_create_hic {
     input {
-        File pairs_file
-        File chrsz_
-        File restriction_sites
-        String ligation_site
-        String quality
+        File pre
+        File pre_index
+        File stats
+        File stats_hists
+        File chrsz
         String assembly_name
         Array[String] normalization_methods = []
+        Int quality
     }
 
     call hic.create_hic { input:
-        assembly_name = assembly_name,
-        chrsz_ = chrsz_,
-        ligation_site = ligation_site,
-        normalization_methods = normalization_methods,
-        pairs_file = pairs_file,
+        pre = pre,
+        pre_index = pre_index,
+        stats = stats,
+        stats_hists = stats_hists,
+        chrsz = chrsz,
         quality = quality,
-        restriction_sites = restriction_sites,
+        assembly_name = assembly_name,
+        normalization_methods = normalization_methods,
     }
 }

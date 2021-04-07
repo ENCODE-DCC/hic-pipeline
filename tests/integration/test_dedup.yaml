@@ -7,10 +7,6 @@
       tests/integration/wdl/test_dedup.wdl
       tests/integration/json/test_dedup.json
     files:
-      - path: test-output/result_alignable_dedup.bam
-      - path: test-output/library_complexity.json
-        md5sum: 28a6cd5d363069c16b26e73f06423dcd
-      - path: test-output/merged_nodups.txt.gz
-        md5sum: e75252f7b3ce8862957841fec212d372
-      - path: test-output/stats.json
-        md5sum: 0bf37e3571b5b7668a886b7725c1705c
+      - path: test-output/merged_dedup.bam
+      - path: test-output/duplicate_count.txt
+        md5sum: 9d41b3aff5a04acb9874ceaf2b7504a7

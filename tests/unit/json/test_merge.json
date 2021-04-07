@@ -1,0 +1,7 @@
+{
+  "test_merge.bams": [
+    "tests/data/dummy.txt",
+    "tests/data/dummy.txt"
+  ],
+  "test_merge.num_cpus": 4
+}

@@ -1,0 +1,6 @@
+{
+  "test_chimeric_sam_specific.bam": "tests/data/dummy.txt",
+  "test_chimeric_sam_specific.ligation_count": "tests/data/dummy.txt",
+  "test_chimeric_sam_specific.num_cpus": 4,
+  "test_chimeric_sam_specific.restriction_sites": "tests/data/dummy.txt"
+}

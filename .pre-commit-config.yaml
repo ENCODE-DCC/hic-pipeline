@@ -24,13 +24,6 @@ repos:
       - id: shell-lint
         args: [--severity=warning]
 
-  - repo: https://github.com/doublify/pre-commit-rust
-    rev: master
-    hooks:
-      - id: fmt
-      - id: cargo-check
-      - id: clippy
-
   - repo: git://github.com/detailyang/pre-commit-shell
     sha: v1.0.6
     hooks:
@@ -51,7 +44,7 @@ repos:
       - id: check-yaml
 
   - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-    rev: 0.0.10
+    rev: 0.1.0
     hooks:
       - id: yamlfmt
-        args: [--mapping, '2', --sequence, '4', --offset, '2']
+        args: [--mapping, '2', --sequence, '4', --offset, '2', --preserve-quotes]

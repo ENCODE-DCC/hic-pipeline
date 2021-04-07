@@ -1,0 +1,12 @@
+{
+  "test_calculate_stats.alignment_stats": [
+    "tests/data/chimeric_sam_specific_stats.txt"
+  ],
+  "test_calculate_stats.duplicate_counts": [
+    "tests/data/duplicate_count.txt"
+  ],
+  "test_calculate_stats.ligation_site": "GATCGATC",
+  "test_calculate_stats.pre": "tests/data/merged_nodups.txt.gz",
+  "test_calculate_stats.quality": 30,
+  "test_calculate_stats.restriction_sites": "tests/data/ce10_selected_MboI.txt"
+}

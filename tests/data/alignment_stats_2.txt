@@ -1,9 +1,0 @@
-Sequenced Read Pairs:  155520
- Normal Paired: 12220 (7.86%)
- Chimeric Paired: 1 (0.00%)
- Collisions: 0 (0.00%)
- Low MAPQ Collisions: 0 (0.00%)
- Unmapped: 137158 (88.19%)
- MAPQ 0: 6141 (3.95%)
- Ligation Motif Present: 83 (0.05%)
-Alignable (Normal+Chimeric Paired): 12221 (7.86%)

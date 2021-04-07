@@ -8,6 +8,6 @@
       tests/unit/json/test_entrypoint_from_bams.json
     stdout:
       contains:
-        - fragment result_norm.txt
+        - chimeric_sam.awk
       must_not_contain:
         - bwa mem

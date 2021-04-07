@@ -19,10 +19,20 @@ fi
 
 WDL=$1
 INPUT=$2
+WORKFLOW_OPTIONS="tests/pytest_workflow_options.json"
+WORKFLOW_OPTIONS_FLAG="--no-relative-output-paths"
 
-echo "Running caper with WDL ${WDL}, input ${INPUT}, and image ${HIC_DOCKER_IMAGE_TAG}"
+if [ $# -gt 2 ]; then
+    if [ "$3" != "${WORKFLOW_OPTIONS_FLAG}" ]; then
+        echo "Third argument must be ${WORKFLOW_OPTIONS_FLAG}"
+        exit 1
+    fi
+    WORKFLOW_OPTIONS="tests/pytest_workflow_no_relative_output_paths.json"
+fi
 
-caper run "${WDL}" -i "${INPUT}" --docker "${HIC_DOCKER_IMAGE_TAG}" -o ./tests/pytest_workflow_options.json
+echo "Running caper with WDL ${WDL}, input ${INPUT}, workflow options ${WORKFLOW_OPTIONS}, and image ${HIC_DOCKER_IMAGE_TAG}"
+
+caper run "${WDL}" -i "${INPUT}" --docker "${HIC_DOCKER_IMAGE_TAG}" -o "./${WORKFLOW_OPTIONS}"
 
 if [[ -f "cromwell.out" ]]; then
     cat cromwell.out

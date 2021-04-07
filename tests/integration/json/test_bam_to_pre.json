@@ -1,0 +1,5 @@
+{
+  "test_bam_to_pre.bam": "tests/data/alignable_shard0.bam",
+  "test_bam_to_pre.num_cpus": 1,
+  "test_bam_to_pre.quality": 30
+}

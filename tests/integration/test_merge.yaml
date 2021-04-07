@@ -7,4 +7,4 @@
       tests/integration/wdl/test_merge.wdl
       tests/integration/json/test_merge.json
     files:
-      - path: test-output/merged_bam_files.bam
+      - path: test-output/merged.bam

@@ -30,7 +30,7 @@ To verify your installation, you can run the following pipeline with a test data
 > Note: this will incur some cost when running in cloud environments.
 
 ```bash
-$ caper run hic.wdl -i tests/functional/json/test_hic_with_read_group.json
+$ caper run hic.wdl -i tests/functional/json/test_hic.json --docker
 ```
 
 For detailed usage, see [usage](docs/usage.md)

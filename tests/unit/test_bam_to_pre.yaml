@@ -1,0 +1,14 @@
+---
+  - name: test_bam_to_pre_unit
+    tags:
+      - unit
+    command: >-
+      tests/caper_run.sh
+      tests/unit/wdl/test_bam_to_pre.wdl
+      tests/unit/json/test_bam_to_pre.json
+    stdout:
+      contains:
+        - MERGED_NODUPS_FILENAME=merged_nodups_99.txt
+        - MERGED_NODUPS_INDEX_FILENAME=merged_nodups_99_index.txt
+        - -@ 3
+        - mapq=99

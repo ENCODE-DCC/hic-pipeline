@@ -1,7 +1,10 @@
 {
   "test_create_hic.assembly_name": "ce10",
   "test_create_hic.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
-  "test_create_hic.ligation_site": "GATCGATC",
-  "test_create_hic.pairs_file": "tests/data/merged_nodups.txt.gz",
-  "test_create_hic.restriction_sites": "tests/data/ce10_selected_MboI.txt"
+  "test_create_hic.num_cpus": 1,
+  "test_create_hic.pre": "tests/data/merged_nodups.txt.gz",
+  "test_create_hic.pre_index": "tests/data/merged_nodups_index.txt.gz",
+  "test_create_hic.quality": 30,
+  "test_create_hic.stats": "tests/data/stats.txt",
+  "test_create_hic.stats_hists": "tests/data/stats_hists.m"
 }

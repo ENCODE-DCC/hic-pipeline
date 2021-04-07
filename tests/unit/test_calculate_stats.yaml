@@ -1,0 +1,27 @@
+---
+  - name: test_calculate_stats_unit
+    tags:
+      - unit
+    command: >-
+      tests/caper_run.sh
+      tests/unit/wdl/test_calculate_stats.wdl
+      tests/unit/json/test_calculate_stats.json
+    stdout:
+      contains:
+        - dummy.txt >> $STATS_FILENAME
+        - STATS_FILENAME=stats_30.txt
+        - -l CAT
+      contains_regex:
+        - 'gzip -dc .*dummy.txt >'
+        - 'stats_sub.awk.*dummy.txt .*dummy.txt'
+        - '-s .*dummy.txt'
+  - name: test_calculate_stats_no_restriction_sites_unit
+    tags:
+      - unit
+    command: >-
+      tests/caper_run.sh
+      tests/unit/wdl/test_calculate_stats.wdl
+      tests/unit/json/test_calculate_stats_no_restriction_sites.json
+    stdout:
+      contains:
+        - s none

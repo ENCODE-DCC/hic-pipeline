@@ -4,14 +4,6 @@
       - functional
     command: >-
       tests/caper_run.sh
-      tests/functional/wdl/test_multiple_libraries.wdl
+      hic.wdl
       tests/functional/json/test_multiple_libraries.json
-    files:
-      - path: test-output/result_alignable_dedup.bam
-      - path: test-output/pairix.bsorted.pairs.gz
-      - path: test-output/glob-6a31d38462145ec363d0f357468a1d26/inter_1.hic
-        md5sum: add9e80e2542635fbdb4177265a1b8b2
-      - path: test-output/glob-6a31d38462145ec363d0f357468a1d26/inter_30.hic
-        md5sum: 229e92305074af021836fbf84d05a4ac
-      - path: test-output/merged_nodups.txt.gz
-        md5sum: 732861f1392940e9efa84d55b282022a
+      --no-relative-output-paths

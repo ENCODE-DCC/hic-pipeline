@@ -1,6 +1,6 @@
 {
   "hic.align": {
-    "result": {
+    "bam": {
       "path": "align/rep${i+1}/read_pair_${j+1}/${basename}",
       "table": "Align/Replicate ${i+1}/Read Pair ${j+1}/Raw BAM"
     }
@@ -11,38 +11,26 @@
       "table": "Arrowhead TAD Calls"
     }
   },
-  "hic.create_hic": {
-    "inter": {
-      "path": "create_hic/${basename}",
-      "table": "Create HiC/HiC Files/MAPQ ${basename.split('.')[0].lstrip('inter_')}"
+  "hic.calculate_stats": {
+    "stats": {
+      "path": "calculate_stats/${basename}",
+      "table": "Calculate Stats/Stats txt/MAPQ ${basename.split('.')[0].lstrip('stats_')}"
     },
     "stats_json": {
-      "path": "qc/quality_${basename.split('.')[0].lstrip('inter_')}",
-      "table": "QC and logs/Merged Stats/MAPQ ${basename.split('.')[0].lstrip('inter_')}"
+      "path": "calculate_stats/${basename}",
+      "table": "Calculate Stats/Stats JSON/MAPQ ${basename.split('.')[0].lstrip('stats_')}"
+    }
+  },
+  "hic.create_hic": {
+    "output_hic": {
+      "path": "create_hic/${basename}",
+      "table": "Create HiC/HiC Files/MAPQ ${basename.split('.')[0].lstrip('inter_')}"
     }
   },
   "hic.dedup": {
     "deduped_bam": {
       "path": "dedup/rep${i+1}/${basename}",
       "table": "Filtering/Replicate ${i+1}/Filtered Merged BAMs"
-    },
-    "library_complexity_json": {
-      "path": "qc/rep${i+1}/${basename}",
-      "table": "QC and logs/Replicate ${i+1}/Library Complexity QC"
-    },
-    "stats_json": {
-      "path": "qc/rep${i+1}/${basename}",
-      "table": "QC and logs/Replicate ${i+1}/Library Stats QC"
-    }
-  },
-  "hic.fragment": {
-    "alignable": {
-      "path": "align/rep${i+1}/read_pair_${j+1}/${basename}",
-      "table": "Align/Replicate ${i+1}/Read Pair ${j+1}/Alignable BAM"
-    },
-    "alignment_stats_json": {
-      "path": "qc/rep${i+1}/read_pair_${j+1}/${basename}",
-      "table": "QC and logs/Replicate ${i+1}/Read Pair ${j+1}/Alignment stats JSON"
     }
   },
   "hic.hiccups": {

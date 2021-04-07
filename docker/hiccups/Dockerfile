@@ -21,8 +21,11 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /opt/
 
 # Install Juicer
-RUN git clone --branch encode https://github.com/theaidenlab/juicer.git
-RUN cd juicer && chmod +x CPU/* CPU/common/*
+RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
+    cd juicer && \
+    git checkout ff481e8c29aba67f69040ff3658199b7d9715096 && \
+    chmod +x CPU/* CPU/common/* misc/* && \
+    find -mindepth 1 -maxdepth 1  -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
 
 # Install Juicer tools
 ADD http://s3.amazonaws.com/hicfiles.tc4ga.com/public/juicer/juicer_tools_1.11.09_jcuda.0.8.jar /opt/juicer/CPU/common

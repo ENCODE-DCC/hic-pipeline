@@ -1,0 +1,5 @@
+{
+  "test_chimeric_sam_nonspecific.bam": "tests/data/dummy.txt",
+  "test_chimeric_sam_nonspecific.ligation_count": "tests/data/dummy.txt",
+  "test_chimeric_sam_nonspecific.num_cpus": 4
+}

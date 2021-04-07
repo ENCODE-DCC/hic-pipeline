@@ -7,9 +7,7 @@
   - [Inputs](#inputs)
     - [Entrypoints](#entrypoints)
       - [From fastqs](#from-fastqs)
-      - [From aligned BAM](#from-aligned-bam)
-      - [From processed libraries](#from-processed-libraries)
-      - [From merged libraries](#from-merged-libraries)
+      - [From aligned BAMs](#from-aligned-bams)
       - [From hic file for loop and TAD calls](#from-hic-file-for-loop-and-tad-calls)
       - [Generating restriction site files](#generating-restriction-site-files)
     - [Input descriptions](#input-descriptions)
@@ -39,38 +37,13 @@ Runs the pipeline from the very beginning starting from `fastq` files. `read_gro
 *Optional inputs*
 * `read_groups`
 
-#### From aligned BAM
+#### From aligned BAMs
 
 Runs the pipeline from starting from `bam` files, skipping `bwa` alignment.
 
 *Required inputs*
 * `bams`
 * `ligation_counts`
-* `restriction_enzymes`
-* `restriction_sites`
-* `chrsz`
-
-#### From processed libraries
-
-Runs the pipeline from starting with files from libraries that have already been processed by the pipeline. While `alignment_stats` and `library_stats` are optional it is highly recommended to specify them to obtain QC values for the merged libraries.
-
-*Required inputs*
-* `input_dedup_pairs`
-* `restriction_enzymes`
-* `restriction_sites`
-* `chrsz`
-
-
-*Optional inputs*
-* `alignment_stats`
-* `library_stats`
-
-#### From merged libraries
-
-Runs the pipeline starting with single Juicer-format text file.
-
-*Required inputs*
-* `input_pairs`
 * `restriction_enzymes`
 * `restriction_sites`
 * `chrsz`
@@ -84,12 +57,12 @@ Runs the pipeline starting with a `.hic` file for loop and TAD calling.
 
 #### Generating restriction site files
 
-Runs the restriction sites file generation step only.
+Use the WDL `make_restriction_site_locations.wdl` to generate the restriction sites file for your enzyme and reference fasta.
 
 *Required inputs*
 * `reference_fasta`
-* `restriction_enzymes`
-* `restriction_site_locations_only`, should be set to `true`
+* `restriction_enzyme`
+* `assembly_name`, should be set to `true`
 
 ### Input descriptions
 
@@ -123,17 +96,12 @@ Runs the restriction sites file generation step only.
 * `bams` is a nested array of aligned, unfiltered BAM files, organized by `[replicate][library]`
 * `ligation_counts` is an array of text files containing ligation counts for the `fastq` pair, organized by `[biological replicate][techincal replicate]`. These should be calculated from `fastqs` using the Juicer `countligations` script: https://github.com/aidenlab/juicer/blob/encode/CPU/common/
 countligations.sh
-* `input_pairs` is a text file containing the paired fragments to use to generate `.hic` contact maps, a detailed description of the file format can be found [here](https://github.com/aidenlab/juicer/wiki/Pre#long-format)
 * `input_hic` is an input `.hic` file which will be used to call loops and domains
 * `normalization_methods` is an array of normalization methods to use for `.hic` file generation as per Juicer Tools `pre`. If not specified then will use `pre` defaults of `VC`, `VC_SQRT`, `KR`, and `SCALE`. Valid methods are `VC`, `VC_SQRT`, `KR`, `SCALE`, `GW_KR`, `GW_SCALE`, `GW_VC`, `INTER_KR`, `INTER_SCALE`, and `INTER_VC.
-* `input_dedup_pairs` is an a array consisting of text files in the [Juicer pre long format](https://github.com/aidenlab/juicer/wiki/Pre#long-format) of paired fragments, one per library.
-* `alignment_stats` is an array consisting of text files of alignment stats, one per library. Use is recommended but not required when merging libraries in order to calculate quality metrics on the merged libraries.
-* `library_stats` is an array consisting of text files of library stats, one per library. Use is recommended but not required when merging libraries in order to calculate quality metrics on the merged libraries.
 * `reference_fasta` is FASTA file for the genome of interest to be used for generating restriction site locations. For the output locations file to have a descriptive filename it is also recommended to specify the `assembly_name`
 * `no_bam2pairs` is a boolean which if `true` results in skipping generating `.pairs` files, defaults to `false`
 * `no_call_loops` is a boolean which if `true` results in skipping calling loops, defaults to `false`. Since the loop calling requires GPUs it is recommended to set to `true` if you do not
 * `no_call_tads` is a boolean which if `true` skips calling domains with arrowhead, defaults to `false`
-* `include_mapq0_reads` is a boolean which if `true` results in chimeric reads (3+ alignments) with one MAPQ 0 read being classified as normal paired reads with the MAPQ 0 read discarded. If `false` such reads will be classified as low mapq collisions. Defaults to `false`
 * `cpu` is number of threads to use for `bwa` alignment, it is recommended to leave at the default value.
 * `assembly_name` is name of assembly to insert into hic file header, recommended to specify for reproducibility otherwise the resulting `.hic.` file may have variable data in the header (the matrix contents will still be the same).
 
@@ -167,7 +135,6 @@ A draft document describing the pipeline outputs and quality control (QC) values
 
 ### Output descriptions
 
-* `restriction_site_locations` is the generated restriction sites file
 * `alignable_bam` is an array of filtered BAM files, one per biological replicate
 * `out_pairs` is an array of files in [`pairs` format](https://github.com/4dn-dcic/pairix/blob/master/pairs_format_specification.md), one per biological replicate
 * `out_dedup` is an array of files in [Juicer long format](https://github.com/aidenlab/juicer/wiki/Pre#long-format), one per biological replicate
