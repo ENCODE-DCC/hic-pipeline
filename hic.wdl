@@ -232,7 +232,7 @@ task align {
         File idx_tar        # reference bwa index tar
         Array[File] fastqs  # [read_end_id]
         String ligation_site
-        Int? num_cpus = 32
+        Int num_cpus = 32
     }
 
     command {
