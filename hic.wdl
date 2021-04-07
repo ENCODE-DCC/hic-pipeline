@@ -59,7 +59,7 @@ workflow hic {
     }
 
     # Default MAPQ thresholds for generating .hic contact maps
-    Array[String] DEFAULT_HIC_QUALITIES = ["1", "30"]
+    Array[Int] DEFAULT_HIC_QUALITIES = [1, 30]
     Boolean is_nonspecific = length(restriction_enzymes) > 0 && restriction_enzymes[0] == "none"
 
     if (!defined(ligation_site_regex) && !defined(input_hic)) {
