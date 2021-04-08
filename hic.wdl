@@ -519,8 +519,8 @@ task create_hic {
             -jar /opt/scripts/common/juicer_tools.jar \
             pre \
             -n \
-            -s stats_${quality}.txt \
-            -g stats_${quality}_hists.m \
+            -s ~{stats} \
+            -g ~{stats_hists} \
             -r 2500000,1000000,500000,250000,100000,50000,25000,10000,5000,2000,1000,500,200,100 \
             ~{if defined(assembly_name) then "-y " + assembly_name else ""} \
             ~{if length(normalization_methods) > 0 then "-k" else ""} ~{sep="," normalization_methods} \
