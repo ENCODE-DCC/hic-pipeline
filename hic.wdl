@@ -537,7 +537,7 @@ task create_hic {
             addNorm \
             --threads ~{num_cpus} \
             inter_~{quality}.hic
-    }
+    >>>
 
     output {
         File output_hic = "inter_~{quality}.hic"
