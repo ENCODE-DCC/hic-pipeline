@@ -1,7 +1,8 @@
 {
   "test_align.fastq_pair": {
     "read_1": "tests/data/merged_read1.fastq.gz",
-    "read_2": "tests/data/merged_read2.fastq.gz"
+    "read_2": "tests/data/merged_read2.fastq.gz",
+    "read_group": "@RG\\tID:foo\\tDS:cool"
   },
   "test_align.idx_tar": "tests/data/ce10_selected.tar.gz",
   "test_align.ligation_site": "GATCGATC"

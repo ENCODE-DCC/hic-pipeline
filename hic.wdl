@@ -1,5 +1,16 @@
 version 1.0
 
+struct FastqPair {
+    File read_1
+    File read_2
+    String? read_group
+}
+
+struct BamAndLigationCount {
+    File bam
+    File ligation_count
+}
+
 workflow hic {
     meta {
         version: "0.1.0"
@@ -10,17 +21,12 @@ workflow hic {
 
     input {
         # Main entrypoint, need to specify all five of these values except read_groups when running from fastqs
-        Array[Array[Array[File]]] fastq = []
-        Array[Array[String]] read_groups = []
+        Array[Array[FastqPair]] fastq = []
         Array[String] restriction_enzymes = []
         String? ligation_site_regex
         File? restriction_sites
         File? chrsz
         File? reference_index
-
-        # Entrypoint from aligned bam
-        Array[Array[File]]? bams
-        Array[Array[File]]? ligation_counts
 
         # Entrypoint right before hic generation
         File? input_pairs
@@ -38,16 +44,13 @@ workflow hic {
     }
 
     parameter_meta {
-        fastq: "Twice nested array of input fastqs, takes form of [lib_id][fastq_id][read_end_id]"
-        read_groups: "Optional strings to be inserted into the BAM as the read group (@RG), passed via `samtools addreplacerg` `-r` option. One per SE read/read pair with nested array structure mirroring the `fastq` input"
+        fastq: "Twice nested array of input `FastqPair`s, takes form of [lib_id][fastq_id]"
         restriction_enzymes: "An array of names containing the restriction enzyme(s) used to generate the Hi-C libraries"
         restriction_sites: "A text file containing cut sites for the given restriction enzyme. You should generate this file using this script: https://github.com/aidenlab/juicer/blob/encode/misc/generate_site_positions.py"
         ligation_site_regex: "A custom regex to use for counting ligation site, if specified then restriction_sites file must be manually specified. Can be just a single site, e.g. ATGC, or several sites wrapped in parentheses and separated by pipes, e.g. `(ATGC|CTAG)`"
         chrsz: "A chromosome sizes file for the desired assembly, this is a tab-separated text file whose rows take the form [chromosome] [size]"
         reference_index: "A pregenerated BWA index for the desired assembly"
         normalization_methods: "An array of normalization methods to use for .hic file generation as per Juicer Tools `pre`, if not specified then will use `pre` defaults of VC, VC_SQRT, KR, and SCALE. Valid methods are VC, VC_SQRT, KR, SCALE, GW_KR, GW_SCALE, GW_VC, INTER_KR, INTER_SCALE, and INTER_VC."
-        bams: "Aligned, unfiltered bams, organized by [biorep[techrep]]. If specified, the `ligation_counts` array must also be specified"
-        ligation_counts: "Text files containing ligation counts for the fastq pair, organized by [biorep[techrep]]. Has no meaning if the `bams` array is not also be specified. These should be calculated from fastqs using the Juicer countligations script: https://github.com/aidenlab/juicer/blob/encode/CPU/common/countligations.sh"
         input_pairs: "A text file containing the paired fragments to use to generate the .hic contact maps, a detailed format description can be found here: https://github.com/aidenlab/juicer/wiki/Pre#long-format"
         input_pairs_index: "Index of input_pairs as generated with index_by_chr.awk in task bam_to_pre"
         input_hic: "An input .hic file for which to call loops and domains"
@@ -75,48 +78,32 @@ workflow hic {
         }
     }
 
-    # scatter over libraries
-    Int num_bioreps = if defined(bams) then length(select_first([bams])) else length(fastq)
-
-    scatter(i in range(num_bioreps)) {
-        # Align fastqs if input bams were not provided
-        if (!defined(bams) && defined(reference_index)) {
-            scatter(j in range(length(fastq[i]))) {
-                call align { input:
-                    fastqs = fastq[i][j],
-                    idx_tar = select_first([reference_index]),
-                    ligation_site = select_first([ligation_site]),
-                    num_cpus = align_num_cpus,
-                }
-                if (length(read_groups) > 0) {
-                    call add_read_group_to_bam { input:
-                        bam = align.bam,
-                        read_group = read_groups[i][j],
-                    }
-                }
+    scatter(i in range(length(fastq))) {
+        Array[FastqPair] replicate = fastq[i]
+        scatter(fastq_pair in replicate) {
+            call align { input:
+                fastq_pair = fastq_pair,
+                idx_tar = select_first([reference_index]),
+                ligation_site = select_first([ligation_site]),
+                num_cpus = align_num_cpus,
             }
-            Array[File] aligned_bams = select_all(if length(read_groups) > 0 then add_read_group_to_bam.bam_with_read_group else align.bam)
         }
 
-        Array[File] rep_bam_files = if defined(bams) then select_first([bams])[i] else select_first([aligned_bams])
-        Array[File] rep_ligation_counts = if defined(ligation_counts) then select_first([ligation_counts])[i] else select_first([align.ligation_count])
-
-        # Scatter across all the bams in the biorep (one per tech rep)
         if (is_nonspecific) {
-            scatter(j in range(length(rep_bam_files))) {
+            scatter(bam_and_ligation_count in align.bam_and_ligation_count) {
                 call chimeric_sam_nonspecific { input:
-                    bam = rep_bam_files[j],
-                    ligation_count = rep_ligation_counts[j]
+                    bam = bam_and_ligation_count.bam,
+                    ligation_count = bam_and_ligation_count.ligation_count,
                 }
             }
         }
 
         if (!is_nonspecific) {
-            scatter(j in range(length(rep_bam_files))) {
+            scatter(bam_and_ligation_count in align.bam_and_ligation_count) {
                 call chimeric_sam_specific { input:
-                    bam = rep_bam_files[j],
+                    bam = bam_and_ligation_count.bam,
+                    ligation_count = bam_and_ligation_count.ligation_count,
                     restriction_sites = select_first([restriction_sites]),
-                    ligation_count = rep_ligation_counts[j]
                 }
             }
         }
@@ -151,7 +138,7 @@ workflow hic {
         }
     }
 
-    Array[String] qualities = if !defined(input_hic) then DEFAULT_HIC_QUALITIES else []
+    Array[Int] qualities = if !defined(input_hic) then DEFAULT_HIC_QUALITIES else []
     scatter(i in range(length(qualities))) {
         call bam_to_pre { input:
             bam = select_first([merge_replicates.bam]),
@@ -229,8 +216,8 @@ task get_ligation_site_regex {
 
 task align {
     input {
+        FastqPair fastq_pair
         File idx_tar        # reference bwa index tar
-        Array[File] fastqs  # [read_end_id]
         String ligation_site
         Int num_cpus = 32
     }
@@ -249,8 +236,8 @@ task align {
         usegzip=1
         name="result"
         ligation="${ligation_site}"
-        name1=${fastqs[0]}
-        name2=${fastqs[1]}
+        name1=${fastq_pair.read_1}
+        name2=${fastq_pair.read_2}
         ext=""
         #count ligations
         # Need to unset the -e option, when ligation site is XXXX grep will exit with
@@ -260,42 +247,28 @@ task align {
         set -e
         # Align reads
         echo "Running bwa command"
-        bwa mem -SP5M -t ~{num_cpus} $reference_index_path ${fastqs[0]} ${fastqs[1]} |
+        bwa \
+            mem \
+            -SP5M \
+            ~{if defined(fastq_pair.read_group) then "-R '" + fastq_pair.read_group + "'" else ""} \
+            -t ~{num_cpus} \
+            $reference_index_path \
+            ${fastq_pair.read_1} \
+            ${fastq_pair.read_2} | \
             samtools view -hbS - > aligned.bam
         mv result_norm.txt.res.txt ligation_count.txt
     }
 
     output {
-        File bam = "aligned.bam"
-        File ligation_count = "ligation_count.txt"
+        BamAndLigationCount bam_and_ligation_count = object {
+            bam: "aligned.bam",
+            ligation_count: "ligation_count.txt",
+        }
      }
 
     runtime {
         cpu : "~{num_cpus}"
         memory: "64 GB"
-        disks: "local-disk 1000 HDD"
-    }
-}
-
-task add_read_group_to_bam {
-    input {
-        File bam
-        String read_group
-        Int num_cpus = 8
-    }
-
-    command {
-        set -euo pipefail
-        samtools addreplacerg -r "~{read_group}" -o with_read_group.bam --threads "~{num_cpus - 1}" "~{bam}"
-    }
-
-    output {
-        File bam_with_read_group = "with_read_group.bam"
-    }
-
-    runtime {
-        cpu : "~{num_cpus}"
-        memory: "32 GB"
         disks: "local-disk 1000 HDD"
     }
 }

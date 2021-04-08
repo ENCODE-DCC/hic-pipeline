@@ -1,0 +1,10 @@
+{
+  "test_align.fastq_pair": {
+    "read_1": "tests/data/dummy.txt",
+    "read_2": "tests/data/dummy.txt",
+    "read_group": "@RG\\tID:foo"
+  },
+  "test_align.idx_tar": "tests/data/dummy.txt",
+  "test_align.ligation_site": "bar",
+  "test_align.num_cpus": 1
+}
