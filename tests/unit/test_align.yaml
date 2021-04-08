@@ -20,4 +20,4 @@
       tests/unit/json/test_align_with_read_group.json
     stdout:
       contains:
-        - -R @RG\tID:foo
+        - -R '@RG\tID:foo'
