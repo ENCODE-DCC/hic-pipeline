@@ -3,20 +3,20 @@
   "hic.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
   "hic.fastq": [
     [
-      [
-        "tests/data/SRR1665089_R1_split_1.fastq.gz",
-        "tests/data/SRR1665089_R2_split_1.fastq.gz"
-      ]
+      {
+        "read_1": "tests/data/SRR1665089_R1_split_1.fastq.gz",
+        "read_2": "tests/data/SRR1665089_R2_split_1.fastq.gz"
+      }
     ],
     [
-      [
-        "tests/data/SRR1665089_R1_split_2.fastq.gz",
-        "tests/data/SRR1665089_R2_split_2.fastq.gz"
-      ],
-      [
-        "tests/data/SRR1665089_R1_split_3.fastq.gz",
-        "tests/data/SRR1665089_R2_split_3.fastq.gz"
-      ]
+      {
+        "read_1": "tests/data/SRR1665089_R1_split_2.fastq.gz",
+        "read_2": "tests/data/SRR1665089_R2_split_2.fastq.gz"
+      },
+      {
+        "read_1": "tests/data/SRR1665089_R1_split_3.fastq.gz",
+        "read_2": "tests/data/SRR1665089_R2_split_3.fastq.gz"
+      }
     ]
   ],
   "hic.no_call_loops": true,

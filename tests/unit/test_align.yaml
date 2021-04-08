@@ -1,0 +1,23 @@
+---
+  - name: test_align_unit
+    tags:
+      - unit
+    command: >-
+      tests/caper_run.sh
+      tests/unit/wdl/test_align.wdl
+      tests/unit/json/test_align.json
+    stdout:
+      contains:
+        - -t 1
+      must_not_contain:
+        - -R
+  - name: test_align_with_read_group_unit
+    tags:
+      - unit
+    command: >-
+      tests/caper_run.sh
+      tests/unit/wdl/test_align.wdl
+      tests/unit/json/test_align_with_read_group.json
+    stdout:
+      contains:
+        - -R @RG\tID:foo

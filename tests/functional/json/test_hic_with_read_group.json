@@ -3,19 +3,15 @@
   "hic.chrsz": "tests/data/ce10_selected.chrom.sizes.tsv",
   "hic.fastq": [
     [
-      [
-        "tests/data/merged_read1.fastq.gz",
-        "tests/data/merged_read2.fastq.gz"
-      ]
+      {
+        "read_1": "tests/data/merged_read1.fastq.gz",
+        "read_2": "tests/data/merged_read2.fastq.gz",
+        "read_group": "@RG\\tID:foo"
+      }
     ]
   ],
   "hic.no_call_loops": true,
   "hic.no_call_tads": true,
-  "hic.read_groups": [
-    [
-      "ID:foo"
-    ]
-  ],
   "hic.reference_index": "tests/data/ce10_selected.tar.gz",
   "hic.restriction_enzymes": [
     "MboI"

@@ -7,7 +7,6 @@
   - [Inputs](#inputs)
     - [Entrypoints](#entrypoints)
       - [From fastqs](#from-fastqs)
-      - [From aligned BAMs](#from-aligned-bams)
       - [From hic file for loop and TAD calls](#from-hic-file-for-loop-and-tad-calls)
       - [Generating restriction site files](#generating-restriction-site-files)
     - [Input descriptions](#input-descriptions)
@@ -36,17 +35,6 @@ Runs the pipeline from the very beginning starting from `fastq` files. `read_gro
 
 *Optional inputs*
 * `read_groups`
-
-#### From aligned BAMs
-
-Runs the pipeline from starting from `bam` files, skipping `bwa` alignment.
-
-*Required inputs*
-* `bams`
-* `ligation_counts`
-* `restriction_enzymes`
-* `restriction_sites`
-* `chrsz`
 
 #### From hic file for loop and TAD calls
 
@@ -93,9 +81,6 @@ Use the WDL `make_restriction_site_locations.wdl` to generate the restriction si
 * `restriction_sites` is a text file containing cut sites for the given restriction enzyme. For supported enzymes you can generate this using the [reference building entrypoint](#generating-restriction-site-files). Note that if you need to generate a sites file for a multiple digest or for an unsupported enzyme you will need to edit this script and run it yourself: https://github.com/aidenlab/juicer/blob/encode/misc/generate_site_positions.py
 * `chrsz` is a chromosome sizes file for the desired assembly. It is a tab-separated text file whose rows take the form `[chromosome][TAB][size]`. You can find these on the ENCODE portal for some human and mouse assemblies, see [reference files](#reference-files)
 * `reference_index` is a pre-generated BWA index for the desired assembly. Depending on your assembly you may also be able to find these on the ENCODE portal, see [reference files](#reference-files)
-* `bams` is a nested array of aligned, unfiltered BAM files, organized by `[replicate][library]`
-* `ligation_counts` is an array of text files containing ligation counts for the `fastq` pair, organized by `[biological replicate][techincal replicate]`. These should be calculated from `fastqs` using the Juicer `countligations` script: https://github.com/aidenlab/juicer/blob/encode/CPU/common/
-countligations.sh
 * `input_hic` is an input `.hic` file which will be used to call loops and domains
 * `normalization_methods` is an array of normalization methods to use for `.hic` file generation as per Juicer Tools `pre`. If not specified then will use `pre` defaults of `VC`, `VC_SQRT`, `KR`, and `SCALE`. Valid methods are `VC`, `VC_SQRT`, `KR`, `SCALE`, `GW_KR`, `GW_SCALE`, `GW_VC`, `INTER_KR`, `INTER_SCALE`, and `INTER_VC.
 * `reference_fasta` is FASTA file for the genome of interest to be used for generating restriction site locations. For the output locations file to have a descriptive filename it is also recommended to specify the `assembly_name`
@@ -141,7 +126,6 @@ A draft document describing the pipeline outputs and quality control (QC) values
 * `library_complexity_stats_json` is an array of library complexity QC statistics in JSON format, one per biological replicate.
 * `stats` is an array of library QC statistics in JSON format, one per biological replicate. It includes statistics describing the quantity and nature of the Hi-C contacts.
 * `alignment_stats_` is an array of arrays of alignment QC statistics in plain text, one per technical replicate.
-* `bams_with_read_group` is an array of arrays of unfiltered BAM files, one per technical replicate, it is only applicable if `read_groups` was specified as a pipeline input.
 * `merged_stats_json` is a JSON file containing alignment and library statistics for merged libraries
 * `out_hic_1` is a [`.hic` file](https://github.com/aidenlab/juicer/wiki/Data#hic-files) containing the contact matrix filtered by MAPQ >= 1
 * `out_hic_30` is a [`.hic` file](https://github.com/aidenlab/juicer/wiki/Data#hic-files) containing the contact matrix filtered by MAPQ >= 30
