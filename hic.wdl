@@ -22,7 +22,6 @@ workflow hic {
     input {
         # Main entrypoint, need to specify all five of these values except read_groups when running from fastqs
         Array[Array[FastqPair]] fastq = []
-        Array[Array[String]]? read_groups
         Array[String] restriction_enzymes = []
         String? ligation_site_regex
         File? restriction_sites
