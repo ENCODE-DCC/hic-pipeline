@@ -503,7 +503,6 @@ task create_hic {
         File stats_hists
         Array[String] normalization_methods = []
         Int quality
-        Int num_cpus = 8
         String? assembly_name
         Int num_cpus = 16
     }
