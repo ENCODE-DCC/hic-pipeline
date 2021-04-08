@@ -10,3 +10,14 @@
       - path: test-output/aligned.bam
       - path: test-output/ligation_count.txt
         md5sum: 971bc71200b3e7c224f668b82b6e59cf
+  - name: test_align_with_read_group
+    tags:
+      - integration
+    command: >-
+      tests/caper_run.sh
+      tests/integration/wdl/test_align.wdl
+      tests/integration/json/test_align_with_read_group.json
+    files:
+      - path: test-output/aligned.bam
+      - path: test-output/ligation_count.txt
+        md5sum: 971bc71200b3e7c224f668b82b6e59cf
