@@ -252,7 +252,7 @@ task align {
         bwa \
             mem \
             -SP5M \
-            ~{if defined(fastq_pair.read_group) then "-R " + fastq_pair.read_group else ""} \
+            ~{if defined(fastq_pair.read_group) then "-R '" + fastq_pair.read_group + "'" else ""} \
             -t ~{num_cpus} \
             $reference_index_path \
             ${fastq_pair.read_1} \

@@ -26,4 +26,4 @@ def test_align_with_read_group_read_group_added_to_bam_header(bam_path):
 @pytest.mark.workflow("test_align_with_read_group")
 def test_align_with_read_group_bam_match(bam_path, bam_md5):
     bam_md5sum = bam_md5(bam_path)
-    assert bam_md5sum == "8cb6f293859775fdee81a51c73f51c1e"
+    assert bam_md5sum == "6b5734b4d6c86a95651ce75347befbcb"
