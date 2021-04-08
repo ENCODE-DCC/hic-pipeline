@@ -33,9 +33,6 @@ Runs the pipeline from the very beginning starting from `fastq` files. `read_gro
 * `chrsz`
 * `reference_index`
 
-*Optional inputs*
-* `read_groups`
-
 #### From hic file for loop and TAD calls
 
 Runs the pipeline starting with a `.hic` file for loop and TAD calling.
