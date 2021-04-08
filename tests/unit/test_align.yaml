@@ -9,6 +9,10 @@
     stdout:
       contains:
         - -t 1
+        - ligation="bar"
+      contains_regex:
+        - 'name1=.*dummy.txt'
+        - 'name2=.*dummy.txt'
       must_not_contain:
         - -R
   - name: test_align_with_read_group_unit
