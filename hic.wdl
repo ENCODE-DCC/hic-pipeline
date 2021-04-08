@@ -44,8 +44,7 @@ workflow hic {
     }
 
     parameter_meta {
-        fastq: "Twice nested array of input fastqs, takes form of [lib_id][fastq_id][read_end_id]"
-        read_groups: "Optional strings to be inserted into the BAM as the read group (@RG), passed via `samtools addreplacerg` `-r` option. One per SE read/read pair with nested array structure mirroring the `fastq` input"
+        fastq: "Twice nested array of input `FastqPair`s, takes form of [lib_id][fastq_id]"
         restriction_enzymes: "An array of names containing the restriction enzyme(s) used to generate the Hi-C libraries"
         restriction_sites: "A text file containing cut sites for the given restriction enzyme. You should generate this file using this script: https://github.com/aidenlab/juicer/blob/encode/misc/generate_site_positions.py"
         ligation_site_regex: "A custom regex to use for counting ligation site, if specified then restriction_sites file must be manually specified. Can be just a single site, e.g. ATGC, or several sites wrapped in parentheses and separated by pipes, e.g. `(ATGC|CTAG)`"
