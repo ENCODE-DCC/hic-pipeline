@@ -510,8 +510,8 @@ task create_hic {
     command <<<
         set -euo pipefail
         PRE_FILE=pre.txt
+        PRE_INDEX_FILE=pre_index.txt
         gzip -dc ~{pre} > $PRE_FILE
-        PRE_INDEX_FILE=pre.txt
         gzip -dc ~{pre_index} > $PRE_INDEX_FILE
         # If the assembly name is empty, then we write chrsz path into file as usual, otherwise, use the assembly name instead of the path
         java \
