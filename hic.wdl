@@ -517,7 +517,7 @@ task create_hic {
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
-            -Xmx120g \
+            -Xmx200g \
             -jar /opt/scripts/common/juicer_tools.jar \
             pre \
             -n \
@@ -548,7 +548,7 @@ task create_hic {
     runtime {
         cpu : "~{num_cpus}"
         disks: "local-disk 1000 SSD"
-        memory : "128 GB"
+        memory : "200 GB"
     }
 }
 
