@@ -511,6 +511,8 @@ task create_hic {
         set -euo pipefail
         PRE_FILE=pre.txt
         gzip -dc ~{pre} > $PRE_FILE
+        PRE_INDEX_FILE=pre.txt
+        gzip -dc ~{pre_index} > $PRE_INDEX_FILE
         # If the assembly name is empty, then we write chrsz path into file as usual, otherwise, use the assembly name instead of the path
         java \
             -Ddevelopment=false \
@@ -524,7 +526,7 @@ task create_hic {
             -r 2500000,1000000,500000,250000,100000,50000,25000,10000,5000,2000,1000,500,200,100 \
             ~{if defined(assembly_name) then "-y " + assembly_name else ""} \
             ~{if length(normalization_methods) > 0 then "-k" else ""} ~{sep="," normalization_methods} \
-            -i ~{pre_index} \
+            -i $PRE_INDEX_FILE \
             --threads ~{num_cpus} \
             $PRE_FILE \
             inter_~{quality}.hic \
