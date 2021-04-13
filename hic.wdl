@@ -504,7 +504,7 @@ task create_hic {
         Array[String] normalization_methods = []
         Int quality
         String? assembly_name
-        Int num_cpus = 8
+        Int num_cpus = 16
     }
 
     command <<<
