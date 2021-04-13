@@ -517,7 +517,7 @@ task create_hic {
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
-            -Xmx200g \
+            -Xmx120g \
             -jar /opt/scripts/common/juicer_tools.jar \
             pre \
             -n \
