@@ -3,6 +3,13 @@ version 1.0
 import "./hic.wdl"
 
 workflow hic_from_pre {
+    meta {
+        version: "0.1.0"
+        caper_docker: "encodedcc/hic-pipeline:0.1.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:0.1.0"
+        croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
+    }
+
     input {
         File stats
         File stats_hists
