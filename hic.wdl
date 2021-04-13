@@ -504,7 +504,7 @@ task create_hic {
         Array[String] normalization_methods = []
         Int quality
         String? assembly_name
-        Int num_cpus = 16
+        Int num_cpus = 8
     }
 
     command <<<
@@ -548,7 +548,7 @@ task create_hic {
     runtime {
         cpu : "~{num_cpus}"
         disks: "local-disk 1000 SSD"
-        memory : "200 GB"
+        memory : "128 GB"
     }
 }
 
