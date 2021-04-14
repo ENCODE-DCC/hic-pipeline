@@ -517,7 +517,7 @@ task create_hic {
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
-            -Xmx240g \
+            -Xmx290g \
             -jar /opt/scripts/common/juicer_tools.jar \
             pre \
             -n \
@@ -535,7 +535,7 @@ task create_hic {
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
-            -Xmx240g \
+            -Xmx290g \
             -jar /opt/scripts/common/juicer_tools.jar \
             addNorm \
             --threads ~{num_cpus} \
@@ -549,7 +549,7 @@ task create_hic {
     runtime {
         cpu : "~{num_cpus}"
         disks: "local-disk 2000 SSD"
-        memory : "256 GB"
+        memory : "300 GB"
     }
 }
 
