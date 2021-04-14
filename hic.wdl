@@ -504,7 +504,7 @@ task create_hic {
         Array[String] normalization_methods = []
         Int quality
         String? assembly_name
-        Int num_cpus = 16
+        Int num_cpus = 24
     }
 
     command <<<
@@ -527,6 +527,7 @@ task create_hic {
             ~{if defined(assembly_name) then "-y " + assembly_name else ""} \
             ~{if length(normalization_methods) > 0 then "-k" else ""} ~{sep="," normalization_methods} \
             -i $PRE_INDEX_FILE \
+            --block-capacity 1000000 \
             --threads ~{num_cpus} \
             $PRE_FILE \
             inter_~{quality}.hic \
