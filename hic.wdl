@@ -517,7 +517,7 @@ task create_hic {
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
-            -Xmx290g \
+            -Xmx390g \
             -jar /opt/scripts/common/juicer_tools.jar \
             pre \
             -n \
@@ -525,7 +525,6 @@ task create_hic {
             -g ~{stats_hists} \
             -r 2500000,1000000,500000,250000,100000,50000,25000,10000,5000,2000,1000,500,200,100 \
             ~{if defined(assembly_name) then "-y " + assembly_name else ""} \
-            ~{if length(normalization_methods) > 0 then "-k" else ""} ~{sep="," normalization_methods} \
             -i $PRE_INDEX_FILE \
             --block-capacity 1000000 \
             --threads ~{num_cpus} \
@@ -535,9 +534,10 @@ task create_hic {
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
-            -Xmx290g \
+            -Xmx390g \
             -jar /opt/scripts/common/juicer_tools.jar \
             addNorm \
+            ~{if length(normalization_methods) > 0 then "-k" else ""} ~{sep="," normalization_methods} \
             --threads ~{num_cpus} \
             inter_~{quality}.hic
     >>>
@@ -549,7 +549,7 @@ task create_hic {
     runtime {
         cpu : "~{num_cpus}"
         disks: "local-disk 2000 SSD"
-        memory : "300 GB"
+        memory : "400 GB"
     }
 }
 
