@@ -13,7 +13,6 @@ workflow hic_from_pre {
     input {
         File stats
         File stats_hists
-        File chrsz
         File pre
         File pre_index
         String assembly_name
@@ -23,7 +22,6 @@ workflow hic_from_pre {
     call hic.create_hic { input:
         pre = pre,
         pre_index = pre_index,
-        chrsz = chrsz,
         quality = quality,
         stats = stats,
         stats_hists = stats_hists,

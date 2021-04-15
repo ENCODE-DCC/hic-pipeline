@@ -58,7 +58,7 @@ workflow hic {
         no_call_loops: "If set to `true`, avoid calling loops with hiccups, defaults to false"
         no_call_tads: "If set to `true`, avoid calling domains with arrowhead, defaults to false"
         align_num_cpus: "Number of threads to use for bwa alignment"
-        assembly_name: "Name of assembly to insert into hic file header, recommended to specify for reproducbility otherwise hic file will be nondeterministic"
+        assembly_name: "Name of assembly to use for hic creation. For valid options see `genomeID` at https://github.com/aidenlab/juicer/wiki/Pre"
     }
 
     # Default MAPQ thresholds for generating .hic contact maps
@@ -496,7 +496,6 @@ task calculate_stats {
 
 task create_hic {
     input {
-        File chrsz
         File pre
         File pre_index
         File stats
@@ -504,6 +503,7 @@ task create_hic {
         Array[String] normalization_methods = []
         Int quality
         String? assembly_name
+        File? chrsz
         Int num_cpus = 24
     }
 
@@ -524,13 +524,12 @@ task create_hic {
             -s ~{stats} \
             -g ~{stats_hists} \
             -r 2500000,1000000,500000,250000,100000,50000,25000,10000,5000,2000,1000,500,200,100 \
-            ~{if defined(assembly_name) then "-y " + assembly_name else ""} \
             -i $PRE_INDEX_FILE \
             --block-capacity 1000000 \
             --threads ~{num_cpus} \
             $PRE_FILE \
             inter_~{quality}.hic \
-            ~{chrsz}
+            ~{if defined(chrsz) then chrsz else assembly_name}
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
