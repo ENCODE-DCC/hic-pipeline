@@ -559,6 +559,7 @@ task create_hic {
 task arrowhead {
     input {
         File hic_file
+        Int ram_gb = 32
     }
 
     command {
@@ -566,7 +567,7 @@ task arrowhead {
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
-            -Xmx16g \
+            -Xmx~{ram_gb}g \
             -jar /opt/scripts/common/juicer_tools.jar \
             arrowhead \
             ${hic_file} \
@@ -581,7 +582,7 @@ task arrowhead {
     runtime {
         cpu : "1"
         disks: "local-disk 100 SSD"
-        memory : "16 GB"
+        memory : "~{ram_gb} GB"
     }
 }
 
