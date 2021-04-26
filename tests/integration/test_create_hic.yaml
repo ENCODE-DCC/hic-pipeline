@@ -8,4 +8,4 @@
       tests/integration/json/test_create_hic.json
     files:
       - path: test-output/inter_30.hic
-        md5sum: 3ab6501d6205c93fa27502528e0e5279
+        md5sum: 61f35e284a1eb555ef39eb63ea72ab5f
