@@ -74,7 +74,7 @@ RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
 
 # Install Juicer tools
 ENV JUICER_TOOLS_VERSION=1.22.01
-ADD juicer_tools.2.06.03.jar /opt/juicer/CPU/common/juicer_tools.jar
+ADD https://s3.amazonaws.com/hicfiles.tc4ga.com/public/juicer/511fb255c56cbfaf7a0fc7bf763cb096/juicer_tools_2.07.02.jar /opt/juicer/CPU/common/juicer_tools.jar
 RUN chmod 666 /opt/juicer/CPU/common/juicer_tools.jar && \
     ln -s juicer/CPU scripts
 
