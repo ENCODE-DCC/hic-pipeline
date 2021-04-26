@@ -16,6 +16,7 @@ workflow hic_from_pre {
         File chrsz
         File pre
         File pre_index
+        File restriction_sites
         String assembly_name
         Int quality
     }
@@ -23,6 +24,7 @@ workflow hic_from_pre {
     call hic.create_hic { input:
         pre = pre,
         pre_index = pre_index,
+        restriction_sites = restriction_sites,
         chrsz = chrsz,
         quality = quality,
         stats = stats,

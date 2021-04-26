@@ -164,6 +164,7 @@ workflow hic {
             pre = select_first([input_pairs, bam_to_pre.pre]),
             pre_index = select_first([input_pairs_index, bam_to_pre.index]),
             chrsz = select_first([chrsz]),
+            restriction_sites = restriction_sites,
             quality = qualities[i],
             stats = calculate_stats.stats,
             stats_hists = calculate_stats.stats_hists,
@@ -504,6 +505,7 @@ task create_hic {
         Int quality
         String? assembly_name
         File? chrsz
+        File? restriction_sites
         Int num_cpus = 24
     }
 
@@ -521,6 +523,7 @@ task create_hic {
             -jar /opt/scripts/common/juicer_tools.jar \
             pre \
             -n \
+            ~{if defined(restriction_sites) then "-f " + restriction_sites else ""} \
             -s ~{stats} \
             -g ~{stats_hists} \
             -r 2500000,1000000,500000,250000,100000,50000,25000,10000,5000,2000,1000,500,200,100 \
