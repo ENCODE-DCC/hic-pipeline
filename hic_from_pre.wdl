@@ -4,9 +4,9 @@ import "./hic.wdl"
 
 workflow hic_from_pre {
     meta {
-        version: "0.1.0"
+        version: "0.2.0"
         caper_docker: "gcr.io/hic-pipeline/new-jar:latest"
-        caper_singularity: "docker://encodedcc/hic-pipeline:0.1.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:0.2.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
