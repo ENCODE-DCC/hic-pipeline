@@ -3,4 +3,3 @@
 !hic_pipeline/*.py
 !hic_pipeline/*.awk
 !hic_pipeline/*/
-!juicer_tools.2.06.03.jar
