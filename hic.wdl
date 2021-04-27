@@ -470,6 +470,7 @@ task calculate_stats {
         STATS_FILENAME=stats_~{quality}.txt
         gzip -dc ~{pre} > $PRE_FILE
         awk -f "$(which stats_sub.awk)" ~{sep=" " alignment_stats} >> $STATS_FILENAME
+        mapq=$(wc -l $PRE_FILE | awk '{print $1}')
         awk \
             -f "$(which count_unique_reads.awk)" \
             $STATS_FILENAME \
