@@ -526,6 +526,7 @@ task create_hic {
             ~{if defined(restriction_sites) then "-f " + restriction_sites else ""} \
             -s ~{stats} \
             -g ~{stats_hists} \
+            ~{if defined(assembly_name) then "-y " + assembly_name else ""} \
             -r 2500000,1000000,500000,250000,100000,50000,25000,10000,5000,2000,1000,500,200,100 \
             -i $PRE_INDEX_FILE \
             --block-capacity 1000000 \
