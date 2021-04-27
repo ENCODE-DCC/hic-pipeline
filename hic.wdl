@@ -572,8 +572,8 @@ task arrowhead {
             -Djava.awt.headless=true \
             -Xmx~{ram_gb}g \
             -jar /opt/scripts/common/juicer_tools.jar \
-            ~{if ignore_sparsity then "--ignore-sparsity" else ""} \
             arrowhead \
+            ~{if ignore_sparsity then "--ignore-sparsity" else ""} \
             ${hic_file} \
             contact_domains
         gzip -n contact_domains/*
