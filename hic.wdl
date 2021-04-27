@@ -13,9 +13,9 @@ struct BamAndLigationCount {
 
 workflow hic {
     meta {
-        version: "0.1.0"
-        caper_docker: "encodedcc/hic-pipeline:0.1.0"
-        caper_singularity: "docker://encodedcc/hic-pipeline:0.1.0"
+        version: "0.2.0"
+        caper_docker: "encodedcc/hic-pipeline:0.2.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:0.2.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -164,6 +164,7 @@ workflow hic {
             pre = select_first([input_pairs, bam_to_pre.pre]),
             pre_index = select_first([input_pairs_index, bam_to_pre.index]),
             chrsz = select_first([chrsz]),
+            restriction_sites = restriction_sites,
             quality = qualities[i],
             stats = calculate_stats.stats,
             stats_hists = calculate_stats.stats_hists,
@@ -391,8 +392,8 @@ task dedup {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 1000 HDD"
-        memory: "16 GB"
+        disks: "local-disk 2000 SSD"
+        memory: "32 GB"
     }
 }
 
@@ -496,37 +497,52 @@ task calculate_stats {
 
 task create_hic {
     input {
-        File chrsz
         File pre
         File pre_index
         File stats
         File stats_hists
         Array[String] normalization_methods = []
         Int quality
-        Int num_cpus = 8
         String? assembly_name
+        File? chrsz
+        File? restriction_sites
+        Int num_cpus = 24
     }
 
     command <<<
         set -euo pipefail
         PRE_FILE=pre.txt
+        PRE_INDEX_FILE=pre_index.txt
         gzip -dc ~{pre} > $PRE_FILE
+        gzip -dc ~{pre_index} > $PRE_INDEX_FILE
         # If the assembly name is empty, then we write chrsz path into file as usual, otherwise, use the assembly name instead of the path
         java \
-            -jar \
             -Ddevelopment=false \
-            /opt/scripts/common/juicer_tools.jar \
+            -Djava.awt.headless=true \
+            -Xmx390g \
+            -jar /opt/scripts/common/juicer_tools.jar \
             pre \
+            -n \
+            ~{if defined(restriction_sites) then "-f " + restriction_sites else ""} \
             -s ~{stats} \
             -g ~{stats_hists} \
-            -q ~{quality} \
             ~{if defined(assembly_name) then "-y " + assembly_name else ""} \
-            ~{if length(normalization_methods) > 0 then "-k" else ""} ~{sep="," normalization_methods} \
-            -i ~{pre_index} \
+            -r 2500000,1000000,500000,250000,100000,50000,25000,10000,5000,2000,1000,500,200,100 \
+            -i $PRE_INDEX_FILE \
+            --block-capacity 1000000 \
             --threads ~{num_cpus} \
             $PRE_FILE \
             inter_~{quality}.hic \
-            ~{chrsz}
+            ~{if defined(chrsz) then chrsz else assembly_name}
+        java \
+            -Ddevelopment=false \
+            -Djava.awt.headless=true \
+            -Xmx390g \
+            -jar /opt/scripts/common/juicer_tools.jar \
+            addNorm \
+            ~{if length(normalization_methods) > 0 then "-k" else ""} ~{sep="," normalization_methods} \
+            --threads ~{num_cpus} \
+            inter_~{quality}.hic
     >>>
 
     output {
@@ -535,8 +551,8 @@ task create_hic {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 1000 HDD"
-        memory : "64 GB"
+        disks: "local-disk 2000 SSD"
+        memory : "400 GB"
     }
 }
 
@@ -549,10 +565,10 @@ task arrowhead {
     command {
         set -euo pipefail
         java \
-            -jar \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
-            /opt/scripts/common/juicer_tools.jar \
+            -Xmx16g \
+            -jar /opt/scripts/common/juicer_tools.jar \
             arrowhead \
             ${hic_file} \
             contact_domains
@@ -578,10 +594,9 @@ task hiccups {
     command {
         set -euo pipefail
         java \
-            -jar \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
-            /opt/scripts/common/juicer_tools.jar \
+            -jar /opt/scripts/common/juicer_tools.jar \
             hiccups \
             ${hic_file} \
             loops
@@ -596,10 +611,18 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 SSD"
-        docker: "encodedcc/hic-pipeline:0.1.0_hiccups"
+        docker: "encodedcc/hic-pipeline:0.2.0_hiccups"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
+        zones: [
+            "us-central1-c",
+            "us-central1-f",
+            "us-east1-b",
+            "us-east1-c",
+            "us-west1-a",
+            "us-west1-b",
+        ]
     }
 }
 

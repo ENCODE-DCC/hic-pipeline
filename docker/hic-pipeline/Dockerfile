@@ -8,20 +8,24 @@ ENV BWA_VERSION=0.7.17
 ENV PAIRIX_VERSION=0.3.6
 ENV SAMTOOLS_VERSION=1.6
 
-RUN apt-get update && apt-get install -y \
-    bzip2 \
-    curl \
-    gawk \
-    gcc \
-    git \
-    libbz2-dev \
-    libz-dev \
-    locales \
-    make \
-    openjdk-8-jdk \
-    python3 \
-    unzip \
-&& rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository -y ppa:openjdk-r/ppa && \
+    apt-get update && \
+    apt-get install -y \
+        bzip2 \
+        curl \
+        gawk \
+        gcc \
+        git \
+        libbz2-dev \
+        libz-dev \
+        locales \
+        make \
+        openjdk-11-jdk \
+        python3 \
+        unzip \
+    && rm -rf /var/lib/apt/lists/*
 
 # GAWK has the 'and' function, needed for chimeric_blacklist
 RUN echo 'alias awk=gawk' >> ~/.bashrc
@@ -69,8 +73,10 @@ RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     find -mindepth 1 -maxdepth 1  -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
 
 # Install Juicer tools
-ENV JUICER_TOOLS_VERSION=1.22.01
-RUN curl -L "http://s3.amazonaws.com/hicfiles.tc4ga.com/public/juicer/juicer_tools_${JUICER_TOOLS_VERSION}.jar" -o /opt/juicer/CPU/common/juicer_tools.jar && \
+RUN curl \
+        -L \
+        https://s3.amazonaws.com/hicfiles.tc4ga.com/public/juicer/511fb255c56cbfaf7a0fc7bf763cb096/juicer_tools_2.07.02.jar \
+        -o /opt/juicer/CPU/common/juicer_tools.jar && \
     chmod 666 /opt/juicer/CPU/common/juicer_tools.jar && \
     ln -s juicer/CPU scripts
 
