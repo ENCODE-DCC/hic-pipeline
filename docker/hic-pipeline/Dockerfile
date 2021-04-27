@@ -73,7 +73,6 @@ RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     find -mindepth 1 -maxdepth 1  -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
 
 # Install Juicer tools
-ENV JUICER_TOOLS_VERSION=1.22.01
 RUN curl \
         -L \
         https://s3.amazonaws.com/hicfiles.tc4ga.com/public/juicer/511fb255c56cbfaf7a0fc7bf763cb096/juicer_tools_2.07.02.jar \
