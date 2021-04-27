@@ -399,13 +399,12 @@ task dedup {
             -h \
             -@ ~{num_cpus - 1} \
             ~{bam} | \
-            awk -f "$(which dups_sam.awk)" -v fname=duplicate_count.txt > merged_dedup.sam
+            awk -f "$(which dups_sam.awk)" > merged_dedup.sam
         samtools view -b -@ ~{num_cpus - 1} merged_dedup.sam > merged_dedup.bam
     >>>
 
     output {
         File deduped_bam = "merged_dedup.bam"
-        File duplicate_count = "duplicate_count.txt"
     }
 
     runtime {
