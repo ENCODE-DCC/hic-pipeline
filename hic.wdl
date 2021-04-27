@@ -123,6 +123,23 @@ workflow hic {
         call dedup { input:
             bam = merge.bam
         }
+
+        call bam_to_pre as bam_to_pre_for_stats { input:
+            bam = dedup.deduped_bam,
+            quality = 1,
+        }
+
+        call calculate_stats as calculate_stats_on_library { input:
+            alignment_stats = flatten(
+                select_all([chimeric_sam_specific.stats, chimeric_sam_nonspecific.stats])
+            ),
+            bam = dedup.deduped_bam,
+            pre = bam_to_pre_for_stats.pre,
+            restriction_sites = restriction_sites,
+            chrom_sizes = select_first([chrsz]),
+            ligation_site = select_first([ligation_site]),
+            output_filename_suffix = "_lib" + i,
+        }
     }
 
     if (!defined(input_hic)) {
@@ -153,9 +170,10 @@ workflow hic {
                     )
                 )
             ),
-            duplicate_counts = dedup.duplicate_count,
+            bam = select_first([merge_replicates.bam]),
             pre = bam_to_pre.pre,
             restriction_sites = restriction_sites,
+            chrom_sizes = select_first([chrsz]),
             ligation_site = select_first([ligation_site]),
             quality = qualities[i],
         }
@@ -458,41 +476,48 @@ task bam_to_pre {
 task calculate_stats {
     input {
         Array[File] alignment_stats
-        Array[File] duplicate_counts
         File pre
+        File chrom_sizes
+        File bam
         File? restriction_sites
         String ligation_site
-        Int quality
+        String output_filename_suffix = ""
+        Int quality = 0
     }
 
     command <<<
         PRE_FILE=pre.txt
-        STATS_FILENAME=stats_~{quality}.txt
+        STATS_FILENAME=stats_~{quality}~{output_filename_suffix}.txt
         gzip -dc ~{pre} > $PRE_FILE
-        awk -f "$(which stats_sub.awk)" ~{sep=" " alignment_stats} >> $STATS_FILENAME
-        mapq=$(wc -l $PRE_FILE | awk '{print $1}')
+        duplicate_count=$(samtools view -c -f 1089 -F 256 ~{bam})
         awk \
-            -f "$(which count_unique_reads.awk)" \
+            -f "$(which stats_sub.awk)" \
+            -v ligation=~{ligation_site} \
+            -v dups="$duplicate_count" \
+            ~{sep=" " alignment_stats} >> $STATS_FILENAME
+        java \
+            -Ddevelopment=false \
+            -Djava.awt.headless=true \
+            -Xmx16g \
+            statistics \
+            --ligation ~{ligation_site} \
+            ~{default="none" restriction_sites} \
             $STATS_FILENAME \
-            ~{sep=" " duplicate_counts} >> $STATS_FILENAME
-        statistics.pl \
-            -s ~{default="none" restriction_sites} \
-            -l ~{ligation_site} \
-            -o $STATS_FILENAME \
-            $PRE_FILE
+            ~{pre} \
+            ~{chrom_sizes}
         python3 "$(which jsonify_stats.py)" --alignment-stats $STATS_FILENAME
     >>>
 
     output {
-        File stats = "stats_~{quality}.txt"
-        File stats_json = "stats_~{quality}.json"
-        File stats_hists = "stats_~{quality}_hists.m"
+        File stats = "stats_~{quality}~{output_filename_suffix}.txt"
+        File stats_json = "stats_~{quality}~{output_filename_suffix}.json"
+        File stats_hists = "stats_~{quality}~{output_filename_suffix}_hists.m"
     }
 
     runtime {
         cpu : "1"
         disks: "local-disk 1000 HDD"
-        memory : "8 GB"
+        memory : "16 GB"
     }
 }
 
