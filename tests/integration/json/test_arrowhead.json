@@ -1,4 +1,0 @@
-{
-  "test_arrowhead.ignore_sparsity": true,
-  "test_arrowhead.input_hic": "tests/data/inter_30.hic"
-}
