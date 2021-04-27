@@ -611,7 +611,7 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 SSD"
-        docker: "gcr.io/hic-pipeline/new-jar-hiccups:latest"
+        docker: "encodedcc/hic-pipeline:0.2.0_hiccups"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
