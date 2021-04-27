@@ -561,8 +561,6 @@ task arrowhead {
     input {
         File hic_file
         Int ram_gb = 32
-        # For test purposes only
-        Boolean ignore_sparsity = false
     }
 
     command {
@@ -573,7 +571,6 @@ task arrowhead {
             -Xmx~{ram_gb}g \
             -jar /opt/scripts/common/juicer_tools.jar \
             arrowhead \
-            ~{if ignore_sparsity then "--ignore-sparsity" else ""} \
             ${hic_file} \
             contact_domains
         gzip -n contact_domains/*
