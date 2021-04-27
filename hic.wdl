@@ -58,7 +58,7 @@ workflow hic {
         no_call_loops: "If set to `true`, avoid calling loops with hiccups, defaults to false"
         no_call_tads: "If set to `true`, avoid calling domains with arrowhead, defaults to false"
         align_num_cpus: "Number of threads to use for bwa alignment"
-        assembly_name: "Name of assembly to use for hic creation. For valid options see `genomeID` at https://github.com/aidenlab/juicer/wiki/Pre"
+        assembly_name: "Name of assembly to insert into hic file header, recommended to specify for reproducbility otherwise hic file will be nondeterministic"
     }
 
     # Default MAPQ thresholds for generating .hic contact maps
