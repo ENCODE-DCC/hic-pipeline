@@ -505,7 +505,7 @@ task calculate_stats {
             $STATS_FILENAME \
             ~{pre} \
             ~{chrom_sizes}
-        python3 "$(which jsonify_stats.py)" --alignment-stats $STATS_FILENAME
+        python3 "$(which jsonify_stats.py)" $STATS_FILENAME
     >>>
 
     output {
