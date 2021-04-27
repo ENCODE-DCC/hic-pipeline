@@ -498,6 +498,7 @@ task calculate_stats {
             -Ddevelopment=false \
             -Djava.awt.headless=true \
             -Xmx16g \
+            /opt/scripts/common/juicer_tools.jar \
             statistics \
             --ligation ~{ligation_site} \
             ~{default="none" restriction_sites} \
