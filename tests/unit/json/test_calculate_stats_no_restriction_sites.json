@@ -3,10 +3,10 @@
     "tests/data/dummy.txt",
     "tests/data/dummy.txt"
   ],
-  "test_calculate_stats.duplicate_counts": [
-    "tests/data/dummy.txt"
-  ],
   "test_calculate_stats.ligation_site": "CAT",
   "test_calculate_stats.pre": "tests/data/dummy.txt",
+  "test_calculate_stats.bam": "tests/data/dummy.txt",
+  "test_calculate_stats.chrom_sizes": "tests/data/dummy.txt",
+  "test_calculate_stats.restriction_sites": "tests/data/dummy.txt",
   "test_calculate_stats.quality": 30
 }

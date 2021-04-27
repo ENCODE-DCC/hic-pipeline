@@ -10,11 +10,11 @@
       contains:
         - dummy.txt >> $STATS_FILENAME
         - STATS_FILENAME=stats_30.txt
-        - -l CAT
+        - -v ligation=CAT
+        - --ligation CAT
       contains_regex:
         - 'gzip -dc .*dummy.txt >'
-        - 'stats_sub.awk.*dummy.txt .*dummy.txt'
-        - '-s .*dummy.txt'
+        - 'duplicate_count=\$\(samtools view -c -f 1089 -F 256 .*dummy.txt\)'
   - name: test_calculate_stats_no_restriction_sites_unit
     tags:
       - unit
