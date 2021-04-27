@@ -561,6 +561,8 @@ task arrowhead {
     input {
         File hic_file
         Int ram_gb = 32
+        # For test purposes only
+        Boolean ignore_sparsity = false
     }
 
     command {
@@ -570,6 +572,7 @@ task arrowhead {
             -Djava.awt.headless=true \
             -Xmx~{ram_gb}g \
             -jar /opt/scripts/common/juicer_tools.jar \
+            ~{if ignore_sparsity then "--ignore-sparsity" else ""} \
             arrowhead \
             ${hic_file} \
             contact_domains

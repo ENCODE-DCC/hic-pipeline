@@ -5,10 +5,12 @@ import "../../../hic.wdl" as hic
 workflow test_arrowhead {
     input {
         File input_hic
+        Boolean ignore_sparsity
     }
 
     call hic.arrowhead as test_arrowhead_task { input:
-        hic_file = input_hic
+        hic_file = input_hic,
+        ignore_sparsity = ignore_sparsity,
     }
 
     output {
