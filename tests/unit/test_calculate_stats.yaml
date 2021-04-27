@@ -24,4 +24,4 @@
       tests/unit/json/test_calculate_stats_no_restriction_sites.json
     stdout:
       contains:
-        - s none
+        - none
