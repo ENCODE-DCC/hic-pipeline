@@ -14,12 +14,8 @@ def main():
 
 def get_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "infile", help="path to the stats file to convert to json"
-    )
-    parser.add_argument(
-        "outfile", help="Name of file to output stats to"
-    )
+    parser.add_argument("infile", help="path to the stats file to convert to json")
+    parser.add_argument("outfile", help="Name of file to output stats to")
     return parser
 
 
