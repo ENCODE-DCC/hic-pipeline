@@ -123,7 +123,7 @@ def test_jsonify_stats():
             "pct_of_unique_reads": 0.03,
             "total": 110,
         },
-        "alignable_(normal+chimeric_paired)": {"pct": 96.6, "total": 321559},
+        "alignable_normal_and_chimeric_paired": {"pct": 96.6, "total": 321559},
         "average_insert_size": 0.0,
         "below_mapq_threshold": {
             "pct_of_sequenced_reads": 96.24,
