@@ -29,21 +29,41 @@ def parse_to_dict(data):
     field names such that "Key Name" becomes "key_name" in the resulting
     dictionary
     """
-    keys = []
-    values = []
+    output = {}
     for line in data:
-        split_line = line.split(": ")
-        key = "_".join(split_line[0].strip().split(" "))
-        keys.append(key.lower())
-        values.append(split_line[1].strip())
-    output = dict(zip(keys, values))
+        key, value = line.split(":")
+        if not value.strip():
+            continue
+        output[clean_key(key)] = value.strip()
     return output
+
+
+def clean_key(key):
+    """
+    Rather complex key parsing to make the keys look more normal.
+    """
+    key = "_".join(key.strip().split(" ")).lower()
+    key = key.replace("+", "_and_")
+    key = key.replace("hi-c", "hic")
+    if "bp" in key or "kb" in key:
+        key = key.replace("-", "_to_")
+    else:
+        key = key.replace("-", "_")
+    key = key.replace("(", "")
+    key = key.replace(")", "")
+    key = key.replace("'", "_prime_")
+    key = key.replace("%", "_percent_")
+    key = key.replace(">", "_greater_than_")
+    key = key.replace("<", "_less_than_")
+    key = key.lstrip("_")
+    key = key.replace("__", "_")
+    return key
 
 
 def jsonify_stats(parsed_data):
     """
-    Does more fine grained parsing on the input file such as unflattening certain qc
-    values.
+    Does more fine grained parsing on the qc values, including converting some flat
+    strings into structured objects.
     """
     value_sep = "-"
     output = {}

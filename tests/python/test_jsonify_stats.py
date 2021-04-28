@@ -1,14 +1,31 @@
-import json
-from hic_pipeline.jsonify_stats import parse_to_dict, jsonify_stats
+import pytest
+
+from hic_pipeline.jsonify_stats import clean_key, jsonify_stats, parse_to_dict
 
 
 def test_parse_to_dict():
     data = ["foo bar: baz\n", "Baz Qux: quuux\n", "corge:\n"]
     result = parse_to_dict(data)
-    assert result == {
-        "foo_bar": "baz",
-        "baz_qux": "quuux",
-    }
+    assert result == {"foo_bar": "baz", "baz_qux": "quuux"}
+
+
+@pytest.mark.parametrize(
+    "key,expected",
+    [
+        (" Ligation Motif Present", "ligation_motif_present"),
+        ("3' Bias (Long Range)", "3_prime_bias_long_range"),
+        ("<500BP", "less_than_500bp"),
+        ("500BP-5kB", "500bp_to_5kb"),
+        ("Long Range (>20Kb)", "long_range_greater_than_20kb"),
+        ("Alignable (Normal+Chimeric Paired)", "alignable_normal_and_chimeric_paired"),
+        ('Intra-fragment Reads', "intra_fragment_reads"),
+        ("Hi-C Contacts", "hic_contacts"),
+        ("Pair Type %(L-I-O-R)", "pair_type_percent_lior"),
+    ],
+)
+def test_clean_key(key, expected):
+    result = clean_key(key)
+    assert result == expected
 
 
 def test_jsonify_stats():
@@ -18,7 +35,7 @@ def test_jsonify_stats():
         "chimeric_paired": "1 (0.00%)",
         "chimeric_ambiguous": "26 (0.01%)",
         "unmapped": "11303 (3.40%)",
-        "ligation_motif_present": "96 (0.03%)",
+        # "ligation_motif_present": "96 (0.03%)",
         "single_alignment": "496 (0.15%)",
         "average_insert_size": "0.00",
         "alignable_(normal+chimeric_paired)": "321559 (96.60%)",
@@ -41,6 +58,4 @@ def test_jsonify_stats():
     }
 
     result = jsonify_stats(parsed_data)
-    assert result == {
-        "foo": "bar"
-    }
+    assert result == {"foo": "bar"}
