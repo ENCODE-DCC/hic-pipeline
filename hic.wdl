@@ -127,6 +127,7 @@ workflow hic {
         call bam_to_pre as bam_to_pre_for_stats { input:
             bam = dedup.deduped_bam,
             quality = 1,
+            output_filename_suffix = "_lib" + i
         }
 
         call calculate_stats as calculate_stats_on_library { input:
@@ -442,12 +443,13 @@ task bam_to_pre {
         File bam
         Int quality
         Int num_cpus = 8
+        String output_filename_suffix = ""
     }
 
     command <<<
         set -euo pipefail
-        MERGED_NODUPS_FILENAME=merged_nodups_~{quality}.txt
-        MERGED_NODUPS_INDEX_FILENAME=merged_nodups_~{quality}_index.txt
+        MERGED_NODUPS_FILENAME=merged_nodups_~{quality}~{output_filename_suffix}.txt
+        MERGED_NODUPS_INDEX_FILENAME=merged_nodups_~{quality}~{output_filename_suffix}_index.txt
         samtools view \
             -h \
             -F 1024 \
@@ -461,8 +463,8 @@ task bam_to_pre {
     >>>
 
     output {
-        File pre = "merged_nodups_~{quality}.txt.gz"
-        File index = "merged_nodups_~{quality}_index.txt.gz"
+        File pre = "merged_nodups_~{quality}~{output_filename_suffix}.txt.gz"
+        File index = "merged_nodups_~{quality}~{output_filename_suffix}_index.txt.gz"
     }
 
     runtime {
