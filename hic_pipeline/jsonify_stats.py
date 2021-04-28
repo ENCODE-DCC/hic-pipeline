@@ -5,11 +5,19 @@ import json
 def main():
     parser = get_parser()
     args = parser.parse_args()
-    with open(args.filepath) as f:
-        data = f.readlines()
+    data = load_data(args.infile)
     processed = process_data(data)
-    with open(args.outfile, "w") as f:
-        f.write(json.dumps(processed, indent=4, sort_keys=True))
+    write_json_to_file(processed, args.outfile)
+
+
+def load_data(infile):
+    with open(infile) as f:
+        return f.readlines()
+
+
+def write_json_to_file(data, outfile):
+    with open(outfile, "w") as f:
+        f.write(json.dumps(data, indent=4, sort_keys=True))
 
 
 def get_parser():
