@@ -8,5 +8,3 @@
       tests/integration/json/test_dedup.json
     files:
       - path: test-output/merged_dedup.bam
-      - path: test-output/duplicate_count.txt
-        md5sum: 9d41b3aff5a04acb9874ceaf2b7504a7

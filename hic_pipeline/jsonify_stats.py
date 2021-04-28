@@ -1,142 +1,174 @@
-#!/usr/bin/env python
-
 import argparse
 import json
-import os
 
 
-def parse_arguments():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "filepath", type=str, help="filepath to the file to convert to json"
-    )
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument(
-        "--library-complexity",
-        help="A library_complexity.txt file",
-        action="store_const",
-        const=jsonify_library_complexity,
-        dest="jsonify",
-    )
-    group.add_argument(
-        "--library-stats",
-        help="A statistics file produced during dedup",
-        action="store_const",
-        const=jsonify_library_stats,
-        dest="jsonify",
-    )
-    group.add_argument(
-        "--alignment-stats",
-        help="An alignment_stats.txt file generated in fragment task",
-        action="store_const",
-        const=jsonify_alignment_stats,
-        dest="jsonify",
-    )
+def main():
+    parser = get_parser()
     args = parser.parse_args()
-    return args
+    data = load_data(args.infile)
+    processed = process_data(data)
+    write_json_to_file(processed, args.outfile)
 
 
-def parse_to_dict(filepath):
+def load_data(infile):
+    with open(infile) as f:
+        return f.readlines()
+
+
+def write_json_to_file(data, outfile):
+    with open(outfile, "w") as f:
+        f.write(json.dumps(data, indent=4, sort_keys=True))
+
+
+def get_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("infile", help="path to the stats file to convert to json")
+    parser.add_argument("outfile", help="Name of file to output stats to")
+    return parser
+
+
+def process_data(data):
+    parsed_data = parse_to_dict(data)
+    jsonified = jsonify_stats(parsed_data)
+    return jsonified
+
+
+def parse_to_dict(data):
     """
     Convert a text file of key: value pairs to a dictionary, preprocessing the
     field names such that "Key Name" becomes "key_name" in the resulting
     dictionary
     """
-    keys = []
-    values = []
-    with open(filepath) as f:
-        data = f.readlines()
+    output = {}
     for line in data:
-        split_line = line.split(": ")
-        key = "_".join(split_line[0].strip().split(" "))
-        keys.append(key.lower())
-        values.append(split_line[1].strip())
-    output = dict(zip(keys, values))
+        key, value = line.split(":")
+        value = value.strip()
+        if not value:
+            continue
+        output[clean_key(key)] = value
     return output
 
 
-def jsonify_library_complexity(filepath):
-    """
-    An example libary_complexity.txt file looks like the following:
-        Unique Reads: 12,101
-        PCR Duplicates: 120
-        Optical Duplicates: 0
-        Library Complexity Estimate: 618,223
-    """
-    jsonified = parse_to_dict(filepath)
-    return jsonified
+def parse_to_total_and_percentage(value):
+    total, percent = value.split("(")
+    values = {
+        "total": parse_int_with_commas(total.strip()),
+        "pct": float(percent.rstrip("%)")),
+    }
+    return values
 
 
-def jsonify_library_stats(filepath):
+def parse_to_total_and_two_percentages(
+    value,
+    first_percentage_name="pct_of_unique_reads",
+    second_percentage_name="pct_of_sequenced_reads",
+):
     """
-    See https://github.com/aidenlab/juicer/blob/master/CPU/common/statistics.pl
-    for more details on the meaning of the fields. An example stats.txt file
-    looks like the following:
-        Intra-fragment Reads: 6,969(57.59%)
-        Hi-C Contacts: 5,132(42.41%)
-        Ligation Motif Present: 3 (0.02%)
-        3' Bias (Long Range): 65% - 35%
-        Pair Type %(L-I-O-R): 25% - 23% - 27% - 25%
-        Inter-chromosomal: 6 (0.05%)
-        Intra-chromosomal: 5,126 (42.36%)
-        Short Range (<20Kb): 4,537 (37.49%)
-        Long Range (>20Kb): 589 (4.87%)
+    For unique and duplicates, they are percentage of alignable / percentage of
+    sequenced reads. For the rest, they are percentage of unique reads / percentage of
+    sequenced reads.
+
+    The separator of the two percentages can be either a slash and a comma.
     """
-    jsonified = parse_to_dict(filepath)
-    value_sep = "-"
-    for k, v in jsonified.items():
-        if "%" in v and value_sep not in v:
-            split_value = v.split("(")
-            values = {
-                "total": split_value[0].strip(),
-                "percent": split_value[1].rstrip("%)"),
-            }
-        else:
-            split_value = v.split(value_sep)
-            split_value = [i.strip() for i in split_value]
+    total, percentages = value.split("(")
+    try:
+        first_percentage, second_percentage = percentages.split("/")
+    except ValueError:
+        first_percentage, second_percentage = percentages.split(",")
+    values = {
+        "total": parse_int_with_commas(total.strip()),
+        first_percentage_name: float(first_percentage.rstrip("% ")),
+        second_percentage_name: float(second_percentage.rstrip("%)")),
+    }
+    return values
+
+
+def parse_to_multiple_percentages(value, fields):
+    """
+    Handles QC with multiple percentage values like 25% - 23% - 27% - 25%
+    """
+    split_value = [float(i.strip(" %")) for i in value.split("-")]
+    values = dict(zip(fields, split_value))
+    return values
+
+
+def parse_to_int_or_float(value):
+    """
+    Tries to parse `value` as float or int, if not possible will raise a ValueError
+    """
+    try:
+        return parse_int_with_commas(value)
+    except ValueError:
+        return float(value)
+
+
+def parse_int_with_commas(value):
+    """
+    Python `int` builtin does not handle strings with commas and this is more readable
+    than using `atoi`
+    """
+    return int(value.replace(",", ""))
+
+
+def clean_key(key):
+    """
+    Rather complex key parsing to make the keys look more normal. Converts special
+    characters to English.
+    """
+    key = "_".join(key.strip().split(" ")).lower()
+    key = key.replace("+", "_and_")
+    key = key.replace("hi-c", "hic")
+    if "bp" in key or "kb" in key:
+        key = key.replace("-", "_to_")
+        if "long" not in key:
+            key = "short_range_" + key
+    else:
+        key = key.replace("-", "_")
+    key = key.replace("(", "")
+    key = key.replace(")", "")
+    key = key.replace("'", "_prime_")
+    key = key.replace("%", "_percent_")
+    key = key.replace(">", "_greater_than_")
+    key = key.replace("<", "_less_than_")
+    key = key.lstrip("_")
+    key = key.replace("__", "_")
+    key = key.replace("l_i_o_r", "lior")
+    return key
+
+
+def jsonify_stats(parsed_data):
+    """
+    Does more fine grained parsing on the qc values, including converting some flat
+    strings into structured objects.
+    """
+    output = {}
+    for k, v in parsed_data.items():
+        if "%" in v and "-" in v:
             if "bias" in k:
-                fields = ["long_range", "short_range"]
-            elif "pair" in k:
-                fields = ["left", "inner", "outer", "right"]
-            values = dict(zip(fields, split_value))
-        jsonified[k] = values
-    return jsonified
-
-
-def jsonify_alignment_stats(filepath):
-    """
-    An example alignment_stats.txt file looks like the following:
-        Sequenced Read Pairs:  332888
-         Normal Paired: 297469 (89.36%)
-         Chimeric Paired: 16 (0.00%)
-         Collisions: 1 (0.00%)
-         Low MAPQ Collisions: 2 (0.00%)
-         Unmapped: 11303 (3.40%)
-         MAPQ 0: 24097 (7.24%)
-         Ligation Motif Present: 145 (0.04%)
-        Alignable (Normal+Chimeric Paired): 297485 (89.36%)
-    """
-    jsonified = parse_to_dict(filepath)
-    for k, v in jsonified.items():
-        if "(" in v:
-            split_value = v.split("(")
-            values = {
-                "total": split_value[0].strip(),
-                "percent": split_value[1].rstrip("%)"),
-            }
+                fields = ("pct_long_range", "pct_short_range")
+            elif "pair_type" in k:
+                fields = ("pct_left", "pct_inner", "pct_outer", "pct_right")
+            try:
+                values = parse_to_multiple_percentages(v, fields)
+            except ValueError:
+                continue
+            output[k] = values
+        elif k in ("unique_reads", "duplicates"):
+            output[k] = parse_to_total_and_two_percentages(
+                v,
+                first_percentage_name="pct_of_alignable_reads",
+                second_percentage_name="pct_of_sequenced_reads",
+            )
+        elif v.count("%") == 1:
+            output[k] = parse_to_total_and_percentage(v)
+        elif v.count("%") == 2:
+            output[k] = parse_to_total_and_two_percentages(v)
         else:
-            values = v.strip()
-        jsonified[k] = values
-    return jsonified
-
-
-def main():
-    args = parse_arguments()
-    filepath = args.filepath
-    jsonified = args.jsonify(filepath)
-    filename = os.path.splitext(filepath)[0] + ".json"
-    with open(filename, "w") as f:
-        f.write(json.dumps(jsonified, indent=4, sort_keys=True))
+            try:
+                output[k] = parse_to_int_or_float(v)
+            except ValueError:
+                continue
+    return output
 
 
 if __name__ == "__main__":

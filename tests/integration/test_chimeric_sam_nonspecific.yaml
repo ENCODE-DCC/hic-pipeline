@@ -9,4 +9,4 @@
     files:
       - path: test-output/chimeric_sam_nonspecific.bam
       - path: test-output/result_norm.txt.res.txt
-        md5sum: ac09e2da6a6e0844e3e874a7c02d0ef9
+        md5sum: fed58a58c66813aea16c4b4638662be5

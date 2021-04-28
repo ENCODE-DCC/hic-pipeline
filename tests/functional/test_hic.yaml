@@ -10,10 +10,10 @@
       - path: test-output/merged_dedup.bam
       - path: test-output/pairix.bsorted.pairs.gz
       - path: test-output/inter_1.hic
-        md5sum: 5e14bc20694fc5ce5ebf8570a6c4bd72
+        md5sum: 129a57a2386dc600999dc9b857cb4700
       - path: test-output/inter_30.hic
-        md5sum: e088c26eaf48ca6c367a6b86cb444365
+        md5sum: ca13af6b1beed5e57511fe7af986767e
       - path: test-output/merged_nodups_30.txt.gz
-        md5sum: fa719e3286a68175032500d99c1c53c5
+        md5sum: ee923f74237094ac00cd701650af906c
       - path: test-output/stats_30.json
-        md5sum: 544efbd6f509666bd29315dc33a0acfd
+        md5sum: 2bfa772a98381c3a48d9f2dbf1b6bff1
