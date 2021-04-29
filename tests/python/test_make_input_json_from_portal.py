@@ -18,6 +18,19 @@ def test_get_input_json():
     }
 
 
+def test_get_input_json_none_enzyme_has_no_restriction_sites():
+    result = get_input_json(
+        fastqs=["foo", "bar"], assembly_name="GRCh38", enzyme="none"
+    )
+    assert result == {
+        "hic.assembly_name": "GRCh38",
+        "hic.chrsz": "https://www.encodeproject.org/files/GRCh38_EBV.chrom.sizes/@@download/GRCh38_EBV.chrom.sizes.tsv",
+        "hic.fastq": ["foo", "bar"],
+        "hic.reference_index": "https://www.encodeproject.org/files/ENCFF643CGH/@@download/ENCFF643CGH.tar.gz",
+        "hic.restriction_enzymes": ["none"],
+    }
+
+
 def test_get_fastqs_from_experiment():
     experiment = {
         "files": [

@@ -81,16 +81,18 @@ def get_fastqs_from_experiment(experiment):
 
 
 def get_input_json(fastqs, assembly_name, enzyme):
-    return {
+    input_json = {
         "hic.fastq": fastqs,
         "hic.assembly_name": assembly_name,
         "hic.chrsz": REFERENCE_FILES[assembly_name]["chrom_sizes"],
         "hic.reference_index": REFERENCE_FILES[assembly_name]["bwa_index"],
         "hic.restriction_enzymes": [enzyme],
-        "hic.restriction_sites": REFERENCE_FILES[assembly_name]["restriction_sites"][
-            enzyme
-        ],
     }
+    if enzyme != "none":
+        input_json["hic.restriction_sites"] = REFERENCE_FILES[assembly_name][
+            "restriction_sites"
+        ][enzyme]
+    return input_json
 
 
 def write_json_to_file(data, outfile):
