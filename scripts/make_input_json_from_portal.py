@@ -29,7 +29,7 @@ REFERENCE_FILES = {
         ),
     }
 }
-
+ENZYMES = ("HindIII", "DpnII", "MboI", "none")
 ALLOWED_STATUSES = ("released", "in progress")
 
 
@@ -39,8 +39,9 @@ def main():
     auth = read_auth_from_file(args.keypair_file)
     experiment = get_experiment(args.accession, auth=auth)
     fastqs = get_fastqs_from_experiment(experiment)
+    enzymes = get_enzymes_from_experiment(experiment)
     input_json = get_input_json(
-        fastqs=fastqs, assembly_name=args.assembly_name, enzyme=args.enzyme
+        fastqs=fastqs, assembly_name=args.assembly_name, enzymes=enzymes
     )
     outfile = args.outfile or "{}.json".format(args.accession)
     write_json_to_file(input_json, outfile)
@@ -54,6 +55,25 @@ def get_experiment(accession, auth=None):
     )
     response.raise_for_status()
     return response.json()
+
+
+def get_enzymes_from_experiment(experiment, enzymes=ENZYMES):
+    used_enzymes = []
+    fragmentation_methods = []
+    for replicate in experiment["replicates"]:
+        fragmentation_methods.extend(replicate["library"]["fragmentation_methods"])
+    fragmentation_methods = list(set(fragmentation_methods))
+    if len(fragmentation_methods) > 1:
+        raise ValueError(
+            "Currently only experiments with one fragmentation method are supported"
+        )
+    for enzyme in enzymes:
+        if enzyme in fragmentation_methods[0]:
+            used_enzymes.append(enzyme)
+            break
+    if not used_enzymes:
+        used_enzymes.append("none")
+    return used_enzymes
 
 
 def get_fastqs_from_experiment(experiment):
@@ -80,18 +100,18 @@ def get_fastqs_from_experiment(experiment):
     return output
 
 
-def get_input_json(fastqs, assembly_name, enzyme):
+def get_input_json(fastqs, assembly_name, enzymes):
     input_json = {
         "hic.fastq": fastqs,
         "hic.assembly_name": assembly_name,
         "hic.chrsz": REFERENCE_FILES[assembly_name]["chrom_sizes"],
         "hic.reference_index": REFERENCE_FILES[assembly_name]["bwa_index"],
-        "hic.restriction_enzymes": [enzyme],
+        "hic.restriction_enzymes": enzymes,
     }
-    if enzyme != "none":
+    if enzymes != ["none"]:
         input_json["hic.restriction_sites"] = REFERENCE_FILES[assembly_name][
             "restriction_sites"
-        ][enzyme]
+        ][enzymes[0]]
     return input_json
 
 
@@ -115,13 +135,6 @@ def get_parser():
         "--accession",
         required=True,
         help="Accession of portal experiment to generate input for",
-    )
-    parser.add_argument(
-        "-e",
-        "--enzyme",
-        choices=("HindIII", "DpnII", "MboI", "none"),
-        required=True,
-        help="Name of restriction enzyme",
     )
     parser.add_argument("--outfile")
     parser.add_argument(
