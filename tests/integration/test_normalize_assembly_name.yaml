@@ -9,5 +9,5 @@
     # Cannot easily check the file contents, since not copied to test-output
     stdout:
       contains:
-        - "test_normalize_assembly_name.normalize_assembly_name.normalized_assembly_name": "hg38"
-        - "test_normalize_assembly_name.normalize_assembly_name.assembly_is_supported": true
+        - '"test_normalize_assembly_name.normalize_assembly_name.normalized_assembly_name": "hg38"'
+        - '"test_normalize_assembly_name.normalize_assembly_name.assembly_is_supported": true'
