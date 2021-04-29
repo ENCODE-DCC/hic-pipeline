@@ -39,26 +39,9 @@ workflow hic {
         Boolean no_bam2pairs = false
         Boolean no_call_loops = false
         Boolean no_call_tads = false
+        Boolean use_chrom_sizes_for_pre = false
         Int align_num_cpus = 32
         String? assembly_name
-    }
-
-    parameter_meta {
-        fastq: "Twice nested array of input `FastqPair`s, takes form of [lib_id][fastq_id]"
-        restriction_enzymes: "An array of names containing the restriction enzyme(s) used to generate the Hi-C libraries"
-        restriction_sites: "A text file containing cut sites for the given restriction enzyme. You should generate this file using this script: https://github.com/aidenlab/juicer/blob/encode/misc/generate_site_positions.py"
-        ligation_site_regex: "A custom regex to use for counting ligation site, if specified then restriction_sites file must be manually specified. Can be just a single site, e.g. ATGC, or several sites wrapped in parentheses and separated by pipes, e.g. `(ATGC|CTAG)`"
-        chrsz: "A chromosome sizes file for the desired assembly, this is a tab-separated text file whose rows take the form [chromosome] [size]"
-        reference_index: "A pregenerated BWA index for the desired assembly"
-        normalization_methods: "An array of normalization methods to use for .hic file generation as per Juicer Tools `pre`, if not specified then will use `pre` defaults of VC, VC_SQRT, KR, and SCALE. Valid methods are VC, VC_SQRT, KR, SCALE, GW_KR, GW_SCALE, GW_VC, INTER_KR, INTER_SCALE, and INTER_VC."
-        input_pairs: "A text file containing the paired fragments to use to generate the .hic contact maps, a detailed format description can be found here: https://github.com/aidenlab/juicer/wiki/Pre#long-format"
-        input_pairs_index: "Index of input_pairs as generated with index_by_chr.awk in task bam_to_pre"
-        input_hic: "An input .hic file for which to call loops and domains"
-        no_bam2pairs: "If set to `true`, avoid generating .pairs files, defaults to false"
-        no_call_loops: "If set to `true`, avoid calling loops with hiccups, defaults to false"
-        no_call_tads: "If set to `true`, avoid calling domains with arrowhead, defaults to false"
-        align_num_cpus: "Number of threads to use for bwa alignment"
-        assembly_name: "Name of assembly to insert into hic file header, recommended to specify for reproducbility otherwise hic file will be nondeterministic"
     }
 
     # Default MAPQ thresholds for generating .hic contact maps
@@ -179,21 +162,36 @@ workflow hic {
             quality = qualities[i],
         }
 
-        call create_hic { input:
-            pre = select_first([input_pairs, bam_to_pre.pre]),
-            pre_index = select_first([input_pairs_index, bam_to_pre.index]),
-            chrsz = select_first([chrsz]),
-            restriction_sites = restriction_sites,
-            quality = qualities[i],
-            stats = calculate_stats.stats,
-            stats_hists = calculate_stats.stats_hists,
-            assembly_name = assembly_name,
-            normalization_methods = normalization_methods,
+        if (use_chrom_sizes_for_pre) {
+            call create_hic as create_hic_with_chrom_sizes { input:
+                pre = select_first([input_pairs, bam_to_pre.pre]),
+                pre_index = select_first([input_pairs_index, bam_to_pre.index]),
+                chrsz = select_first([chrsz]),
+                restriction_sites = restriction_sites,
+                quality = qualities[i],
+                stats = calculate_stats.stats,
+                stats_hists = calculate_stats.stats_hists,
+                assembly_name = assembly_name,
+                normalization_methods = normalization_methods,
+            }
+        }
+
+        if (!use_chrom_sizes_for_pre) {
+            call create_hic { input:
+                pre = select_first([input_pairs, bam_to_pre.pre]),
+                pre_index = select_first([input_pairs_index, bam_to_pre.index]),
+                restriction_sites = restriction_sites,
+                quality = qualities[i],
+                stats = calculate_stats.stats,
+                stats_hists = calculate_stats.stats_hists,
+                assembly_name = assembly_name,
+                normalization_methods = normalization_methods,
+            }
         }
     }
 
     if ((defined(input_hic) || defined(create_hic.output_hic))) {
-        File hic_file = if defined(input_hic) then select_first([input_hic]) else create_hic.output_hic[1]
+        File hic_file = select_first([input_hic, create_hic.output_hic, create_hic_with_chrom_sizes.output_hic])
         if (!no_call_tads) {
             call arrowhead { input:
                 hic_file = hic_file
