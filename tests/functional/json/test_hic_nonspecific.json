@@ -14,5 +14,6 @@
   "hic.reference_index": "tests/data/ce10_selected.tar.gz",
   "hic.restriction_enzymes": [
     "none"
-  ]
+  ],
+  "hic.use_chrom_sizes_for_pre": true
 }
