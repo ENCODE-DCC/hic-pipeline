@@ -191,7 +191,7 @@ workflow hic {
     }
 
     File hic_file = select_first(
-        [input_hic, create_hic.output_hic, create_hic_with_chrom_sizes.output_hic]
+        [input_hic, create_hic.output_hic[1], create_hic_with_chrom_sizes.output_hic[1]]
     )
     if (!no_call_tads) {
         call arrowhead { input:
