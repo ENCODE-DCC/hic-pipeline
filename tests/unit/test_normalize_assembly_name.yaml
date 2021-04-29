@@ -1,0 +1,13 @@
+---
+  - name: test_normalize_assembly_name_unit
+    tags:
+      - unit
+    command: >-
+      tests/caper_run.sh
+      tests/unit/wdl/test_normalize_assembly_name.wdl
+      tests/unit/json/test_normalize_assembly_name.json
+    stdout:
+      contains:
+        - "hg38"
+        - "foo.txt"
+        - "bar.txt"
