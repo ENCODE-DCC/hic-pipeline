@@ -1,0 +1,5 @@
+{
+  "test_normalize_assembly_name.assembly_is_supported_output_path": "is_supported.txt",
+  "test_normalize_assembly_name.assembly_name": "GRCh38",
+  "test_normalize_assembly_name.normalized_assembly_name_output_path": "normalized.txt"
+}

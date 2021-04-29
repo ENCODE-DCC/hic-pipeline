@@ -1,0 +1,13 @@
+---
+  - name: test_normalize_assembly_name
+    tags:
+      - integration
+    command: >-
+      tests/caper_run.sh
+      tests/integration/wdl/test_normalize_assembly_name.wdl
+      tests/integration/json/test_normalize_assembly_name.json
+    # Cannot easily check the file contents, since not copied to test-output
+    stdout:
+      contains:
+        - '"test_normalize_assembly_name.normalize_assembly_name.normalized_assembly_name": "hg38"'
+        - '"test_normalize_assembly_name.normalize_assembly_name.assembly_is_supported": true'

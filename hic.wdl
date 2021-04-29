@@ -13,9 +13,9 @@ struct BamAndLigationCount {
 
 workflow hic {
     meta {
-        version: "0.3.0"
-        caper_docker: "encodedcc/hic-pipeline:0.3.0"
-        caper_singularity: "docker://encodedcc/hic-pipeline:0.3.0"
+        version: "0.4.0"
+        caper_docker: "encodedcc/hic-pipeline:0.4.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:0.4.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -40,25 +40,7 @@ workflow hic {
         Boolean no_call_loops = false
         Boolean no_call_tads = false
         Int align_num_cpus = 32
-        String? assembly_name
-    }
-
-    parameter_meta {
-        fastq: "Twice nested array of input `FastqPair`s, takes form of [lib_id][fastq_id]"
-        restriction_enzymes: "An array of names containing the restriction enzyme(s) used to generate the Hi-C libraries"
-        restriction_sites: "A text file containing cut sites for the given restriction enzyme. You should generate this file using this script: https://github.com/aidenlab/juicer/blob/encode/misc/generate_site_positions.py"
-        ligation_site_regex: "A custom regex to use for counting ligation site, if specified then restriction_sites file must be manually specified. Can be just a single site, e.g. ATGC, or several sites wrapped in parentheses and separated by pipes, e.g. `(ATGC|CTAG)`"
-        chrsz: "A chromosome sizes file for the desired assembly, this is a tab-separated text file whose rows take the form [chromosome] [size]"
-        reference_index: "A pregenerated BWA index for the desired assembly"
-        normalization_methods: "An array of normalization methods to use for .hic file generation as per Juicer Tools `pre`, if not specified then will use `pre` defaults of VC, VC_SQRT, KR, and SCALE. Valid methods are VC, VC_SQRT, KR, SCALE, GW_KR, GW_SCALE, GW_VC, INTER_KR, INTER_SCALE, and INTER_VC."
-        input_pairs: "A text file containing the paired fragments to use to generate the .hic contact maps, a detailed format description can be found here: https://github.com/aidenlab/juicer/wiki/Pre#long-format"
-        input_pairs_index: "Index of input_pairs as generated with index_by_chr.awk in task bam_to_pre"
-        input_hic: "An input .hic file for which to call loops and domains"
-        no_bam2pairs: "If set to `true`, avoid generating .pairs files, defaults to false"
-        no_call_loops: "If set to `true`, avoid calling loops with hiccups, defaults to false"
-        no_call_tads: "If set to `true`, avoid calling domains with arrowhead, defaults to false"
-        align_num_cpus: "Number of threads to use for bwa alignment"
-        assembly_name: "Name of assembly to insert into hic file header, recommended to specify for reproducbility otherwise hic file will be nondeterministic"
+        String assembly_name = "undefined"
     }
 
     # Default MAPQ thresholds for generating .hic contact maps
@@ -76,6 +58,10 @@ workflow hic {
                 message = "Must provide restriction sites file if enzyme is not `none`"
             }
         }
+    }
+
+    call normalize_assembly_name { input:
+        assembly_name = assembly_name
     }
 
     scatter(i in range(length(fastq))) {
@@ -179,33 +165,48 @@ workflow hic {
             quality = qualities[i],
         }
 
-        call create_hic { input:
-            pre = select_first([input_pairs, bam_to_pre.pre]),
-            pre_index = select_first([input_pairs_index, bam_to_pre.index]),
-            chrsz = select_first([chrsz]),
-            restriction_sites = restriction_sites,
-            quality = qualities[i],
-            stats = calculate_stats.stats,
-            stats_hists = calculate_stats.stats_hists,
-            assembly_name = assembly_name,
-            normalization_methods = normalization_methods,
+        # If Juicer Tools doesn't support the assembly then need to pass chrom sizes
+        if (!normalize_assembly_name.assembly_is_supported) {
+            call create_hic as create_hic_with_chrom_sizes { input:
+                pre = select_first([input_pairs, bam_to_pre.pre]),
+                pre_index = select_first([input_pairs_index, bam_to_pre.index]),
+                chrsz = select_first([chrsz]),
+                restriction_sites = restriction_sites,
+                quality = qualities[i],
+                stats = calculate_stats.stats,
+                stats_hists = calculate_stats.stats_hists,
+                assembly_name = assembly_name,
+                normalization_methods = normalization_methods,
+            }
+        }
+
+        if (normalize_assembly_name.assembly_is_supported) {
+            call create_hic { input:
+                pre = select_first([input_pairs, bam_to_pre.pre]),
+                pre_index = select_first([input_pairs_index, bam_to_pre.index]),
+                restriction_sites = restriction_sites,
+                quality = qualities[i],
+                stats = calculate_stats.stats,
+                stats_hists = calculate_stats.stats_hists,
+                assembly_name = assembly_name,
+                normalization_methods = normalization_methods,
+            }
         }
     }
 
-    if ((defined(input_hic) || defined(create_hic.output_hic))) {
-        File hic_file = if defined(input_hic) then select_first([input_hic]) else create_hic.output_hic[1]
-        if (!no_call_tads) {
-            call arrowhead { input:
-                hic_file = hic_file
-            }
-        }
-        if (!no_call_loops) {
-            call hiccups { input:
-                hic_file = hic_file
-            }
+    File hic_file = select_first(
+        [input_hic, create_hic.output_hic[1], create_hic_with_chrom_sizes.output_hic[1]]
+    )
+    if (!no_call_tads) {
+        call arrowhead { input:
+            hic_file = hic_file
         }
     }
-
+    if (!no_call_loops) {
+        call hiccups { input:
+            hic_file = hic_file
+        }
+    }
 }
 
 task get_ligation_site_regex {
@@ -226,6 +227,32 @@ task get_ligation_site_regex {
         String ligation_site_regex = read_string("~{output_path}")
         # Surface the original file for testing purposes
         File ligation_site_regex_file = "~{output_path}"
+    }
+
+    runtime {
+        cpu : "1"
+        memory: "500 MB"
+    }
+}
+
+task normalize_assembly_name {
+    input {
+        String assembly_name
+        String normalized_assembly_name_output_path = "normalized_assembly_name.txt"
+        String assembly_is_supported_output_path = "is_supported.txt"
+    }
+
+    command <<<
+        set -euo pipefail
+        python3 "$(which normalize_assembly_name.py)" \
+            ~{assembly_name} \
+            ~{normalized_assembly_name_output_path} \
+            ~{assembly_is_supported_output_path}
+    >>>
+
+    output {
+        String normalized_assembly_name = read_string("~{normalized_assembly_name_output_path}")
+        Boolean assembly_is_supported = read_boolean("~{assembly_is_supported_output_path}")
     }
 
     runtime {
@@ -642,7 +669,7 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 SSD"
-        docker: "encodedcc/hic-pipeline:0.3.0_hiccups"
+        docker: "encodedcc/hic-pipeline:0.4.0_hiccups"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
