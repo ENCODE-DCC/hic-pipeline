@@ -18,6 +18,8 @@
 
 This pipeline has several different supported modes of operation. As such there are various entrypoints into the pipeline, each with their own set of relevant inputs. The various entrypoints are described in detail [here](#entrypoints), and the individual parameters are described [here](#input-descriptions). We recommend first determining which entrypoint you need then cross-referencing the relevant input descriptions.
 
+You can create an input JSON for running the pipeline end-to-end, i.e. from fastqs to loop and domain calls, on a Hi-C experiment from the ENCODE portal using the provided [input JSON generation script](../scripts/make_input_json_from_portal.py). Before running it install the requirements with `pip install -r requirements-scripts.txt`. To invoke it, you must at the minimum provide the accession of the experiment on the portal and the restriction enzyme name (can be `none` for nonspecific enzymes like DNAse). See the script's help text for documentation of usage and options (`python scripts/make_input_json_from_portal.py --help`).
+
 ### Entrypoints
 
 Under each individual entrypoint the inputs for that entrypoint are listed. To run the pipeline using that particular entrypoint you need only specify the required inputs.
