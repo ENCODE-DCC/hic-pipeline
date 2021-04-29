@@ -86,9 +86,8 @@ Use the WDL `make_restriction_site_locations.wdl` to generate the restriction si
 * `no_bam2pairs` is a boolean which if `true` results in skipping generating `.pairs` files, defaults to `false`
 * `no_call_loops` is a boolean which if `true` results in skipping calling loops, defaults to `false`. Since the loop calling requires GPUs it is recommended to set to `true` if you do not
 * `no_call_tads` is a boolean which if `true` skips calling domains with arrowhead, defaults to `false`
-* `use_chrom_sizes_for_pre` is a boolean that if set to `true` results in chrom sizes being passed to `pre` instead of using `assembly_name`, defaults to `false`. You should set to `true` when using assemblies not supported by Juicer Tools, see [`Pre` documentation](https://github.com/aidenlab/juicer/wiki/Pre#usage) for list of supported values
 * `align_num_cpus` is number of threads to use for `bwa` alignment, it is recommended to leave at the default value.
-* `assembly_name` is name of assembly to insert into hic file header, recommended to specify for reproducibility otherwise the resulting `.hic.` file may have variable data in the header (the matrix contents will still be the same).
+* `assembly_name` is name of assembly, defaults to "unknown". If the assembly is supported by Juicer Tools `pre` then `.hic` file creation will use Juicer Tools' internal chrom sizes instead of the inputted `chrsz`, see [`Pre` documentation](https://github.com/aidenlab/juicer/wiki/Pre#usage) for list of supported values. The pipeline does some normalization of this value internally, for instance `GRCh38` will be converted into the Juicer Tools-supported `hg38`.
 
 ### Reference files
 

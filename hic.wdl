@@ -39,9 +39,8 @@ workflow hic {
         Boolean no_bam2pairs = false
         Boolean no_call_loops = false
         Boolean no_call_tads = false
-        Boolean use_chrom_sizes_for_pre = false
         Int align_num_cpus = 32
-        String? assembly_name
+        String assembly_name = "undefined"
     }
 
     # Default MAPQ thresholds for generating .hic contact maps
@@ -59,6 +58,10 @@ workflow hic {
                 message = "Must provide restriction sites file if enzyme is not `none`"
             }
         }
+    }
+
+    call normalize_assembly_name { input:
+        assembly_name = assembly_name
     }
 
     scatter(i in range(length(fastq))) {
@@ -162,7 +165,8 @@ workflow hic {
             quality = qualities[i],
         }
 
-        if (use_chrom_sizes_for_pre) {
+        # If Juicer Tools doesn't support the assembly then need to pass chrom sizes
+        if (!normalize_assembly_name.assembly_is_supported) {
             call create_hic as create_hic_with_chrom_sizes { input:
                 pre = select_first([input_pairs, bam_to_pre.pre]),
                 pre_index = select_first([input_pairs_index, bam_to_pre.index]),
@@ -176,7 +180,7 @@ workflow hic {
             }
         }
 
-        if (!use_chrom_sizes_for_pre) {
+        if (normalize_assembly_name.assembly_is_supported) {
             call create_hic { input:
                 pre = select_first([input_pairs, bam_to_pre.pre]),
                 pre_index = select_first([input_pairs_index, bam_to_pre.index]),
@@ -223,6 +227,32 @@ task get_ligation_site_regex {
         String ligation_site_regex = read_string("~{output_path}")
         # Surface the original file for testing purposes
         File ligation_site_regex_file = "~{output_path}"
+    }
+
+    runtime {
+        cpu : "1"
+        memory: "500 MB"
+    }
+}
+
+task normalize_assembly_name {
+    input {
+        String assembly_name
+        String normalized_assembly_name_output_path = "normalized_assembly_name.txt"
+        String assembly_is_supported_output_path = "is_supported.txt"
+    }
+
+    command <<<
+        set -euo pipefail
+        python3 "$(which normalize_assembly_name.py)" \
+            ~{assembly_name} \
+            ~{normalized_assembly_name_output_path} \
+            ~{assembly_is_supported_output_path}
+    >>>
+
+    output {
+        String normalized_assembly_name = read_string("~{normalized_assembly_name_output_path}")
+        Boolean assembly_is_supported = read_boolean("~{assembly_is_supported_output_path}")
     }
 
     runtime {
