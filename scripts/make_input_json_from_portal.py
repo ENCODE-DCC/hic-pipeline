@@ -72,7 +72,9 @@ def get_enzymes_from_experiment(experiment, enzymes=ENZYMES):
             used_enzymes.append(enzyme)
             break
     if not used_enzymes:
-        used_enzymes.append("none")
+        raise ValueError(
+            "Unsupported fragmentation method: {}".format(fragmentation_methods[0])
+        )
     return used_enzymes
 
 

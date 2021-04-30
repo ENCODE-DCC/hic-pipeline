@@ -34,23 +34,20 @@ def test_get_input_json_none_enzyme_has_no_restriction_sites():
     }
 
 
-@pytest.mark.parametrize(
-    "fragmentation_method,expected",
-    [
-        ("chemical (myenzyme restriction", ["myenzyme"]),
-        ("chemical (whoknows)", ["none"]),
-    ],
-)
-def test_get_enzymes_from_experiment(fragmentation_method, expected):
+def test_get_enzymes_from_experiment():
     result = get_enzymes_from_experiment(
         {
             "replicates": [
-                {"library": {"fragmentation_methods": [fragmentation_method]}}
+                {
+                    "library": {
+                        "fragmentation_methods": ["chemical (myenzyme restriction"]
+                    }
+                }
             ]
         },
         enzymes=["myenzyme"],
     )
-    assert result == expected
+    assert result == ["myenzyme"]
 
 
 def test_get_enzymes_from_experiment_multiple_fragmentation_methods_raises():
@@ -58,6 +55,16 @@ def test_get_enzymes_from_experiment_multiple_fragmentation_methods_raises():
         "replicates": [
             {"library": {"fragmentation_methods": ["chemical (MboI restriction)"]}},
             {"library": {"fragmentation_methods": ["chemical (MseI restriction)"]}},
+        ]
+    }
+    with pytest.raises(ValueError):
+        get_enzymes_from_experiment(experiment, enzymes=["MboI", "MseI"])
+
+
+def test_get_enzymes_from_experiment_unknown_fragmentation_methods_raises():
+    experiment = {
+        "replicates": [
+            {"library": {"fragmentation_methods": ["chemical (myenzyme restriction"]}}
         ]
     }
     with pytest.raises(ValueError):
