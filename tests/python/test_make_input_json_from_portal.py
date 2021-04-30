@@ -1,4 +1,7 @@
+import pytest
+
 from scripts.make_input_json_from_portal import (
+    get_enzymes_from_experiment,
     get_fastqs_from_experiment,
     get_input_json,
 )
@@ -6,7 +9,7 @@ from scripts.make_input_json_from_portal import (
 
 def test_get_input_json():
     result = get_input_json(
-        fastqs=["foo", "bar"], assembly_name="GRCh38", enzyme="MboI"
+        fastqs=["foo", "bar"], assembly_name="GRCh38", enzymes=["MboI"]
     )
     assert result == {
         "hic.assembly_name": "GRCh38",
@@ -20,7 +23,7 @@ def test_get_input_json():
 
 def test_get_input_json_none_enzyme_has_no_restriction_sites():
     result = get_input_json(
-        fastqs=["foo", "bar"], assembly_name="GRCh38", enzyme="none"
+        fastqs=["foo", "bar"], assembly_name="GRCh38", enzymes=["none"]
     )
     assert result == {
         "hic.assembly_name": "GRCh38",
@@ -29,6 +32,43 @@ def test_get_input_json_none_enzyme_has_no_restriction_sites():
         "hic.reference_index": "https://www.encodeproject.org/files/ENCFF643CGH/@@download/ENCFF643CGH.tar.gz",
         "hic.restriction_enzymes": ["none"],
     }
+
+
+def test_get_enzymes_from_experiment():
+    result = get_enzymes_from_experiment(
+        {
+            "replicates": [
+                {
+                    "library": {
+                        "fragmentation_methods": ["chemical (myenzyme restriction"]
+                    }
+                }
+            ]
+        },
+        enzymes=["myenzyme"],
+    )
+    assert result == ["myenzyme"]
+
+
+def test_get_enzymes_from_experiment_multiple_fragmentation_methods_raises():
+    experiment = {
+        "replicates": [
+            {"library": {"fragmentation_methods": ["chemical (MboI restriction)"]}},
+            {"library": {"fragmentation_methods": ["chemical (MseI restriction)"]}},
+        ]
+    }
+    with pytest.raises(ValueError):
+        get_enzymes_from_experiment(experiment, enzymes=["MboI", "MseI"])
+
+
+def test_get_enzymes_from_experiment_unknown_fragmentation_methods_raises():
+    experiment = {
+        "replicates": [
+            {"library": {"fragmentation_methods": ["chemical (myenzyme restriction"]}}
+        ]
+    }
+    with pytest.raises(ValueError):
+        get_enzymes_from_experiment(experiment, enzymes=["MboI", "MseI"])
 
 
 def test_get_fastqs_from_experiment():
