@@ -47,10 +47,13 @@ workflow hic {
     Array[Int] DEFAULT_HIC_QUALITIES = [1, 30]
     Boolean is_nonspecific = length(restriction_enzymes) > 0 && restriction_enzymes[0] == "none"
 
-    if (!defined(ligation_site_regex) && !defined(input_hic)) {
-        call get_ligation_site_regex { input:
-            restriction_enzymes = restriction_enzymes
+    if (!defined(input_hic)) {
+        if (!defined(ligation_site_regex)) {
+            call get_ligation_site_regex { input:
+                restriction_enzymes = restriction_enzymes
+            }
         }
+
         String ligation_site = select_first([ligation_site_regex, get_ligation_site_regex.ligation_site_regex])
 
         if (!is_nonspecific && !defined(restriction_sites)) {
