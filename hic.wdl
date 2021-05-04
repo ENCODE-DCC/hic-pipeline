@@ -523,7 +523,7 @@ task calculate_stats {
         duplicate_count=$(samtools view -c -f 1089 -F 256 ~{bam})
         awk \
             -f "$(which stats_sub.awk)" \
-            -v ligation=~{ligation_site} \
+            -v ligation="~{ligation_site}" \
             -v dups="$duplicate_count" \
             ~{sep=" " alignment_stats} >> $STATS_FILENAME
         java \
@@ -532,7 +532,7 @@ task calculate_stats {
             -Xmx16g \
             -jar /opt/scripts/common/juicer_tools.jar \
             statistics \
-            --ligation ~{ligation_site} \
+            --ligation "~{ligation_site}" \
             ~{default="none" restriction_sites} \
             $STATS_FILENAME \
             ~{pre} \
