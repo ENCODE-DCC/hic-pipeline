@@ -302,6 +302,7 @@ task align {
             -SP5M \
             ~{if defined(fastq_pair.read_group) then "-R '" + fastq_pair.read_group + "'" else ""} \
             -t ~{num_cpus} \
+            -K 320000000 \
             $reference_index_path \
             ${fastq_pair.read_1} \
             ${fastq_pair.read_2} | \
