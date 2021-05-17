@@ -191,7 +191,7 @@ workflow hic {
                 quality = qualities[i],
                 stats = calculate_stats.stats,
                 stats_hists = calculate_stats.stats_hists,
-                assembly_name = assembly_name,
+                assembly_name = normalize_assembly_name.normalized_assembly_name,
                 normalization_methods = normalization_methods,
             }
         }
