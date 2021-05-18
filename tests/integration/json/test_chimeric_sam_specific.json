@@ -2,5 +2,5 @@
   "test_chimeric_sam_specific.bam": "tests/data/alignable_shard0.bam",
   "test_chimeric_sam_specific.ligation_count": "tests/data/result_norm.txt.res.txt",
   "test_chimeric_sam_specific.num_cpus": 1,
-  "test_chimeric_sam_specific.restriction_sites": "tests/data/ce10_selected_MboI.txt"
+  "test_chimeric_sam_specific.restriction_sites": "tests/data/ce10_selected_MboI.txt.gz"
 }

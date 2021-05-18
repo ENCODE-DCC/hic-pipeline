@@ -51,7 +51,7 @@ cat << EOF > input.json
   "hic.restriction_enzymes": [
     "MboI"
   ],
-  "hic.restriction_sites": "tests/data/ce10_selected_MboI.txt"
+  "hic.restriction_sites": "tests/data/ce10_selected_MboI.txt.gz"
 }
 EOF
 ```

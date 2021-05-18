@@ -334,11 +334,13 @@ task chimeric_sam_specific {
 
     command <<<
         set -euo pipefail
+        RESTRICTION_SITES_FILENAME=restriction_sites.txt
+        gzip -dc ~{restriction_sites} > $RESTRICTION_SITES_FILENAME
         cp ~{ligation_count} result_norm.txt.res.txt
         samtools view -h -@ ~{num_cpus - 1} ~{bam} > result.sam
         awk \
             -v stem=result_norm \
-            -v site_file=~{restriction_sites} \
+            -v site_file=$RESTRICTION_SITES_FILENAME \
             -f "$(which chimeric_sam.awk)" \
             result.sam | \
             samtools sort -t cb -n --threads ~{num_cpus} > chimeric_sam_specific.bam
@@ -519,8 +521,10 @@ task calculate_stats {
 
     command <<<
         PRE_FILE=pre.txt
+        RESTRICTION_SITES_FILENAME=restriction_sites.txt
         STATS_FILENAME=stats_~{quality}~{output_filename_suffix}.txt
         gzip -dc ~{pre} > $PRE_FILE
+        ~{if defined(restriction_sites) then "gzip -dc " + restriction_sites + " > $RESTRICTION_SITES_FILENAME" else ""}
         duplicate_count=$(samtools view -c -f 1089 -F 256 ~{bam})
         awk \
             -f "$(which stats_sub.awk)" \
@@ -534,7 +538,7 @@ task calculate_stats {
             -jar /opt/scripts/common/juicer_tools.jar \
             statistics \
             --ligation "~{ligation_site}" \
-            ~{default="none" restriction_sites} \
+            ~{if defined(restriction_sites) then "$RESTRICTION_SITES_FILENAME" else "none"} \
             $STATS_FILENAME \
             ~{pre} \
             ~{chrom_sizes}
@@ -575,8 +579,10 @@ task create_hic {
         set -euo pipefail
         PRE_FILE=pre.txt
         PRE_INDEX_FILE=pre_index.txt
+        RESTRICTION_SITES_FILENAME=restriction_sites.txt
         gzip -dc ~{pre} > $PRE_FILE
         gzip -dc ~{pre_index} > $PRE_INDEX_FILE
+        ~{if defined(restriction_sites) then "gzip -dc " + restriction_sites + " > $RESTRICTION_SITES_FILENAME" else ""}
         # If the assembly name is empty, then we write chrsz path into file as usual, otherwise, use the assembly name instead of the path
         java \
             -Ddevelopment=false \
@@ -585,7 +591,7 @@ task create_hic {
             -jar /opt/scripts/common/juicer_tools.jar \
             pre \
             -n \
-            ~{if defined(restriction_sites) then "-f " + restriction_sites else ""} \
+            ~{if defined(restriction_sites) then "-f $RESTRICTION_SITES_FILENAME" else ""} \
             -s ~{stats} \
             -g ~{stats_hists} \
             ~{if defined(assembly_name) then "-y " + assembly_name else ""} \

@@ -13,4 +13,4 @@
         - --threads 4
       contains_regex:
         - 'cp .*dummy.txt result_norm.txt.res.txt'
-        - '-v site_file=.*dummy.txt'
+        - 'gzip -dc .*dummy.txt > \$RESTRICTION_SITES_FILENAME'

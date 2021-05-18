@@ -1,0 +1,15 @@
+{
+  "test_create_hic.assembly_name": "GRCh39",
+  "test_create_hic.chrsz": "tests/data/dummy.txt",
+  "test_create_hic.normalization_methods": [
+    "foo",
+    "bar",
+    "baz"
+  ],
+  "test_create_hic.pre": "tests/data/dummy.txt",
+  "test_create_hic.pre_index": "tests/data/dummy.txt",
+  "test_create_hic.quality": "30",
+  "test_create_hic.restriction_sites": "tests/data/dummy.txt",
+  "test_create_hic.stats": "tests/data/dummy.txt",
+  "test_create_hic.stats_hists": "tests/data/dummy.txt"
+}
