@@ -587,7 +587,7 @@ task create_hic {
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
-            -Xmx390g \
+            -Xmx590g \
             -jar /opt/scripts/common/juicer_tools.jar \
             pre \
             -n \
@@ -605,7 +605,7 @@ task create_hic {
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
-            -Xmx390g \
+            -Xmx590g \
             -jar /opt/scripts/common/juicer_tools.jar \
             addNorm \
             ~{if length(normalization_methods) > 0 then "-k" else ""} ~{sep="," normalization_methods} \
@@ -620,7 +620,7 @@ task create_hic {
     runtime {
         cpu : "~{num_cpus}"
         disks: "local-disk 2000 SSD"
-        memory : "400 GB"
+        memory : "600 GB"
     }
 }
 
