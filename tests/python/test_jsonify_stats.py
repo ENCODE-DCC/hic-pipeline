@@ -188,7 +188,8 @@ def test_jsonify_stats_without_nas():
 
     result = jsonify_stats(parsed_data)
     assert result == {
-        "3_prime_bias_long_range": 96.0,
+        "pct_3_prime_bias_long_range": 96.0,
+        "pct_5_prime_bias_long_range": 4.0,
         "library_complexity_estimate": 9171866565,
         "ligation_motif_present": 1077293854,
         "pct_ligation_motif_present": 49.22,

@@ -151,7 +151,7 @@ def jsonify_stats(parsed_data):
     for k, v in parsed_data.items():
         if "%" in v and "-" in v:
             if "bias" in k:
-                fields = ("3_prime", "5_prime")
+                fields = ("pct_3_prime_bias", "pct_5_prime_bias")
             elif "pair_type" in k:
                 fields = ("pct_left", "pct_inner", "pct_outer", "pct_right")
             try:
@@ -159,10 +159,9 @@ def jsonify_stats(parsed_data):
             except ValueError:
                 continue
             if "bias" in k:
-                output["3_prime_bias_long_range"] = parsed["3_prime"]
+                update_with_total_and_percentages(output, parsed, "long_range")
             elif "pair_type" in k:
-                for key, value in parsed.items():
-                    output["{}_pair_type".format(key)] = value
+                update_with_total_and_percentages(output, parsed, "pair_type")
         elif k in ("unique_reads", "duplicates"):
             parsed = parse_to_total_and_two_percentages(
                 v,
