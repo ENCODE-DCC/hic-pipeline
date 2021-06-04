@@ -680,7 +680,11 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 SSD"
+<<<<<<< HEAD
         docker: "encodedcc/hic-pipeline:0.5.0_hiccups"
+=======
+        docker: "encodedcc/hic-pipeline:PIP-1539-end-to-end-testing_aec1450f-de94-499e-b228-154b523062d3_hiccups"
+>>>>>>> temporarily hard code docker image
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
