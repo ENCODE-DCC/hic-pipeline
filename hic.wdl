@@ -197,8 +197,8 @@ workflow hic {
         }
     }
 
-    File hic_file = if length(create_hic.output_hic) > 0 then select_first([create_hic.output_hic[1]])
-        else if length(create_hic_with_chrom_sizes.output_hic) > 0 then select_first([create_hic_with_chrom_sizes.output_hic[1]])
+    File hic_file = if length(create_hic.output_hic) > 1 then select_first([create_hic.output_hic[1]])
+        else if length(create_hic_with_chrom_sizes.output_hic) > 1 then select_first([create_hic_with_chrom_sizes.output_hic[1]])
         else select_first([input_hic])
 
     if (!no_call_tads) {
