@@ -467,7 +467,7 @@ task bam2pairs {
     runtime {
         cpu : "8"
         memory: "16 GB"
-        disks: "local-disk 1000 HDD"
+        disks: "local-disk 3000 HDD"
     }
 }
 
@@ -502,7 +502,7 @@ task bam_to_pre {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 1000 HDD"
+        disks: "local-disk 3000 HDD"
         memory : "64 GB"
     }
 }
