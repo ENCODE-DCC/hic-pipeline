@@ -556,7 +556,7 @@ task calculate_stats {
 
     runtime {
         cpu : "1"
-        disks: "local-disk 1000 HDD"
+        disks: "local-disk 4000 HDD"
         memory : "16 GB"
     }
 }
