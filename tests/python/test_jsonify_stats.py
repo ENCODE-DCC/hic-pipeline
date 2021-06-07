@@ -76,6 +76,8 @@ def test_parse_to_int_or_float(value, condition, expected):
         ("Intra-fragment Reads", "intra_fragment_reads"),
         ("Hi-C Contacts", "hic_contacts"),
         ("Pair Type %(L-I-O-R)", "pair_type_percent_lior"),
+        ("Average Insert Size", "avg_insert_size"),
+        ("Unmapped", "unmapped_reads"),
     ],
 )
 def test_clean_key(key, expected):
@@ -97,9 +99,9 @@ def test_jsonify_stats():
         "normal_paired": "321558 (96.60%)",
         "chimeric_paired": "1 (0.00%)",
         "chimeric_ambiguous": "26 (0.01%)",
-        "unmapped": "11303 (3.40%)",
+        "unmapped_reads": "11303 (3.40%)",
         "single_alignment": "496 (0.15%)",
-        "average_insert_size": "0.00",
+        "avg_insert_size": "0.00",
         "alignable_normal_and_chimeric_paired": "321559 (96.60%)",
         "unique_reads": "321559 (100.00%, 96.60%)",
         "duplicates": "0 (0.00%, 0.00%)",
@@ -129,7 +131,7 @@ def test_jsonify_stats():
         "short_range_5kb_to_20kb": 110,
         "pct_alignable_normal_and_chimeric_paired": 96.6,
         "alignable_normal_and_chimeric_paired": 321559,
-        "average_insert_size": 0.0,
+        "avg_insert_size": 0.0,
         "pct_sequenced_below_mapq_threshold": 96.24,
         "pct_unique_below_mapq_threshold": 92.96,
         "below_mapq_threshold": 309458,
@@ -174,8 +176,8 @@ def test_jsonify_stats():
         "pct_alignable_unique_reads": 100.0,
         "pct_sequenced_unique_reads": 96.6,
         "unique_reads": 321559,
-        "pct_unmapped": 3.4,
-        "unmapped": 11303,
+        "pct_unmapped_reads": 3.4,
+        "unmapped_reads": 11303,
     }
 
 

@@ -131,6 +131,9 @@ def clean_key(key):
     key = key.lstrip("_")
     key = key.replace("__", "_")
     key = key.replace("l_i_o_r", "lior")
+    key = key.replace("average", "avg")
+    if key == "unmapped":
+        key += "_reads"
     return key
 
 
