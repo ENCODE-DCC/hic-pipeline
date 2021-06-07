@@ -650,7 +650,7 @@ task arrowhead {
     runtime {
         cpu : "1"
         disks: "local-disk 100 SSD"
-        memory : "16 GB"
+        memory : "32 GB"
     }
 }
 
