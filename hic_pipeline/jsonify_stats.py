@@ -59,9 +59,7 @@ def parse_to_total_and_percentage(value):
 
 
 def parse_to_total_and_two_percentages(
-    value,
-    first_percentage_name="pct_of_unique_reads",
-    second_percentage_name="pct_of_sequenced_reads",
+    value, first_percentage_name="pct_unique", second_percentage_name="pct_sequenced"
 ):
     """
     For unique and duplicates, they are percentage of alignable / percentage of
@@ -133,7 +131,18 @@ def clean_key(key):
     key = key.lstrip("_")
     key = key.replace("__", "_")
     key = key.replace("l_i_o_r", "lior")
+    key = key.replace("average", "avg")
+    if key == "unmapped":
+        key += "_reads"
     return key
+
+
+def update_with_total_and_percentages(output, parsed, parent_key):
+    for key, value in parsed.items():
+        if key == "total":
+            output[parent_key] = value
+        else:
+            output["{}_{}".format(key, parent_key)] = value
 
 
 def jsonify_stats(parsed_data):
@@ -145,24 +154,30 @@ def jsonify_stats(parsed_data):
     for k, v in parsed_data.items():
         if "%" in v and "-" in v:
             if "bias" in k:
-                fields = ("pct_long_range", "pct_short_range")
+                fields = ("pct_3_prime_bias", "pct_5_prime_bias")
             elif "pair_type" in k:
                 fields = ("pct_left", "pct_inner", "pct_outer", "pct_right")
             try:
-                values = parse_to_multiple_percentages(v, fields)
+                parsed = parse_to_multiple_percentages(v, fields)
             except ValueError:
                 continue
-            output[k] = values
+            if "bias" in k:
+                update_with_total_and_percentages(output, parsed, "long_range")
+            elif "pair_type" in k:
+                update_with_total_and_percentages(output, parsed, "pair_type")
         elif k in ("unique_reads", "duplicates"):
-            output[k] = parse_to_total_and_two_percentages(
+            parsed = parse_to_total_and_two_percentages(
                 v,
-                first_percentage_name="pct_of_alignable_reads",
-                second_percentage_name="pct_of_sequenced_reads",
+                first_percentage_name="pct_alignable",
+                second_percentage_name="pct_sequenced",
             )
+            update_with_total_and_percentages(output, parsed, k)
         elif v.count("%") == 1:
-            output[k] = parse_to_total_and_percentage(v)
+            parsed = parse_to_total_and_percentage(v)
+            update_with_total_and_percentages(output, parsed, k)
         elif v.count("%") == 2:
-            output[k] = parse_to_total_and_two_percentages(v)
+            parsed = parse_to_total_and_two_percentages(v)
+            update_with_total_and_percentages(output, parsed, k)
         else:
             try:
                 output[k] = parse_to_int_or_float(v)

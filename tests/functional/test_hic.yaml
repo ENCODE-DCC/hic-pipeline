@@ -16,4 +16,4 @@
       - path: test-output/merged_nodups_30.txt.gz
         md5sum: ee923f74237094ac00cd701650af906c
       - path: test-output/stats_30.json
-        md5sum: 2bfa772a98381c3a48d9f2dbf1b6bff1
+        md5sum: 463d139e8d0691045139a5a2e06ab16d

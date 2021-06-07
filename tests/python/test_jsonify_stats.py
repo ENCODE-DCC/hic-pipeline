@@ -10,6 +10,7 @@ from hic_pipeline.jsonify_stats import (
     parse_to_multiple_percentages,
     parse_to_total_and_percentage,
     parse_to_total_and_two_percentages,
+    update_with_total_and_percentages,
 )
 
 
@@ -75,11 +76,21 @@ def test_parse_to_int_or_float(value, condition, expected):
         ("Intra-fragment Reads", "intra_fragment_reads"),
         ("Hi-C Contacts", "hic_contacts"),
         ("Pair Type %(L-I-O-R)", "pair_type_percent_lior"),
+        ("Average Insert Size", "avg_insert_size"),
+        ("Unmapped", "unmapped_reads"),
     ],
 )
 def test_clean_key(key, expected):
     result = clean_key(key)
     assert result == expected
+
+
+def test_update_with_total_and_percentages():
+    parsed = {"total": 1, "pct_foo": 3.0, "pct_bar": 5.0}
+    output = {"baz": 3}
+    parent_key = "qux"
+    update_with_total_and_percentages(output, parsed, parent_key)
+    assert output == {"baz": 3, "qux": 1, "pct_foo_qux": 3.0, "pct_bar_qux": 5.0}
 
 
 def test_jsonify_stats():
@@ -88,9 +99,9 @@ def test_jsonify_stats():
         "normal_paired": "321558 (96.60%)",
         "chimeric_paired": "1 (0.00%)",
         "chimeric_ambiguous": "26 (0.01%)",
-        "unmapped": "11303 (3.40%)",
+        "unmapped_reads": "11303 (3.40%)",
         "single_alignment": "496 (0.15%)",
-        "average_insert_size": "0.00",
+        "avg_insert_size": "0.00",
         "alignable_normal_and_chimeric_paired": "321559 (96.60%)",
         "unique_reads": "321559 (100.00%, 96.60%)",
         "duplicates": "0 (0.00%, 0.00%)",
@@ -98,7 +109,6 @@ def test_jsonify_stats():
         "intra_fragment_reads": "6,969 (2.09% / 2.17%)",
         "below_mapq_threshold": "309,458 (92.96% / 96.24%)",
         "hic_contacts": "5,132 (1.54% / 1.60%)",
-        # "ligation_motif_present": "96 (0.03%)",
         "ligation_motif_present": "6 (0.00% / 0.00%)",
         "3_prime_bias_long_range": "N/A",
         "pair_type_percent_lior": "25% - 23% - 27% - 25%",
@@ -113,79 +123,76 @@ def test_jsonify_stats():
 
     result = jsonify_stats(parsed_data)
     assert result == {
-        "short_range_500bp_to_5kb": {
-            "pct_of_sequenced_reads": 1.05,
-            "pct_of_unique_reads": 1.02,
-            "total": 3387,
-        },
-        "short_range_5kb_to_20kb": {
-            "pct_of_sequenced_reads": 0.03,
-            "pct_of_unique_reads": 0.03,
-            "total": 110,
-        },
-        "alignable_normal_and_chimeric_paired": {"pct": 96.6, "total": 321559},
-        "average_insert_size": 0.0,
-        "below_mapq_threshold": {
-            "pct_of_sequenced_reads": 96.24,
-            "pct_of_unique_reads": 92.96,
-            "total": 309458,
-        },
-        "chimeric_ambiguous": {"pct": 0.01, "total": 26},
-        "chimeric_paired": {"pct": 0.0, "total": 1},
-        "duplicates": {
-            "pct_of_alignable_reads": 0.0,
-            "pct_of_sequenced_reads": 0.0,
-            "total": 0,
-        },
-        "hic_contacts": {
-            "pct_of_sequenced_reads": 1.6,
-            "pct_of_unique_reads": 1.54,
-            "total": 5132,
-        },
-        "inter_chromosomal": {
-            "pct_of_sequenced_reads": 0.0,
-            "pct_of_unique_reads": 0.0,
-            "total": 6,
-        },
-        "intra_chromosomal": {
-            "pct_of_sequenced_reads": 1.59,
-            "pct_of_unique_reads": 1.54,
-            "total": 5126,
-        },
-        "intra_fragment_reads": {
-            "pct_of_sequenced_reads": 2.17,
-            "pct_of_unique_reads": 2.09,
-            "total": 6969,
-        },
-        "short_range_less_than_500bp": {
-            "pct_of_sequenced_reads": 0.32,
-            "pct_of_unique_reads": 0.31,
-            "total": 1040,
-        },
-        "ligation_motif_present": {
-            "pct_of_sequenced_reads": 0.0,
-            "pct_of_unique_reads": 0.0,
-            "total": 6,
-        },
+        "pct_sequenced_short_range_500bp_to_5kb": 1.05,
+        "pct_unique_short_range_500bp_to_5kb": 1.02,
+        "short_range_500bp_to_5kb": 3387,
+        "pct_sequenced_short_range_5kb_to_20kb": 0.03,
+        "pct_unique_short_range_5kb_to_20kb": 0.03,
+        "short_range_5kb_to_20kb": 110,
+        "pct_alignable_normal_and_chimeric_paired": 96.6,
+        "alignable_normal_and_chimeric_paired": 321559,
+        "avg_insert_size": 0.0,
+        "pct_sequenced_below_mapq_threshold": 96.24,
+        "pct_unique_below_mapq_threshold": 92.96,
+        "below_mapq_threshold": 309458,
+        "pct_chimeric_ambiguous": 0.01,
+        "chimeric_ambiguous": 26,
+        "pct_chimeric_paired": 0.0,
+        "chimeric_paired": 1,
+        "pct_alignable_duplicates": 0.0,
+        "pct_sequenced_duplicates": 0.0,
+        "duplicates": 0,
+        "pct_sequenced_hic_contacts": 1.6,
+        "pct_unique_hic_contacts": 1.54,
+        "hic_contacts": 5132,
+        "pct_sequenced_inter_chromosomal": 0.0,
+        "pct_unique_inter_chromosomal": 0.0,
+        "inter_chromosomal": 6,
+        "pct_sequenced_intra_chromosomal": 1.59,
+        "pct_unique_intra_chromosomal": 1.54,
+        "intra_chromosomal": 5126,
+        "pct_sequenced_intra_fragment_reads": 2.17,
+        "pct_unique_intra_fragment_reads": 2.09,
+        "intra_fragment_reads": 6969,
+        "pct_sequenced_short_range_less_than_500bp": 0.32,
+        "pct_unique_short_range_less_than_500bp": 0.31,
+        "short_range_less_than_500bp": 1040,
+        "pct_sequenced_ligation_motif_present": 0.0,
+        "pct_unique_ligation_motif_present": 0.0,
+        "ligation_motif_present": 6,
         "lior_convergence": 10000000000,
-        "long_range_greater_than_20kb": {
-            "pct_of_sequenced_reads": 0.18,
-            "pct_of_unique_reads": 0.18,
-            "total": 589,
-        },
-        "normal_paired": {"pct": 96.6, "total": 321558},
-        "pair_type_percent_lior": {
-            "pct_inner": 23.0,
-            "pct_left": 25.0,
-            "pct_outer": 27.0,
-            "pct_right": 25.0,
-        },
+        "pct_sequenced_long_range_greater_than_20kb": 0.18,
+        "pct_unique_long_range_greater_than_20kb": 0.18,
+        "long_range_greater_than_20kb": 589,
+        "pct_normal_paired": 96.6,
+        "normal_paired": 321558,
+        "pct_inner_pair_type": 23.0,
+        "pct_left_pair_type": 25.0,
+        "pct_outer_pair_type": 27.0,
+        "pct_right_pair_type": 25.0,
         "sequenced_read_pairs": 332888,
-        "single_alignment": {"pct": 0.15, "total": 496},
-        "unique_reads": {
-            "pct_of_alignable_reads": 100.0,
-            "pct_of_sequenced_reads": 96.6,
-            "total": 321559,
-        },
-        "unmapped": {"pct": 3.4, "total": 11303},
+        "pct_single_alignment": 0.15,
+        "single_alignment": 496,
+        "pct_alignable_unique_reads": 100.0,
+        "pct_sequenced_unique_reads": 96.6,
+        "unique_reads": 321559,
+        "pct_unmapped_reads": 3.4,
+        "unmapped_reads": 11303,
+    }
+
+
+def test_jsonify_stats_without_nas():
+    parsed_data = {
+        "ligation_motif_present": "1077293854 (49.22%)",
+        "library_complexity_estimate": "9,171,866,565",
+        "3_prime_bias_long_range": "96% - 4%",
+    }
+
+    result = jsonify_stats(parsed_data)
+    assert result == {
+        "pct_3_prime_bias_long_range": 96.0,
+        "pct_5_prime_bias_long_range": 4.0,
+        "library_complexity_estimate": 9171866565,
+        "ligation_motif_present": 1077293854,
+        "pct_ligation_motif_present": 49.22,
     }
