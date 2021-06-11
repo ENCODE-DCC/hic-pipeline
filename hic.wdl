@@ -13,9 +13,9 @@ struct BamAndLigationCount {
 
 workflow hic {
     meta {
-        version: "0.5.0"
+        version: "0.6.0"
         caper_docker: "encodedcc/hic-pipeline:PIP-1539-end-to-end-testing_f8a040cc-1b47-4489-bb5e-9a1fc8134653"
-        caper_singularity: "docker://encodedcc/hic-pipeline:0.5.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:0.6.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
