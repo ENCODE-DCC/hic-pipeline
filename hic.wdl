@@ -13,9 +13,9 @@ struct BamAndLigationCount {
 
 workflow hic {
     meta {
-        version: "0.4.0"
-        caper_docker: "encodedcc/hic-pipeline:0.4.0"
-        caper_singularity: "docker://encodedcc/hic-pipeline:0.4.0"
+        version: "0.5.0"
+        caper_docker: "encodedcc/hic-pipeline:0.5.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:0.5.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -666,13 +666,14 @@ task hiccups {
 
     output {
         File out_file = glob("loops/*.bedpe.gz")[0]
+        File merged_loops = "loops/merged_loops.bedpe.gz"
     }
 
     runtime {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 SSD"
-        docker: "encodedcc/hic-pipeline:0.4.0_hiccups"
+        docker: "encodedcc/hic-pipeline:0.5.0_hiccups"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
