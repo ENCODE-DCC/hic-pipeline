@@ -666,6 +666,7 @@ task hiccups {
 
     output {
         File out_file = glob("loops/*.bedpe.gz")[0]
+        File merged_loops = "loops/merged_loops.bedpe.gz"
     }
 
     runtime {
