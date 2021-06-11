@@ -417,7 +417,7 @@ task merge {
     runtime {
         cpu : "~{num_cpus}"
         memory: "16 GB"
-        disks: "local-disk 4000 HDD"
+        disks: "local-disk 6000 HDD"
     }
 }
 
