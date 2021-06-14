@@ -575,7 +575,7 @@ task create_hic {
         String? assembly_name
         File? chrsz
         File? restriction_sites
-        Int? num_cpus = 24
+        Int? num_cpus = 8
     }
 
     command <<<
