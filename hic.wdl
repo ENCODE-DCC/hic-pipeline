@@ -40,6 +40,7 @@ workflow hic {
         Boolean no_call_loops = false
         Boolean no_call_tads = false
         Int align_num_cpus = 32
+        Int? create_hic_num_cpus
         String assembly_name = "undefined"
     }
 
@@ -180,6 +181,7 @@ workflow hic {
                 stats_hists = calculate_stats.stats_hists,
                 assembly_name = assembly_name,
                 normalization_methods = normalization_methods,
+                num_cpus = create_hic_num_cpus,
             }
         }
 
@@ -193,6 +195,7 @@ workflow hic {
                 stats_hists = calculate_stats.stats_hists,
                 assembly_name = normalize_assembly_name.normalized_assembly_name,
                 normalization_methods = normalization_methods,
+                num_cpus = create_hic_num_cpus,
             }
         }
     }
@@ -572,7 +575,7 @@ task create_hic {
         String? assembly_name
         File? chrsz
         File? restriction_sites
-        Int num_cpus = 24
+        Int? num_cpus = 24
     }
 
     command <<<
