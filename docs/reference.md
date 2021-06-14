@@ -89,7 +89,7 @@ Use the WDL `make_restriction_site_locations.wdl` to generate the restriction si
 * `no_call_loops` is a boolean which if `true` results in skipping calling loops, defaults to `false`. Since the loop calling requires GPUs it is recommended to set to `true` if you do not
 * `no_call_tads` is a boolean which if `true` skips calling domains with arrowhead, defaults to `false`
 * `align_num_cpus` is number of threads to use for `bwa` alignment, it is recommended to leave at the default value.
-* `create_hic_num_cpus` is number of threads to use for hic creation, it is recommended to leave at the default value. If you have an OOM error for Juicer Tools `pre`, which may occur for large experiments, then supply a small value such as `4` 
+* `create_hic_num_cpus` is number of threads to use for hic creation, it is recommended to leave at the default value. If you have an OOM error for Juicer Tools `pre`, which may occur for large experiments, then supply a small value such as `4`
 * `assembly_name` is name of assembly, defaults to "unknown". If the assembly is supported by Juicer Tools `pre` then `.hic` file creation will use Juicer Tools' internal chrom sizes instead of the inputted `chrsz`, see [`Pre` documentation](https://github.com/aidenlab/juicer/wiki/Pre#usage) for list of supported values. The pipeline does some normalization of this value internally, for instance `GRCh38` will be converted into the Juicer Tools-supported `hg38`.
 
 ### Reference files
