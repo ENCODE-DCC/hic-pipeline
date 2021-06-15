@@ -1,5 +1,4 @@
-# The * ignores everything, then !src creates an exception for the src folder
 *
 !hic_pipeline/*.py
-!hic_pipeline/*.awk
 !hic_pipeline/*/
+!requirements-delta.txt
