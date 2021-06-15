@@ -9,6 +9,7 @@ workflow test_create_hic {
         File stats
         File stats_hists
         File chrsz
+        File? restriction_sites
         String assembly_name
         Array[String] normalization_methods = []
         Int quality
@@ -20,6 +21,7 @@ workflow test_create_hic {
         stats = stats,
         stats_hists = stats_hists,
         chrsz = chrsz,
+        restriction_sites = restriction_sites,
         quality = quality,
         assembly_name = assembly_name,
         normalization_methods = normalization_methods,

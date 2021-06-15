@@ -39,10 +39,17 @@ def main():
     auth = read_auth_from_file(args.keypair_file)
     experiment = get_experiment(args.accession, auth=auth)
     fastqs = get_fastqs_from_experiment(experiment)
-    enzymes = get_enzymes_from_experiment(experiment)
-    input_json = get_input_json(
-        fastqs=fastqs, assembly_name=args.assembly_name, enzymes=enzymes
-    )
+    if args.ligation_site_regex is None:
+        enzymes = get_enzymes_from_experiment(experiment)
+        input_json = get_input_json(
+            fastqs=fastqs, assembly_name=args.assembly_name, enzymes=enzymes
+        )
+    else:
+        input_json = get_input_json(
+            fastqs=fastqs,
+            assembly_name=args.assembly_name,
+            ligation_site_regex=args.ligation_site_regex,
+        )
     outfile = args.outfile or "{}.json".format(args.accession)
     write_json_to_file(input_json, outfile)
 
@@ -102,18 +109,22 @@ def get_fastqs_from_experiment(experiment):
     return output
 
 
-def get_input_json(fastqs, assembly_name, enzymes):
+def get_input_json(fastqs, assembly_name, enzymes=None, ligation_site_regex=None):
     input_json = {
         "hic.fastq": fastqs,
         "hic.assembly_name": assembly_name,
         "hic.chrsz": REFERENCE_FILES[assembly_name]["chrom_sizes"],
         "hic.reference_index": REFERENCE_FILES[assembly_name]["bwa_index"],
-        "hic.restriction_enzymes": enzymes,
     }
-    if enzymes != ["none"]:
-        input_json["hic.restriction_sites"] = REFERENCE_FILES[assembly_name][
-            "restriction_sites"
-        ][enzymes[0]]
+    if enzymes is not None:
+        input_json["hic.restriction_enzymes"] = enzymes
+        if enzymes != ["none"]:
+            input_json["hic.restriction_sites"] = REFERENCE_FILES[assembly_name][
+                "restriction_sites"
+            ][enzymes[0]]
+
+    if ligation_site_regex is not None:
+        input_json["hic.ligation_site_regex"] = ligation_site_regex
     return input_json
 
 
@@ -148,6 +159,7 @@ def get_parser():
         default="GRCh38",
         help="Name of assembly, mm10 is not yet supported",
     )
+    parser.add_argument("--ligation-site-regex", help="Regex for ligation site")
     return parser
 
 

@@ -13,7 +13,8 @@
         - -v ligation="CAT"
         - --ligation "CAT"
       contains_regex:
-        - 'gzip -dc .*dummy.txt >'
+        - 'gzip -dc .*dummy.txt > \$PRE_FILE'
+        - 'gzip -dc .*dummy.txt > \$RESTRICTION_SITES_FILENAME'
         - 'duplicate_count=\$\(samtools view -c -f 1089 -F 256 .*dummy.txt\)'
   - name: test_calculate_stats_no_restriction_sites_unit
     tags:
@@ -25,3 +26,5 @@
     stdout:
       contains:
         - none
+      must_not_contain:
+        - $RESTRICTION_SITES_FILENAME

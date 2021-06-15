@@ -13,9 +13,9 @@ struct BamAndLigationCount {
 
 workflow hic {
     meta {
-        version: "0.5.0"
-        caper_docker: "encodedcc/hic-pipeline:0.5.0"
-        caper_singularity: "docker://encodedcc/hic-pipeline:0.5.0"
+        version: "0.6.0"
+        caper_docker: "encodedcc/hic-pipeline:0.6.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:0.6.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -40,6 +40,7 @@ workflow hic {
         Boolean no_call_loops = false
         Boolean no_call_tads = false
         Int align_num_cpus = 32
+        Int? create_hic_num_cpus
         String assembly_name = "undefined"
     }
 
@@ -180,6 +181,7 @@ workflow hic {
                 stats_hists = calculate_stats.stats_hists,
                 assembly_name = assembly_name,
                 normalization_methods = normalization_methods,
+                num_cpus = create_hic_num_cpus,
             }
         }
 
@@ -191,8 +193,9 @@ workflow hic {
                 quality = qualities[i],
                 stats = calculate_stats.stats,
                 stats_hists = calculate_stats.stats_hists,
-                assembly_name = assembly_name,
+                assembly_name = normalize_assembly_name.normalized_assembly_name,
                 normalization_methods = normalization_methods,
+                num_cpus = create_hic_num_cpus,
             }
         }
     }
@@ -302,6 +305,7 @@ task align {
             -SP5M \
             ~{if defined(fastq_pair.read_group) then "-R '" + fastq_pair.read_group + "'" else ""} \
             -t ~{num_cpus} \
+            -K 320000000 \
             $reference_index_path \
             ${fastq_pair.read_1} \
             ${fastq_pair.read_2} | \
@@ -333,11 +337,13 @@ task chimeric_sam_specific {
 
     command <<<
         set -euo pipefail
+        RESTRICTION_SITES_FILENAME=restriction_sites.txt
+        gzip -dc ~{restriction_sites} > $RESTRICTION_SITES_FILENAME
         cp ~{ligation_count} result_norm.txt.res.txt
         samtools view -h -@ ~{num_cpus - 1} ~{bam} > result.sam
         awk \
             -v stem=result_norm \
-            -v site_file=~{restriction_sites} \
+            -v site_file=$RESTRICTION_SITES_FILENAME \
             -f "$(which chimeric_sam.awk)" \
             result.sam | \
             samtools sort -t cb -n --threads ~{num_cpus} > chimeric_sam_specific.bam
@@ -414,7 +420,7 @@ task merge {
     runtime {
         cpu : "~{num_cpus}"
         memory: "16 GB"
-        disks: "local-disk 1000 HDD"
+        disks: "local-disk 6000 HDD"
     }
 }
 
@@ -440,7 +446,7 @@ task dedup {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 2000 SSD"
+        disks: "local-disk 5000 SSD"
         memory: "32 GB"
     }
 }
@@ -464,7 +470,7 @@ task bam2pairs {
     runtime {
         cpu : "8"
         memory: "16 GB"
-        disks: "local-disk 1000 HDD"
+        disks: "local-disk 3000 HDD"
     }
 }
 
@@ -499,7 +505,7 @@ task bam_to_pre {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 1000 HDD"
+        disks: "local-disk 3000 HDD"
         memory : "64 GB"
     }
 }
@@ -518,8 +524,10 @@ task calculate_stats {
 
     command <<<
         PRE_FILE=pre.txt
+        RESTRICTION_SITES_FILENAME=restriction_sites.txt
         STATS_FILENAME=stats_~{quality}~{output_filename_suffix}.txt
         gzip -dc ~{pre} > $PRE_FILE
+        ~{if defined(restriction_sites) then "gzip -dc " + restriction_sites + " > $RESTRICTION_SITES_FILENAME" else ""}
         duplicate_count=$(samtools view -c -f 1089 -F 256 ~{bam})
         awk \
             -f "$(which stats_sub.awk)" \
@@ -533,7 +541,7 @@ task calculate_stats {
             -jar /opt/scripts/common/juicer_tools.jar \
             statistics \
             --ligation "~{ligation_site}" \
-            ~{default="none" restriction_sites} \
+            ~{if defined(restriction_sites) then "$RESTRICTION_SITES_FILENAME" else "none"} \
             $STATS_FILENAME \
             ~{pre} \
             ~{chrom_sizes}
@@ -551,7 +559,7 @@ task calculate_stats {
 
     runtime {
         cpu : "1"
-        disks: "local-disk 1000 HDD"
+        disks: "local-disk 4000 HDD"
         memory : "16 GB"
     }
 }
@@ -567,24 +575,26 @@ task create_hic {
         String? assembly_name
         File? chrsz
         File? restriction_sites
-        Int num_cpus = 24
+        Int? num_cpus = 8
     }
 
     command <<<
         set -euo pipefail
         PRE_FILE=pre.txt
         PRE_INDEX_FILE=pre_index.txt
+        RESTRICTION_SITES_FILENAME=restriction_sites.txt
         gzip -dc ~{pre} > $PRE_FILE
         gzip -dc ~{pre_index} > $PRE_INDEX_FILE
+        ~{if defined(restriction_sites) then "gzip -dc " + restriction_sites + " > $RESTRICTION_SITES_FILENAME" else ""}
         # If the assembly name is empty, then we write chrsz path into file as usual, otherwise, use the assembly name instead of the path
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
-            -Xmx390g \
+            -Xmx590g \
             -jar /opt/scripts/common/juicer_tools.jar \
             pre \
             -n \
-            ~{if defined(restriction_sites) then "-f " + restriction_sites else ""} \
+            ~{if defined(restriction_sites) then "-f $RESTRICTION_SITES_FILENAME" else ""} \
             -s ~{stats} \
             -g ~{stats_hists} \
             ~{if defined(assembly_name) then "-y " + assembly_name else ""} \
@@ -598,7 +608,7 @@ task create_hic {
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
-            -Xmx390g \
+            -Xmx590g \
             -jar /opt/scripts/common/juicer_tools.jar \
             addNorm \
             ~{if length(normalization_methods) > 0 then "-k" else ""} ~{sep="," normalization_methods} \
@@ -613,7 +623,7 @@ task create_hic {
     runtime {
         cpu : "~{num_cpus}"
         disks: "local-disk 2000 SSD"
-        memory : "400 GB"
+        memory : "600 GB"
     }
 }
 
@@ -643,7 +653,7 @@ task arrowhead {
     runtime {
         cpu : "1"
         disks: "local-disk 100 SSD"
-        memory : "16 GB"
+        memory : "32 GB"
     }
 }
 
@@ -673,7 +683,7 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 SSD"
-        docker: "encodedcc/hic-pipeline:0.5.0_hiccups"
+        docker: "encodedcc/hic-pipeline:0.6.0_hiccups"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
