@@ -13,9 +13,9 @@ struct BamAndLigationCount {
 
 workflow hic {
     meta {
-        version: "0.6.0"
-        caper_docker: "encodedcc/hic-pipeline:0.6.0"
-        caper_singularity: "docker://encodedcc/hic-pipeline:0.6.0"
+        version: "0.7.0"
+        caper_docker: "encodedcc/hic-pipeline:0.7.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:0.7.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -683,59 +683,10 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 SSD"
-        docker: "encodedcc/hic-pipeline:0.6.0_hiccups"
+        docker: "encodedcc/hic-pipeline:0.7.0_hiccups"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
-        zones: [
-            "us-central1-c",
-            "us-central1-f",
-            "us-east1-b",
-            "us-east1-c",
-            "us-west1-a",
-            "us-west1-b",
-        ]
-    }
-}
-
-task delta {
-    input {
-        File hic_file
-        Array[File] models
-        Array[Int] resolutions = [5000, 10000]
-        String normalization = "SCALE"
-    }
-
-    command {
-        set -euo pipefail
-        mkdir models
-        cp ~{sep=" " models} models
-        python \
-            "$(which Deploy.py)" \
-            ~{hic_file} \
-            models \
-            . \
-            predicted \
-            ~{sep="," resolutions} \
-            ~{normalization}
-        gzip -n loops/*.bedpe
-    }
-
-    output {
-        Array[File] loops = glob("predicted_loops_*")
-        Array[File] domains = glob("predicted_domains_*")
-        Array[File] stripes = glob("predicted_stripes_*")
-        Array[File] loop_domains = glob("predicted_loop_domains_*")
-    }
-
-    runtime {
-        cpu : "2"
-        bootDiskSizeGb: "20"
-        disks: "local-disk 100 SSD"
-        docker: "encodedcc/hic-pipeline:0.6.0_delta"
-        gpuType: "nvidia-tesla-p100"
-        gpuCount: 1
-        memory: "32 GB"
         zones: [
             "us-central1-c",
             "us-central1-f",
