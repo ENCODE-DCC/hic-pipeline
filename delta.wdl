@@ -51,7 +51,7 @@ task deploy_delta {
             predicted \
             ~{sep="," resolutions} \
             ~{normalization}
-        gzip -n loops/*.bedpe
+        gzip -n ./*.bedpe
     }
 
     output {
