@@ -200,9 +200,13 @@ workflow hic {
         }
     }
 
-    File hic_file = select_first(
-        [input_hic, create_hic.output_hic[1], create_hic_with_chrom_sizes.output_hic[1]]
-    )
+    File hic_file = select_first([
+        if (length(select_all(create_hic.output_hic)) > 0) then create_hic.output_hic[1]
+        else if (length(select_all(create_hic_with_chrom_sizes.output_hic)) > 0) then create_hic_with_chrom_sizes.output_hic[1]
+        else input_hic
+    ])
+
+
     if (!no_call_tads) {
         call arrowhead { input:
             hic_file = hic_file
