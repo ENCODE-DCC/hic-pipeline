@@ -11,12 +11,12 @@
         - -SP5M
         - -t 1
         - ligation="bar"
+        - singleend=0
       contains_regex:
         - 'name1=.*dummy.txt'
         - 'name2=.*dummy.txt'
       must_not_contain:
         - -R
-        - singleend
   - name: test_align_with_read_group_unit
     tags:
       - unit
