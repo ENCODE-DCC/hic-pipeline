@@ -11,4 +11,4 @@ def test_multiple_libraries_hic_match(workflow_dir):
         )
     )
     hic_md5sum = hashlib.md5(hic_path.read_bytes()).hexdigest()
-    assert hic_md5sum == "f3e7ef0e8220db2559fe79b5b0811b99"
+    assert hic_md5sum == "4aafbe27fec84119f2e2366e2f37b9e7"

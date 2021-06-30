@@ -7,7 +7,7 @@ import pytest
 def test_hic_merged_dedup_match(workflow_dir, bam_md5):
     bam_path = workflow_dir / Path("test-output/merged_dedup.bam")
     bam_md5sum = bam_md5(bam_path)
-    assert bam_md5sum == "bedd4a49ac87457775089d68b070c865"
+    assert bam_md5sum == "371e7469e475c01d24ebc81b0f5a953d"
 
 
 @pytest.mark.workflow("test_hic")
