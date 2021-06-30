@@ -297,7 +297,7 @@ task align {
         name1=${fastq_pair.read_1}
         name2=${fastq_pair.read_2}
         ext=""
-        ~{if(defined(fastq_pair.read_2)) then "singleend=1" else ""}
+        ~{if(!defined(fastq_pair.read_2)) then "singleend=1" else ""}
         #count ligations
         # Need to unset the -e option, when ligation site is XXXX grep will exit with
         # non-zero status
