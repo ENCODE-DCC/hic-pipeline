@@ -13,3 +13,14 @@
         - --threads 4
       contains_regex:
         - 'cp .*dummy.txt result_norm.txt.res.txt'
+  - name: test_chimeric_sam_nonspecific_single_ended_unit
+    tags:
+      - unit
+    command: >-
+      tests/caper_run.sh
+      tests/unit/wdl/test_chimeric_sam_nonspecific.wdl
+      tests/unit/json/test_chimeric_sam_nonspecific_single_ended.json
+    stdout:
+      contains:
+        - -v singleend=1
+        - samtools sort -t cb -n --threads 4 result.sam2 > chimeric_sam_nonspecific.bam && exit 0

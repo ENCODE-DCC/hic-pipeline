@@ -11,8 +11,8 @@ def main():
 
 
 def load_data(infile):
-    with open(infile) as f:
-        return f.readlines()
+    with open(infile, encoding="utf-8") as f:
+        return f.read()
 
 
 def write_json_to_file(data, outfile):
@@ -28,7 +28,8 @@ def get_parser():
 
 
 def process_data(data):
-    parsed_data = parse_to_dict(data)
+    split = data.splitlines()
+    parsed_data = parse_to_dict(split)
     jsonified = jsonify_stats(parsed_data)
     return jsonified
 
@@ -108,6 +109,10 @@ def parse_int_with_commas(value):
     return int(value.replace(",", ""))
 
 
+def parse_run_type(value):
+    return value.lower().replace(" ", "-") + "ed"
+
+
 def clean_key(key):
     """
     Rather complex key parsing to make the keys look more normal. Converts special
@@ -124,6 +129,11 @@ def clean_key(key):
         key = key.replace("-", "_")
     key = key.replace("(", "")
     key = key.replace(")", "")
+    key = key.replace(";", "")
+    key = key.replace("*", "")
+    key = key.replace("...", "_")
+    key = key.replace(".", "_")
+    key = key.replace("…", "_")
     key = key.replace("'", "_prime_")
     key = key.replace("%", "_percent_")
     key = key.replace(">", "_greater_than_")
@@ -132,8 +142,12 @@ def clean_key(key):
     key = key.replace("__", "_")
     key = key.replace("l_i_o_r", "lior")
     key = key.replace("average", "avg")
+    if key == "library_complexity_estimate_1_and_2_above":
+        key = key.replace("_above", "_alignments")
     if key == "unmapped":
         key += "_reads"
+    if key == "read_type":
+        key = "run_type"
     return key
 
 
@@ -172,12 +186,26 @@ def jsonify_stats(parsed_data):
                 second_percentage_name="pct_sequenced",
             )
             update_with_total_and_percentages(output, parsed, k)
+        elif k in (
+            "1_alignment_unique",
+            "1_alignment_duplicates",
+            "2_alignment_unique",
+            "2_alignment_duplicates",
+        ):
+            parsed = parse_to_total_and_two_percentages(
+                v,
+                first_percentage_name="pct",
+                second_percentage_name="pct_sequenced",
+            )
+            update_with_total_and_percentages(output, parsed, k)
         elif v.count("%") == 1:
             parsed = parse_to_total_and_percentage(v)
             update_with_total_and_percentages(output, parsed, k)
         elif v.count("%") == 2:
             parsed = parse_to_total_and_two_percentages(v)
             update_with_total_and_percentages(output, parsed, k)
+        elif k == "run_type":
+            output[k] = parse_run_type(v)
         else:
             try:
                 output[k] = parse_to_int_or_float(v)

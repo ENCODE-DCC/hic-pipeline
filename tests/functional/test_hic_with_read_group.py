@@ -15,11 +15,11 @@ def test_read_group_added_to_bam_header(workflow_dir):
 def test_hic_with_read_group_alignable_bam_match(workflow_dir, bam_md5):
     bam_path = workflow_dir / Path("test-output/merged_dedup.bam")
     bam_md5sum = bam_md5(bam_path)
-    assert bam_md5sum == "4de9898216a3fc817850d2e1459d3ccf"
+    assert bam_md5sum == "36e92420aaa0fc8efadb661958aa8d1b"
 
 
 @pytest.mark.workflow("test_hic_with_read_group")
 def test_hic_with_read_group_pairs_match(workflow_dir, skip_n_lines_md5):
     pairs_path = workflow_dir / Path("test-output/pairix.bsorted.pairs.gz")
-    pairs_md5 = skip_n_lines_md5(pairs_path, n_lines=5)
-    assert pairs_md5 == "16188e32caf5ee02fb98a6cb417af16d"
+    pairs_md5 = skip_n_lines_md5(pairs_path, n_lines=6)
+    assert pairs_md5 == "3f085d982830044ae0198e3b3b9a683c"

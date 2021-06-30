@@ -2,13 +2,14 @@ version 1.0
 
 struct FastqPair {
     File read_1
-    File read_2
+    File? read_2
     String? read_group
 }
 
 struct BamAndLigationCount {
     File bam
     File ligation_count
+    Boolean single_ended
 }
 
 workflow hic {
@@ -28,15 +29,11 @@ workflow hic {
         File? chrsz
         File? reference_index
 
-        # Entrypoint right before hic generation
-        File? input_pairs
-        File? input_pairs_index
-
         # Entrypoint for loop and TAD calls
         File? input_hic
 
         Array[String] normalization_methods = []
-        Boolean no_bam2pairs = false
+        Boolean no_pairs = false
         Boolean no_call_loops = false
         Boolean no_call_tads = false
         Int align_num_cpus = 32
@@ -85,6 +82,7 @@ workflow hic {
                 call chimeric_sam_nonspecific { input:
                     bam = bam_and_ligation_count.bam,
                     ligation_count = bam_and_ligation_count.ligation_count,
+                    single_ended = bam_and_ligation_count.single_ended,
                 }
             }
         }
@@ -95,6 +93,7 @@ workflow hic {
                     bam = bam_and_ligation_count.bam,
                     ligation_count = bam_and_ligation_count.ligation_count,
                     restriction_sites = select_first([restriction_sites]),
+                    single_ended = bam_and_ligation_count.single_ended,
                 }
             }
         }
@@ -131,6 +130,7 @@ workflow hic {
             chrom_sizes = select_first([chrsz]),
             ligation_site = select_first([ligation_site]),
             output_filename_suffix = "_lib" + i,
+            single_ended = align.bam_and_ligation_count[0].single_ended
         }
     }
 
@@ -139,10 +139,14 @@ workflow hic {
             bams = dedup.deduped_bam,
         }
         # convert alignable bam to pairs to be consistent with 4DN
-        if ( !no_bam2pairs && defined(chrsz)) {
-            call bam2pairs { input:
-                bam_file = merge_replicates.bam,
-                chrsz_  = select_first([chrsz])
+        if ( !no_pairs && defined(chrsz)) {
+            call bam_to_pre as bam_to_pre_mapq0 { input:
+                bam = merge_replicates.bam,
+                quality = 0,
+            }
+            call pre_to_pairs { input:
+                pre = bam_to_pre_mapq0.pre,
+                chrom_sizes  = select_first([chrsz])
             }
         }
     }
@@ -168,13 +172,14 @@ workflow hic {
             chrom_sizes = select_first([chrsz]),
             ligation_site = select_first([ligation_site]),
             quality = qualities[i],
+            single_ended = align.bam_and_ligation_count[0][0].single_ended,
         }
 
         # If Juicer Tools doesn't support the assembly then need to pass chrom sizes
         if (!normalize_assembly_name.assembly_is_supported) {
             call create_hic as create_hic_with_chrom_sizes { input:
-                pre = select_first([input_pairs, bam_to_pre.pre]),
-                pre_index = select_first([input_pairs_index, bam_to_pre.index]),
+                pre = bam_to_pre.pre,
+                pre_index = bam_to_pre.index,
                 chrsz = select_first([chrsz]),
                 restriction_sites = restriction_sites,
                 quality = qualities[i],
@@ -187,8 +192,8 @@ workflow hic {
 
         if (normalize_assembly_name.assembly_is_supported) {
             call create_hic { input:
-                pre = select_first([input_pairs, bam_to_pre.pre]),
-                pre_index = select_first([input_pairs_index, bam_to_pre.index]),
+                pre = bam_to_pre.pre,
+                pre_index = bam_to_pre.index,
                 restriction_sites = restriction_sites,
                 quality = qualities[i],
                 stats = calculate_stats.stats,
@@ -331,6 +336,7 @@ task align {
         name1=${fastq_pair.read_1}
         name2=${fastq_pair.read_2}
         ext=""
+        singleend=~{if(defined(fastq_pair.read_2)) then "0" else "1"}
         #count ligations
         # Need to unset the -e option, when ligation site is XXXX grep will exit with
         # non-zero status
@@ -341,13 +347,13 @@ task align {
         echo "Running bwa command"
         bwa \
             mem \
-            -SP5M \
+            ~{if defined(fastq_pair.read_2) then "-SP5M" else "-5M"} \
             ~{if defined(fastq_pair.read_group) then "-R '" + fastq_pair.read_group + "'" else ""} \
             -t ~{num_cpus} \
             -K 320000000 \
             $reference_index_path \
             ${fastq_pair.read_1} \
-            ${fastq_pair.read_2} | \
+            ~{default="" fastq_pair.read_2} | \
             samtools view -hbS - > aligned.bam
         mv result_norm.txt.res.txt ligation_count.txt
     }
@@ -356,6 +362,7 @@ task align {
         BamAndLigationCount bam_and_ligation_count = object {
             bam: "aligned.bam",
             ligation_count: "ligation_count.txt",
+            single_ended: length(select_all([fastq_pair.read_2])) == 0,
         }
      }
 
@@ -371,6 +378,7 @@ task chimeric_sam_specific {
         File bam
         File ligation_count
         File restriction_sites
+        Boolean single_ended
         Int num_cpus = 8
     }
 
@@ -383,6 +391,7 @@ task chimeric_sam_specific {
         awk \
             -v stem=result_norm \
             -v site_file=$RESTRICTION_SITES_FILENAME \
+            ~{if(single_ended) then "-v singleend=1" else ""} \
             -f "$(which chimeric_sam.awk)" \
             result.sam | \
             samtools sort -t cb -n --threads ~{num_cpus} > chimeric_sam_specific.bam
@@ -404,6 +413,7 @@ task chimeric_sam_nonspecific {
     input {
         File bam
         File ligation_count
+        Boolean single_ended
         Int num_cpus = 8
     }
 
@@ -413,8 +423,10 @@ task chimeric_sam_nonspecific {
         samtools view -h -@ ~{num_cpus - 1} ~{bam} > result.sam
         awk \
             -v stem=result_norm \
+            ~{if(single_ended) then "-v singleend=1" else ""} \
             -f "$(which chimeric_sam.awk)" \
             result.sam > result.sam2
+        ~{if(single_ended) then "samtools sort -t cb -n --threads " + num_cpus + " result.sam2 > chimeric_sam_nonspecific.bam && exit 0" else ""}
         awk \
             -v avgInsertFile=result_norm.txt.res.txt \
             -f "$(which adjust_insert_size.awk)" \
@@ -429,7 +441,7 @@ task chimeric_sam_nonspecific {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 1000 HDD"
+        disks: "local-disk 6000 HDD"
         memory: "16 GB"
     }
 }
@@ -490,20 +502,21 @@ task dedup {
     }
 }
 
-task bam2pairs {
+task pre_to_pairs {
     input {
-        File bam_file
-        File chrsz_
+        File pre
+        File chrom_sizes
     }
 
     command {
         set -euo pipefail
-        bam2pairs -c ${chrsz_} ${bam_file} pairix
+        PRE_FILENAME=pre.txt
+        gzip -dc ~{pre} > $PRE_FILENAME
+        perl "$(which merged_nodup2pairs.pl)" $PRE_FILENAME ~{chrom_sizes} pairix
     }
 
     output {
         File out_file = "pairix.bsorted.pairs.gz"
-        File pairs_index = "pairix.bsorted.pairs.gz.px2"
     }
 
     runtime {
@@ -558,6 +571,7 @@ task calculate_stats {
         File? restriction_sites
         String ligation_site
         String output_filename_suffix = ""
+        Boolean single_ended = false
         Int quality = 0
     }
 
@@ -567,19 +581,32 @@ task calculate_stats {
         STATS_FILENAME=stats_~{quality}~{output_filename_suffix}.txt
         gzip -dc ~{pre} > $PRE_FILE
         ~{if defined(restriction_sites) then "gzip -dc " + restriction_sites + " > $RESTRICTION_SITES_FILENAME" else ""}
-        duplicate_count=$(samtools view -c -f 1089 -F 256 ~{bam})
-        awk \
-            -f "$(which stats_sub.awk)" \
-            -v ligation="~{ligation_site}" \
-            -v dups="$duplicate_count" \
-            ~{sep=" " alignment_stats} >> $STATS_FILENAME
+        if [ ~{if(single_ended) then "1" else "0"} -eq 1 ]
+        then
+            RET=$(samtools view -f 1024 -F 256 ~{bam} | awk '{if ($0~/rt:A:7/){singdup++}else{dup++}}END{print dup,singdup}')
+            DUPS=$(echo $RET | awk '{print $1}')
+            SINGDUPS=$(echo $RET | awk '{print $2}')
+            awk \
+                -f "$(which stats_sub.awk)" \
+                -v dups=$DUPS \
+                -v singdups=$SINGDUPS \
+                -v ligation="~{ligation_site}" \
+                -v singleend=1 \
+                ~{sep=" " alignment_stats} >> $STATS_FILENAME
+        else
+            DUPS=$(samtools view -c -f 1089 -F 256 ~{bam})
+            awk \
+                -f "$(which stats_sub.awk)" \
+                -v dups=$DUPS \
+                -v ligation=$ligation \
+                ~{sep=" " alignment_stats} >> $STATS_FILENAME
+        fi
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
             -Xmx16g \
             -jar /opt/scripts/common/juicer_tools.jar \
             statistics \
-            --ligation "~{ligation_site}" \
             ~{if defined(restriction_sites) then "$RESTRICTION_SITES_FILENAME" else "none"} \
             $STATS_FILENAME \
             ~{pre} \

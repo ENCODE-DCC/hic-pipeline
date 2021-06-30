@@ -57,13 +57,12 @@ RUN curl -OL "https://github.com/samtools/samtools/releases/download/${SAMTOOLS_
     cd .. && \
     rm -rf "samtools-${SAMTOOLS_VERSION}" "samtools-${SAMTOOLS_VERSION}.tar"
 
-# Install pairix, only need bam2pairs + deps
 RUN curl -OL "https://github.com/4dn-dcic/pairix/archive/${PAIRIX_VERSION}.zip" && \
     unzip "${PAIRIX_VERSION}.zip" && \
     cd "pairix-${PAIRIX_VERSION}/" && \
     make && \
     cp bin/pairix bin/bgzip /usr/local/bin && \
-    cp util/bam2pairs/bam2pairs /opt && \
+    cp util/merged_nodup2pairs.pl /opt && \
     cd .. && \
     rm -rf "${PAIRIX_VERSION}.zip" "pairix-${PAIRIX_VERSION}"
 
@@ -102,14 +101,14 @@ RUN curl \
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     cd juicer && \
-    git checkout 5aa2363ca4952f3f36b3a4b3be7cf9ff8851bcd8 && \
+    git checkout 3cbd828fff8d2ae9ac675d517fa8139038167123 && \
     chmod +x CPU/* CPU/common/* misc/* && \
     find -mindepth 1 -maxdepth 1  -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
 
 # Install Juicer tools
 RUN curl \
         -L \
-        https://github.com/aidenlab/Juicebox/releases/download/v2.13.05/juicer_tools.2.13.05.jar \
+        https://github.com/aidenlab/Juicebox/releases/download/v2.13.06/juicer_tools_2.13.06.jar \
         -o /opt/juicer/CPU/common/juicer_tools.jar && \
     chmod 666 /opt/juicer/CPU/common/juicer_tools.jar && \
     ln -s juicer/CPU scripts

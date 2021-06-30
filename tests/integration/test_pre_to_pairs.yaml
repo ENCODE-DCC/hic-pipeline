@@ -1,0 +1,10 @@
+---
+  - name: test_pre_to_pairs
+    tags:
+      - integration
+    command: >-
+      tests/caper_run.sh
+      tests/integration/wdl/test_pre_to_pairs.wdl
+      tests/integration/json/test_pre_to_pairs.json
+    files:
+      - path: test-output/pairix.bsorted.pairs.gz

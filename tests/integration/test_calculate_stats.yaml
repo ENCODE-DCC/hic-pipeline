@@ -8,9 +8,9 @@
       tests/integration/json/test_calculate_stats.json
     files:
       - path: test-output/stats_30.txt
-        md5sum: 0fcc706086c31099dafb1b6e05afafe5
+        md5sum: d371e0f6064f66767f59a719c719726a
       - path: test-output/stats_30.json
-        md5sum: 2dd07c41a38cb02791bb12f495daad7d
+        md5sum: 19bf1f6778f4a1b0fff655052c78447f
       - path: test-output/stats_30_hists.m
         md5sum: 15d1f8b09ad377d5c9e9b5b6dd734a07
   - name: test_calculate_stats_no_restriction_sites
