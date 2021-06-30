@@ -33,7 +33,7 @@
     command: >-
       tests/caper_run.sh
       tests/unit/wdl/test_calculate_stats.wdl
-      tests/unit/json/test_calculate_stats_no_restriction_sites.json
+      tests/unit/json/test_calculate_stats_single_ended.json
     stdout:
       contains_regex:
         - 'duplicate_count=\$\(samtools view -c -f 1024 -F 256 .*dummy.txt\)'
