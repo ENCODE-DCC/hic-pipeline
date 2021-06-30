@@ -2,13 +2,14 @@ version 1.0
 
 struct FastqPair {
     File read_1
-    File read_2
+    File? read_2
     String? read_group
 }
 
 struct BamAndLigationCount {
     File bam
     File ligation_count
+    Boolean single_ended
 }
 
 workflow hic {
@@ -84,6 +85,7 @@ workflow hic {
                 call chimeric_sam_nonspecific { input:
                     bam = bam_and_ligation_count.bam,
                     ligation_count = bam_and_ligation_count.ligation_count,
+                    single_ended = bam_and_ligation_count.single_ended,
                 }
             }
         }
@@ -94,6 +96,7 @@ workflow hic {
                     bam = bam_and_ligation_count.bam,
                     ligation_count = bam_and_ligation_count.ligation_count,
                     restriction_sites = select_first([restriction_sites]),
+                    single_ended = bam_and_ligation_count.single_ended,
                 }
             }
         }
@@ -296,6 +299,7 @@ task align {
         name1=${fastq_pair.read_1}
         name2=${fastq_pair.read_2}
         ext=""
+        ~{if(defined(fastq_pair.read_2)) then "singleend=1" else ""}
         #count ligations
         # Need to unset the -e option, when ligation site is XXXX grep will exit with
         # non-zero status
@@ -306,13 +310,13 @@ task align {
         echo "Running bwa command"
         bwa \
             mem \
-            -SP5M \
+            ~{if defined(fastq_pair.read_2) then "-SP5M" else "-5M"} \
             ~{if defined(fastq_pair.read_group) then "-R '" + fastq_pair.read_group + "'" else ""} \
             -t ~{num_cpus} \
             -K 320000000 \
             $reference_index_path \
             ${fastq_pair.read_1} \
-            ${fastq_pair.read_2} | \
+            ~{default="" fastq_pair.read_2} | \
             samtools view -hbS - > aligned.bam
         mv result_norm.txt.res.txt ligation_count.txt
     }
@@ -321,6 +325,7 @@ task align {
         BamAndLigationCount bam_and_ligation_count = object {
             bam: "aligned.bam",
             ligation_count: "ligation_count.txt",
+            single_ended: defined(fastq_pair.read_2),
         }
      }
 
@@ -336,6 +341,7 @@ task chimeric_sam_specific {
         File bam
         File ligation_count
         File restriction_sites
+        Boolean single_ended
         Int num_cpus = 8
     }
 
@@ -348,6 +354,7 @@ task chimeric_sam_specific {
         awk \
             -v stem=result_norm \
             -v site_file=$RESTRICTION_SITES_FILENAME \
+            ~{if(single_ended) then "-v singleend=1" else ""} \
             -f "$(which chimeric_sam.awk)" \
             result.sam | \
             samtools sort -t cb -n --threads ~{num_cpus} > chimeric_sam_specific.bam
@@ -369,6 +376,7 @@ task chimeric_sam_nonspecific {
     input {
         File bam
         File ligation_count
+        Boolean single_ended
         Int num_cpus = 8
     }
 
@@ -378,8 +386,10 @@ task chimeric_sam_nonspecific {
         samtools view -h -@ ~{num_cpus - 1} ~{bam} > result.sam
         awk \
             -v stem=result_norm \
+            ~{if(single_ended) then "-v singleend=1" else ""} \
             -f "$(which chimeric_sam.awk)" \
             result.sam > result.sam2
+        ~{if(single_ended) then "samtools sort -t cb -n --threads " + num_cpus + " result.sam2 > chimeric_sam_nonspecific.bam && exit 0" else ""}
         awk \
             -v avgInsertFile=result_norm.txt.res.txt \
             -f "$(which adjust_insert_size.awk)" \
@@ -523,6 +533,7 @@ task calculate_stats {
         File? restriction_sites
         String ligation_site
         String output_filename_suffix = ""
+        Boolean single_ended = false
         Int quality = 0
     }
 
@@ -532,7 +543,7 @@ task calculate_stats {
         STATS_FILENAME=stats_~{quality}~{output_filename_suffix}.txt
         gzip -dc ~{pre} > $PRE_FILE
         ~{if defined(restriction_sites) then "gzip -dc " + restriction_sites + " > $RESTRICTION_SITES_FILENAME" else ""}
-        duplicate_count=$(samtools view -c -f 1089 -F 256 ~{bam})
+        duplicate_count=$(samtools view -c -f ~{if(single_ended) then 1024 else 1089} -F 256 ~{bam})
         awk \
             -f "$(which stats_sub.awk)" \
             -v ligation="~{ligation_site}" \
@@ -544,7 +555,6 @@ task calculate_stats {
             -Xmx16g \
             -jar /opt/scripts/common/juicer_tools.jar \
             statistics \
-            --ligation "~{ligation_site}" \
             ~{if defined(restriction_sites) then "$RESTRICTION_SITES_FILENAME" else "none"} \
             $STATS_FILENAME \
             ~{pre} \

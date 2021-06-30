@@ -26,7 +26,7 @@ WORKDIR /opt/
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     cd juicer && \
-    git checkout 5aa2363ca4952f3f36b3a4b3be7cf9ff8851bcd8 && \
+    git checkout 0f7a1097e68a745f942e2c4e0c55b77f9e99c4bc && \
     chmod +x CPU/* CPU/common/* misc/* && \
     find -mindepth 1 -maxdepth 1  -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
 

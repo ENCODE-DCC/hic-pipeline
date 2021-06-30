@@ -8,6 +8,7 @@
       tests/unit/json/test_align.json
     stdout:
       contains:
+        - -SP5M
         - -t 1
         - ligation="bar"
       contains_regex:
@@ -15,6 +16,7 @@
         - 'name2=.*dummy.txt'
       must_not_contain:
         - -R
+        - singleend
   - name: test_align_with_read_group_unit
     tags:
       - unit
@@ -25,3 +27,14 @@
     stdout:
       contains:
         - -R '@RG\tID:foo'
+  - name: test_align_single_end_unit
+    tags:
+      - unit
+    command: >-
+      tests/caper_run.sh
+      tests/unit/wdl/test_align.wdl
+      tests/unit/json/test_align_single_end_unit.json
+    stdout:
+      contains:
+        - singleend=1
+        - -5M

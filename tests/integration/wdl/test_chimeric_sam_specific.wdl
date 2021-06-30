@@ -7,6 +7,7 @@ workflow test_chimeric_sam_specific {
         File bam
         File ligation_count
         File restriction_sites
+        Boolean single_ended
         Int num_cpus
     }
 
@@ -14,6 +15,7 @@ workflow test_chimeric_sam_specific {
         bam = bam,
         ligation_count = ligation_count,
         restriction_sites = restriction_sites,
+        single_ended = single_ended,
         num_cpus = num_cpus,
     }
 }

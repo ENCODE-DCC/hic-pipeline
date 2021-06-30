@@ -14,3 +14,15 @@
       contains_regex:
         - 'cp .*dummy.txt result_norm.txt.res.txt'
         - 'gzip -dc .*dummy.txt > \$RESTRICTION_SITES_FILENAME'
+      must_not_contain:
+        - singleend
+  - name: test_chimeric_sam_specific_single_ended_unit
+    tags:
+      - unit
+    command: >-
+      tests/caper_run.sh
+      tests/unit/wdl/test_chimeric_sam_specific.wdl
+      tests/unit/json/test_chimeric_sam_specific_single_ended.json
+    stdout:
+      contains:
+        - -v singleend=1
