@@ -29,10 +29,6 @@ workflow hic {
         File? chrsz
         File? reference_index
 
-        # Entrypoint right before hic generation
-        File? input_pairs
-        File? input_pairs_index
-
         # Entrypoint for loop and TAD calls
         File? input_hic
 
@@ -133,6 +129,7 @@ workflow hic {
             chrom_sizes = select_first([chrsz]),
             ligation_site = select_first([ligation_site]),
             output_filename_suffix = "_lib" + i,
+            single_ended = align.bam_and_ligation_count[0].single_ended
         }
     }
 
@@ -170,13 +167,14 @@ workflow hic {
             chrom_sizes = select_first([chrsz]),
             ligation_site = select_first([ligation_site]),
             quality = qualities[i],
+            single_ended = align.bam_and_ligation_count[0][0].single_ended,
         }
 
         # If Juicer Tools doesn't support the assembly then need to pass chrom sizes
         if (!normalize_assembly_name.assembly_is_supported) {
             call create_hic as create_hic_with_chrom_sizes { input:
-                pre = select_first([input_pairs, bam_to_pre.pre]),
-                pre_index = select_first([input_pairs_index, bam_to_pre.index]),
+                pre = bam_to_pre.pre,
+                pre_index = bam_to_pre.index,
                 chrsz = select_first([chrsz]),
                 restriction_sites = restriction_sites,
                 quality = qualities[i],
@@ -190,8 +188,8 @@ workflow hic {
 
         if (normalize_assembly_name.assembly_is_supported) {
             call create_hic { input:
-                pre = select_first([input_pairs, bam_to_pre.pre]),
-                pre_index = select_first([input_pairs_index, bam_to_pre.index]),
+                pre = bam_to_pre.pre,
+                pre_index = bam_to_pre.index,
                 restriction_sites = restriction_sites,
                 quality = qualities[i],
                 stats = calculate_stats.stats,
@@ -589,7 +587,7 @@ task create_hic {
         String? assembly_name
         File? chrsz
         File? restriction_sites
-        Int? num_cpus = 8
+        Int num_cpus = 8
     }
 
     command <<<
