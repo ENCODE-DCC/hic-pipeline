@@ -231,6 +231,20 @@ workflow hic {
             }
         }
     }
+
+    if (defined(chrsz)) {
+        call create_eigenvector { input:
+            hic_file = hic_file,
+            chrom_sizes = select_first([chrsz]),
+        }
+
+        if (length(select_all(create_hic.output_hic)) > 0) {
+            call create_eigenvector as create_eigenvector_mapq0 { input:
+                hic_file = select_first([create_hic.output_hic[0]]),
+                chrom_sizes = select_first([chrsz]),
+            }
+        }
+    }
 }
 
 task get_ligation_site_regex {
@@ -717,6 +731,37 @@ task hiccups {
             "us-west1-a",
             "us-west1-b",
         ]
+    }
+}
+
+task create_eigenvector {
+    input {
+        File hic_file
+        File chrom_sizes
+        Int num_cpus = 16
+        Int resolution = 5000
+        String normalization = "SCALE"
+    }
+
+    command {
+        newGW_Intra_Flip \
+            -n ~{normalization} \
+            -T ~{num_cpus} \
+            ~{hic_file} \
+            eigenvector.wig \
+            ~{resolution}
+        wigToBigWig eigenvector.wig ~{chrom_sizes} eigenvector.bw
+    }
+
+    output {
+        File eigenvector_wig = "eigenvector.wig"
+        File eigenvector_bigwig = "eigenvector.bw"
+    }
+
+    runtime {
+        cpu : "~{num_cpus}"
+        disks: "local-disk 100 SSD"
+        memory : "8 GB"
     }
 }
 
