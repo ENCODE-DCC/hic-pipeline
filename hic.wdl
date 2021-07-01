@@ -482,7 +482,6 @@ task pre_to_pairs {
 
     output {
         File out_file = "pairix.bsorted.pairs.gz"
-        File pairs_index = "pairix.bsorted.pairs.gz.px2"
     }
 
     runtime {
