@@ -22,4 +22,4 @@ def test_hic_with_read_group_alignable_bam_match(workflow_dir, bam_md5):
 def test_hic_with_read_group_pairs_match(workflow_dir, skip_n_lines_md5):
     pairs_path = workflow_dir / Path("test-output/pairix.bsorted.pairs.gz")
     pairs_md5 = skip_n_lines_md5(pairs_path, n_lines=6)
-    assert pairs_md5 == "16188e32caf5ee02fb98a6cb417af16d"
+    assert pairs_md5 == "3f085d982830044ae0198e3b3b9a683c"
