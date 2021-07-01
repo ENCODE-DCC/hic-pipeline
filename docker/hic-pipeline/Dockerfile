@@ -15,10 +15,12 @@ RUN apt-get update && \
     apt-get install -y \
         bzip2 \
         curl \
+        g++ \
         gawk \
         gcc \
         git \
         libbz2-dev \
+        libcurl4-openssl-dev \
         libz-dev \
         locales \
         make \
@@ -59,11 +61,36 @@ RUN curl -OL "https://github.com/samtools/samtools/releases/download/${SAMTOOLS_
 RUN curl -OL "https://github.com/4dn-dcic/pairix/archive/${PAIRIX_VERSION}.zip" && \
     unzip "${PAIRIX_VERSION}.zip" && \
     cd "pairix-${PAIRIX_VERSION}/" && \
-    make && \
     cp bin/pairix bin/bgzip /usr/local/bin && \
     cp util/bam2pairs/bam2pairs /opt && \
     cd .. && \
     rm -rf "${PAIRIX_VERSION}.zip" "pairix-${PAIRIX_VERSION}"
+
+# Eigenvector
+RUN git clone https://github.com/JRowleyLab/SparseEigenVector.git && \
+    cd SparseEigenVector && \
+    git checkout 5369424e1e60611d2ad9a81708892fba2aed96d5 && \
+    git clone https://github.com/aidenlab/straw.git && \
+    cd straw && \
+    git checkout 847b61c0e38f953ba7718eb63b0fa3dcb33a88f4 && \
+    cp C++/straw.cpp C++/straw.h ../C++ && \
+    cd ../C++ && \
+    g++ \
+        -O \
+        --std=c++0x \
+        -o createGWEigenVector \
+        createGWEigenVector.cpp \
+        theBestEigen.c \
+        thdMul.c \
+        getMatrix.cpp \
+        straw.cpp \
+        -I. \
+        -lz \
+        -lcurl \
+        -lpthread && \
+    chmod +x createGWEigenVector && \
+    mv createGWEigenVector /usr/local/bin && \
+    rm -rf SparseEigenVector
 
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
