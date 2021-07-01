@@ -83,7 +83,7 @@ Use the WDL `make_restriction_site_locations.wdl` to generate the restriction si
 * `input_hic` is an input `.hic` file which will be used to call loops and domains
 * `normalization_methods` is an array of normalization methods to use for `.hic` file generation as per Juicer Tools `pre`. If not specified then will use `pre` defaults of `VC`, `VC_SQRT`, `KR`, and `SCALE`. Valid methods are `VC`, `VC_SQRT`, `KR`, `SCALE`, `GW_KR`, `GW_SCALE`, `GW_VC`, `INTER_KR`, `INTER_SCALE`, and `INTER_VC.
 * `reference_fasta` is FASTA file for the genome of interest to be used for generating restriction site locations. For the output locations file to have a descriptive filename it is also recommended to specify the `assembly_name`
-* `no_bam2pairs` is a boolean which if `true` results in skipping generating `.pairs` files, defaults to `false`
+* `no_pairs` is a boolean which if `true` results in skipping generating `.pairs` files, defaults to `false`
 * `no_call_loops` is a boolean which if `true` results in skipping calling loops, defaults to `false`. Since the loop calling requires GPUs it is recommended to set to `true` if you do not
 * `no_call_tads` is a boolean which if `true` skips calling domains with arrowhead, defaults to `false`
 * `align_num_cpus` is number of threads to use for `bwa` alignment, it is recommended to leave at the default value.

@@ -55,13 +55,12 @@ RUN curl -OL "https://github.com/samtools/samtools/releases/download/${SAMTOOLS_
     cd .. && \
     rm -rf "samtools-${SAMTOOLS_VERSION}" "samtools-${SAMTOOLS_VERSION}.tar"
 
-# Install pairix, only need bam2pairs + deps
-RUN curl -OL "https://github.com/4dn-dcic/pairix/archive/${PAIRIX_VERSION}.zip" && \
+RUN curl -OL "https://github.com/4dn-dcic/pa irix/archive/${PAIRIX_VERSION}.zip" && \
     unzip "${PAIRIX_VERSION}.zip" && \
     cd "pairix-${PAIRIX_VERSION}/" && \
     make && \
     cp bin/pairix bin/bgzip /usr/local/bin && \
-    cp util/bam2pairs/bam2pairs /opt && \
+    cp util/merged_nodup2pairs.pl /opt && \
     cd .. && \
     rm -rf "${PAIRIX_VERSION}.zip" "pairix-${PAIRIX_VERSION}"
 

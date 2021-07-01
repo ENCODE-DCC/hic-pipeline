@@ -1,0 +1,15 @@
+---
+  - name: test_no_pairs
+    tags:
+      - functional
+    command: >-
+      tests/caper_run.sh
+      hic.wdl
+      tests/functional/json/test_no_pairs.json
+    files:
+      - path: test-output/inter_1.hic
+        md5sum: d9e1eaec4333c32807d4f7d5e9013691
+      - path: test-output/inter_30.hic
+        md5sum: b3eea4c3622e508c1c0a1afcd934f54f
+      - path: test-output/pairix.bsorted.pairs.gz
+        should_exist: false

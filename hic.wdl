@@ -33,7 +33,7 @@ workflow hic {
         File? input_hic
 
         Array[String] normalization_methods = []
-        Boolean no_bam2pairs = false
+        Boolean no_pairs = false
         Boolean no_call_loops = false
         Boolean no_call_tads = false
         Int align_num_cpus = 32
@@ -138,10 +138,14 @@ workflow hic {
             bams = dedup.deduped_bam,
         }
         # convert alignable bam to pairs to be consistent with 4DN
-        if ( !no_bam2pairs && defined(chrsz)) {
-            call bam2pairs { input:
-                bam_file = merge_replicates.bam,
-                chrsz_  = select_first([chrsz])
+        if ( !no_pairs && defined(chrsz)) {
+            call bam_to_pre as bam_to_pre_mapq0 { input:
+                bam = merge_replicates.bam,
+                quality = 0,
+            }
+            call pre_to_pairs { input:
+                pre = bam_to_pre_mapq0.pre,
+                chrom_sizes  = select_first([chrsz])
             }
         }
     }
@@ -463,15 +467,17 @@ task dedup {
     }
 }
 
-task bam2pairs {
+task pre_to_pairs {
     input {
-        File bam_file
-        File chrsz_
+        File pre
+        File chrom_sizes
     }
 
     command {
         set -euo pipefail
-        bam2pairs -c ${chrsz_} ${bam_file} pairix
+        PRE_FILENAME=pre.txt
+        gzip -dc ~{pre} > $PRE_FILENAME
+        perl "$(which merged_nodup2pairs.pl)" "$PRE_FILE" ~{chrom_sizes} pairix
     }
 
     output {
