@@ -55,7 +55,7 @@ RUN curl -OL "https://github.com/samtools/samtools/releases/download/${SAMTOOLS_
     cd .. && \
     rm -rf "samtools-${SAMTOOLS_VERSION}" "samtools-${SAMTOOLS_VERSION}.tar"
 
-RUN curl -OL "https://github.com/4dn-dcic/pa irix/archive/${PAIRIX_VERSION}.zip" && \
+RUN curl -OL "https://github.com/4dn-dcic/pairix/archive/${PAIRIX_VERSION}.zip" && \
     unzip "${PAIRIX_VERSION}.zip" && \
     cd "pairix-${PAIRIX_VERSION}/" && \
     make && \
