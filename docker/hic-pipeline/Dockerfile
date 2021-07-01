@@ -61,6 +61,7 @@ RUN curl -OL "https://github.com/samtools/samtools/releases/download/${SAMTOOLS_
 RUN curl -OL "https://github.com/4dn-dcic/pairix/archive/${PAIRIX_VERSION}.zip" && \
     unzip "${PAIRIX_VERSION}.zip" && \
     cd "pairix-${PAIRIX_VERSION}/" && \
+    make && \
     cp bin/pairix bin/bgzip /usr/local/bin && \
     cp util/bam2pairs/bam2pairs /opt && \
     cd .. && \
