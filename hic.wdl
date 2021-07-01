@@ -212,10 +212,15 @@ workflow hic {
             hic_file = hic_file
         }
     }
+
     if (!no_call_loops) {
         call hiccups { input:
             hic_file = hic_file
         }
+    }
+
+    call create_eigenvector { input:
+        hic_file = hic_file
     }
 }
 
@@ -699,6 +704,35 @@ task hiccups {
             "us-west1-a",
             "us-west1-b",
         ]
+    }
+}
+
+task create_eigenvector {
+    input {
+        File hic_file
+        Int num_cpus = 16
+        Int resolution = 500
+        String normalization = "SCALE"
+    }
+
+    command {
+        createGWEigenVector \
+            -n ~{normalization} \
+            -T ~{num_cpus} \
+            -v \
+            ~{hic_file} \
+            eigenvector.bw \
+            ~{resolution}
+    }
+
+    output {
+        File eigenvector = "eigenvector.bw"
+    }
+
+    runtime {
+        cpu : "~{num_cpus}"
+        disks: "local-disk 100 SSD"
+        memory : "8 GB"
     }
 }
 

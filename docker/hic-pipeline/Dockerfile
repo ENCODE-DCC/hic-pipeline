@@ -73,7 +73,7 @@ RUN git clone https://github.com/JRowleyLab/SparseEigenVector.git && \
     git checkout 5369424e1e60611d2ad9a81708892fba2aed96d5 && \
     git clone https://github.com/aidenlab/straw.git && \
     cd straw && \
-    git checkout 847b61c0e38f953ba7718eb63b0fa3dcb33a88f4 && \
+    git checkout 4d2233652df1088f5530b421b207fe9bd9684600 && \
     cp C++/straw.cpp C++/straw.h ../C++ && \
     cd ../C++ && \
     g++ \
