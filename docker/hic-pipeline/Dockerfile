@@ -75,7 +75,7 @@ RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
 # Install Juicer tools
 RUN curl \
         -L \
-        https://s3.amazonaws.com/hicfiles.tc4ga.com/public/juicer/juicer_tools_2.08.05.jar \
+        https://github.com/aidenlab/Juicebox/releases/download/2.09.00/juicer_tools_2.09.00.jar \
         -o /opt/juicer/CPU/common/juicer_tools.jar && \
     chmod 666 /opt/juicer/CPU/common/juicer_tools.jar && \
     ln -s juicer/CPU scripts

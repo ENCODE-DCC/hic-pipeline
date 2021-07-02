@@ -8,8 +8,8 @@
       tests/functional/json/test_no_bam2pairs.json
     files:
       - path: test-output/inter_1.hic
-        md5sum: 7e59bd612555e3aff378d8ee1488a238
+        md5sum: 6c20f606a02f5ce6bd74b92439e6db1e
       - path: test-output/inter_30.hic
-        md5sum: 8731e2e760a520b9170f9cc508223267
+        md5sum: d9a876be0b02b5f1203e1f6575d767fa
       - path: test-output/pairix.bsorted.pairs.gz
         should_exist: false
