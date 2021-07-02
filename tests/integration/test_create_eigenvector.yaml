@@ -1,0 +1,11 @@
+---
+  - name: test_create_eigenvector
+    tags:
+      - integration
+    command: >-
+      tests/caper_run.sh
+      tests/integration/wdl/test_create_eigenvector.wdl
+      tests/integration/json/test_create_eigenvector.json
+    files:
+      - path: test-output/eigenvector.bw
+        md5sum: ae96b9573c6a9f5a81993bb2782e01d9

@@ -719,7 +719,6 @@ task create_eigenvector {
         createGWEigenVector \
             -n ~{normalization} \
             -T ~{num_cpus} \
-            -v \
             ~{hic_file} \
             eigenvector.bw \
             ~{resolution}
