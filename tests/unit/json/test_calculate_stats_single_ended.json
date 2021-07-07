@@ -8,6 +8,5 @@
   "test_calculate_stats.ligation_site": "CAT",
   "test_calculate_stats.pre": "tests/data/dummy.txt",
   "test_calculate_stats.quality": 30,
-  "test_calculate_stats.restriction_sites": "tests/data/dummy.txt",
-  "test_calculate_stats.single_ended": true
+  "test_calculate_stats.restriction_sites": "tests/data/dummy.txt"
 }
