@@ -113,6 +113,12 @@ RUN curl \
     chmod 666 /opt/juicer/CPU/common/juicer_tools.jar && \
     ln -s juicer/CPU scripts
 
+RUN curl \
+        -LO \
+        https://github.com/sa501428/mixer-tools/releases/download/v4.07.05/MixerTools.4.7.5.jar && \
+    chmod 666 /opt/MixerTools.4.7.5.jar && \
+    ln -s /opt/MixerTools.4.7.5.jar /opt/MixerTools.jar
+
 # For sorting, LC_ALL is C
 ENV LC_ALL C
 ENV PATH=/opt:/opt/scripts:/opt/scripts/common:/opt/juicer/misc:$PATH

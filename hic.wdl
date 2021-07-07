@@ -37,6 +37,7 @@ workflow hic {
         Boolean no_call_loops = false
         Boolean no_call_tads = false
         Boolean no_eigenvectors = false
+        Boolean no_call_subcompartments = false
         Int align_num_cpus = 32
         Int? create_hic_num_cpus
         Int? add_norm_num_cpus
@@ -256,6 +257,12 @@ workflow hic {
             call hiccups as hiccups_input_hic { input:
                 hic_file = select_first([input_hic])
             }
+        }
+    }
+
+    if (!no_call_subcompartments) {
+        call slice { input:
+            hic_file = hic_file
         }
     }
 }
@@ -825,6 +832,42 @@ task create_eigenvector {
         cpu : "~{num_cpus}"
         disks: "local-disk 100 HDD"
         memory : "8 GB"
+    }
+}
+
+task slice {
+    input {
+        File hic_file
+        Int resolution = 25000
+        Int minimum_num_clusters = 2
+        Int maximum_num_clusters = 13
+        Int num_kmeans_runs = 4
+    }
+
+    command {
+        set -euo pipefail
+        java \
+            -Xmx20G \
+            -jar /opt/MixerTools.jar \
+            slice \
+            -r ~{resolution} \
+            ~{hic_file} \
+            ~{minimum_num_clusters},~{maximum_num_clusters},~{num_kmeans_runs} \
+            slice_results \
+            cell_type
+        gzip -n slice_results/*.bed
+    }
+
+    output {
+        Array[File] clusters = glob("slice_results/*.bed.gz")
+        File subcompartments = "slice_results/slice_subcompartment_clusters.bed.gz"
+        File numpy = "slice_results/clusterSize_WCSS_AIC_BIC.npy"
+    }
+
+    runtime {
+        cpu : "1"
+        disks: "local-disk 100 SSD"
+        memory : "24 GB"
     }
 }
 
