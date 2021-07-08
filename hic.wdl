@@ -327,7 +327,7 @@ task align {
         BamAndLigationCount bam_and_ligation_count = object {
             bam: "aligned.bam",
             ligation_count: "ligation_count.txt",
-            single_ended: if (fastq_pair.read_2 == null) then true else false,
+            single_ended: length(select_all([fastq_pair.read_2])) == 0,
         }
      }
 
