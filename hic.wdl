@@ -129,6 +129,7 @@ workflow hic {
             chrom_sizes = select_first([chrsz]),
             ligation_site = select_first([ligation_site]),
             output_filename_suffix = "_lib" + i,
+            single_ended = align.bam_and_ligation_count[0].single_ended
         }
     }
 
@@ -170,6 +171,7 @@ workflow hic {
             chrom_sizes = select_first([chrsz]),
             ligation_site = select_first([ligation_site]),
             quality = qualities[i],
+            single_ended = align.bam_and_ligation_count[0][0].single_ended,
         }
 
         # If Juicer Tools doesn't support the assembly then need to pass chrom sizes
@@ -534,6 +536,7 @@ task calculate_stats {
         File? restriction_sites
         String ligation_site
         String output_filename_suffix = ""
+        Boolean single_ended = false
         Int quality = 0
     }
 
@@ -543,9 +546,7 @@ task calculate_stats {
         STATS_FILENAME=stats_~{quality}~{output_filename_suffix}.txt
         gzip -dc ~{pre} > $PRE_FILE
         ~{if defined(restriction_sites) then "gzip -dc " + restriction_sites + " > $RESTRICTION_SITES_FILENAME" else ""}
-        duplicate_count_paired_ended=$(samtools view -c -f 1089 -F 256 ~{bam})
-        duplicate_count_single_ended=$(samtools view -c -f 1024 -F 256 ~{bam})
-        duplicate_count=$((duplicate_count_paired_ended + duplicate_count_single_ended))
+        duplicate_count=$(samtools view -c -f ~{if(single_ended) then 1024 else 1089} -F 256 ~{bam})
         awk \
             -f "$(which stats_sub.awk)" \
             -v ligation="~{ligation_site}" \
