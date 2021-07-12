@@ -5,5 +5,6 @@
     "create_hic_only.assembly_name": "hg38",
     "create_hic_only.stats_hists": "gs://encode-processing/caper_out_v04_05/hic/6de842b9-77ba-4674-81f2-b5e7db4e50a8/call-calculate_stats/shard-1/stats_30_hists.m",
     "create_hic_only.restriction_sites": "gs://encode-processing/caper_out_v04_05/.caper_tmp/df920593be7531e060e5871dca8aea97/ENCFF132WAM.txt.gz",
-    "create_hic_only.pre_index": "gs://encode-processing/caper_out_v04_05/hic/6de842b9-77ba-4674-81f2-b5e7db4e50a8/call-bam_to_pre/shard-1/merged_nodups_30_index.txt.gz"
+    "create_hic_only.pre_index": "gs://encode-processing/caper_out_v04_05/hic/6de842b9-77ba-4674-81f2-b5e7db4e50a8/call-bam_to_pre/shard-1/merged_nodups_30_index.txt.gz",
+    "create_hic_only.chrom_sizes": "gs://hic-reference/GRCh38/no_scaffold.chrom.sizes"
 }

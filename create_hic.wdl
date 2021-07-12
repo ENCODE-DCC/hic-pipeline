@@ -7,6 +7,7 @@ workflow create_hic_only {
         File stats
         File stats_hists
         File restriction_sites
+        File? chrom_sizes
         String assembly_name
         Int quality
     }
@@ -18,6 +19,7 @@ workflow create_hic_only {
         stats_hists = stats_hists,
         quality = quality,
         restriction_sites = restriction_sites,
+        chrom_sizes = chrom_sizes,
         assembly_name = assembly_name,
     }
 }
@@ -32,6 +34,7 @@ task create_hic {
         Int quality
         String? assembly_name
         File? restriction_sites
+        File? chrom_sizes
         Int num_cpus = 2
     }
 
@@ -61,7 +64,7 @@ task create_hic {
             --threads ~{num_cpus} \
             $PRE_FILE \
             inter_~{quality}.hic \
-            ~{assembly_name}
+            ~{if defined(chrom_sizes) then chrom_sizes else assembly_name}
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
