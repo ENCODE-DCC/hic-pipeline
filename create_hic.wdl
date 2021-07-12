@@ -6,9 +6,9 @@ workflow create_hic_only {
         File pre_index
         File stats
         File stats_hists
+        File restriction_sites
         String assembly_name
         Int quality
-        Int num_cpus
     }
 
     call create_hic { input:
@@ -17,8 +17,8 @@ workflow create_hic_only {
         stats = stats,
         stats_hists = stats_hists,
         quality = quality,
+        restriction_sites = restriction_sites,
         assembly_name = assembly_name,
-        num_cpus = num_cpus,
     }
 }
 
