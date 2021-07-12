@@ -59,9 +59,6 @@ task create_hic {
             -g ~{stats_hists} \
             ~{if defined(assembly_name) then "-y " + assembly_name else ""} \
             -r 2500000,1000000 \
-            -i $PRE_INDEX_FILE \
-            --block-capacity 1000000 \
-            --threads ~{num_cpus} \
             $PRE_FILE \
             inter_~{quality}.hic \
             ~{if defined(chrom_sizes) then chrom_sizes else assembly_name}
