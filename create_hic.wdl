@@ -6,7 +6,6 @@ workflow create_hic_only {
         File pre_index
         File stats
         File stats_hists
-        File chrsz
         String assembly_name
         Int quality
         Int num_cpus
@@ -17,7 +16,6 @@ workflow create_hic_only {
         pre_index = pre_index,
         stats = stats,
         stats_hists = stats_hists,
-        chrsz = chrsz,
         quality = quality,
         assembly_name = assembly_name,
         num_cpus = num_cpus,
@@ -33,7 +31,6 @@ task create_hic {
         Array[String] normalization_methods = []
         Int quality
         String? assembly_name
-        File? chrsz
         File? restriction_sites
         Int num_cpus = 2
     }
@@ -64,7 +61,7 @@ task create_hic {
             --threads ~{num_cpus} \
             $PRE_FILE \
             inter_~{quality}.hic \
-            ~{if defined(chrsz) then chrsz else assembly_name}
+            ~{assembly_name}
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
