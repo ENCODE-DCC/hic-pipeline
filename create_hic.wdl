@@ -84,5 +84,6 @@ task create_hic {
         cpu : "~{num_cpus}"
         disks: "local-disk 2000 SSD"
         memory : "30 GB"
+        docker: "encodedcc/hic-pipeline:bug"
     }
 }
