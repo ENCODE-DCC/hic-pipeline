@@ -73,14 +73,14 @@ RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     find -mindepth 1 -maxdepth 1  -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
 
 # Install Juicer tools
-# RUN curl \
-#         -L \
-#         https://github.com/aidenlab/Juicebox/releases/download/2.09.00/juicer_tools_2.09.00.jar \
-#         -o /opt/juicer/CPU/common/juicer_tools.jar && \
-#     chmod 666 /opt/juicer/CPU/common/juicer_tools.jar && \
-#     ln -s juicer/CPU scripts
+RUN curl \
+        -L \
+        https://github.com/aidenlab/Juicebox/releases/download/2.10.01/juicer_tools.2.10.01.jar \
+        -o /opt/juicer/CPU/common/juicer_tools.jar && \
+    chmod 666 /opt/juicer/CPU/common/juicer_tools.jar && \
+    ln -s juicer/CPU scripts
 
-COPY juicer_tools_test_bug_2.9.1.jar /opt/juicer/CPU/common/juicer_tools.jar
+# COPY juicer_tools_test_bug_2.9.1.jar /opt/juicer/CPU/common/juicer_tools.jar
 
 RUN chmod 666 /opt/juicer/CPU/common/juicer_tools.jar && \
     ln -s juicer/CPU scripts
