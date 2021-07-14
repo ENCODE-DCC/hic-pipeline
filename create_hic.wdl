@@ -35,7 +35,7 @@ task create_hic {
         String? assembly_name
         File? restriction_sites
         File? chrom_sizes
-        Int num_cpus = 2
+        Int num_cpus = 24
     }
 
     command <<<
