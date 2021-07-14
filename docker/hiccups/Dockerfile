@@ -33,7 +33,7 @@ RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
 # Install Juicer tools
 RUN curl \
         -L \
-        https://github.com/aidenlab/Juicebox/releases/download/2.09.00/juicer_tools_2.09.00.jar \
+        https://github.com/aidenlab/Juicebox/releases/download/2.10.01/juicer_tools.2.10.01.jar \
         -o /opt/juicer/CPU/common/juicer_tools.jar && \
     chmod 666 /opt/juicer/CPU/common/juicer_tools.jar && \
     ln -s juicer/CPU scripts
