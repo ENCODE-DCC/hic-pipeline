@@ -60,10 +60,11 @@ task create_hic {
             ~{if defined(assembly_name) then "-y " + assembly_name else ""} \
             -r 2500000,1000000 \
             -i $PRE_INDEX_FILE \
+            --block-capacity 1000000 \
             --threads ~{num_cpus} \
             $PRE_FILE \
             inter_~{quality}.hic \
-            ~{if defined(chrom_sizes) then chrom_sizes else assembly_name}
+            ~{assembly_name}
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
@@ -83,6 +84,6 @@ task create_hic {
         cpu : "~{num_cpus}"
         disks: "local-disk 2000 SSD"
         memory : "30 GB"
-        docker: "encodedcc/hic-pipeline:bug"
+        docker: "encodedcc/hic-pipeline:bug_eadba8c1-a32d-405a-ae5f-4f4238194807"
     }
 }
