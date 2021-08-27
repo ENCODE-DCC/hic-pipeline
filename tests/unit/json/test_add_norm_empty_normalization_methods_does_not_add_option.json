@@ -1,0 +1,5 @@
+{
+  "test_add_norm.hic": "tests/data/dummy.txt",
+  "test_add_norm.normalization_methods": [],
+  "test_add_norm.quality": "30"
+}

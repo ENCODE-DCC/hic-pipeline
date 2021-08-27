@@ -11,7 +11,6 @@ workflow test_create_hic {
         File chrsz
         File? restriction_sites
         String assembly_name
-        Array[String] normalization_methods = []
         Int quality
     }
 
@@ -24,6 +23,5 @@ workflow test_create_hic {
         restriction_sites = restriction_sites,
         quality = quality,
         assembly_name = assembly_name,
-        normalization_methods = normalization_methods,
     }
 }

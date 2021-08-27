@@ -9,10 +9,14 @@
     files:
       - path: test-output/merged_dedup.bam
       - path: test-output/pairix.bsorted.pairs.gz
+      - path: test-output/inter_1_unnormalized.hic
+        md5sum: 9a59c0fc342d5552d7dc903d183027e2
       - path: test-output/inter_1.hic
-        md5sum: 61500d7cde333df8a13c7c44dc1e548e
+        md5sum: f099d71090c85e8f2d847863bb702f1b
+      - path: test-output/inter_30_unnormalized.hic
+        md5sum: 724fef603c5f3d1d683963cd8beaed31
       - path: test-output/inter_30.hic
-        md5sum: 1852d4ee0929f106ebdcb55163126944
+        md5sum: a75d91c949a179ba90e3f2cfbea3a5de
       - path: test-output/merged_nodups_30.txt.gz
         md5sum: ee923f74237094ac00cd701650af906c
       - path: test-output/stats_30.json
