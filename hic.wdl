@@ -198,23 +198,37 @@ workflow hic {
                 num_cpus = create_hic_num_cpus,
             }
         }
-    }
 
-    File hic_file = select_first([
-        if (length(select_all(create_hic.output_hic)) > 0) then create_hic.output_hic[1]
-        else if (length(select_all(create_hic_with_chrom_sizes.output_hic)) > 0) then create_hic_with_chrom_sizes.output_hic[1]
-        else input_hic
-    ])
+        File hic_file = select_first([
+            if (defined(create_hic.output_hic)) then create_hic.output_hic
+            else create_hic_with_chrom_sizes.output_hic
+        ])
 
 
-    if (!no_call_tads) {
-        call arrowhead { input:
-            hic_file = hic_file
+        if (!no_call_tads) {
+            call arrowhead { input:
+                hic_file = hic_file,
+                quality = qualities[i],
+            }
+        }
+        if (!no_call_loops) {
+            call hiccups { input:
+                hic_file = hic_file,
+                 quality = qualities[i],
+            }
         }
     }
-    if (!no_call_loops) {
-        call hiccups { input:
-            hic_file = hic_file
+
+    if (defined(input_hic)) {
+        if (!no_call_tads) {
+            call arrowhead as arrowhead_input_hic { input:
+                hic_file = select_first([input_hic])
+            }
+        }
+        if (!no_call_loops) {
+            call hiccups as hiccups_input_hic { input:
+                hic_file = select_first([input_hic])
+            }
         }
     }
 }
@@ -635,6 +649,7 @@ task create_hic {
 task arrowhead {
     input {
         File hic_file
+        Int quality = 0
     }
 
     command {
@@ -648,10 +663,12 @@ task arrowhead {
             ${hic_file} \
             contact_domains
         gzip -n contact_domains/*
+        STEM=basename contact_domains/*.bedpe.gz .bedpe.gz
+        mv contact_domains/*.bedpe.gz $STEM_~{quality}.bedpe.gz
     }
 
     output {
-        File out_file = glob('contact_domains/*.bedpe.gz')[0]
+        File out_file = glob('*_~{quality}.bedpe.gz')[0]
     }
 
     runtime {
@@ -664,6 +681,7 @@ task arrowhead {
 task hiccups {
     input {
         File hic_file
+        Int quality = 0
     }
 
     command {
@@ -675,12 +693,12 @@ task hiccups {
             hiccups \
             ${hic_file} \
             loops
-        gzip -n loops/*.bedpe
+        gzip -n loops/merged_loops.bedpe
+        mv loops/merged_loops.bedpe.gz merged_loops_~{quality}.bedpe.gz
     }
 
     output {
-        File out_file = glob("loops/*.bedpe.gz")[0]
-        File merged_loops = "loops/merged_loops.bedpe.gz"
+        File merged_loops = "merged_loops_~{quality}.bedpe.gz"
     }
 
     runtime {
