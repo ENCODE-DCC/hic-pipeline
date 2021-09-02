@@ -747,14 +747,17 @@ task create_eigenvector {
             -n ~{normalization} \
             -T ~{num_cpus} \
             ~{hic_file} \
-            eigenvector.wig \
+            eigenvector_~{resolution}.wig \
             ~{resolution}
-        wigToBigWig eigenvector.wig ~{chrom_sizes} eigenvector.bw
+        wigToBigWig \
+            eigenvector_~{resolution}.wig \
+            ~{chrom_sizes} \
+            eigenvector_~{resolution}.bw
     }
 
     output {
-        File eigenvector_wig = "eigenvector.wig"
-        File eigenvector_bigwig = "eigenvector.bw"
+        File eigenvector_wig = "eigenvector_~{resolution}.wig"
+        File eigenvector_bigwig = "eigenvector_~{resolution}.bw"
     }
 
     runtime {

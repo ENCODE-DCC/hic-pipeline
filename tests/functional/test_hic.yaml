@@ -17,7 +17,11 @@
         md5sum: ee923f74237094ac00cd701650af906c
       - path: test-output/stats_30.json
         md5sum: 3547781a62a5f2d008a908382b36f826
-      - path: test-output/eigenvector.bw
+      - path: test-output/eigenvector_5000.bw
         md5sum: 79d3857abb44d5ecfe5f33968d5f18df
-      - path: test-output/eigenvector.wig
+      - path: test-output/eigenvector_5000.wig
+        md5sum: ba01941896c56a14bb20fd09f8a39fe4
+      - path: test-output/eigenvector_10000.bw
+        md5sum: 79d3857abb44d5ecfe5f33968d5f18df
+      - path: test-output/eigenvector_10000.wig
         md5sum: ba01941896c56a14bb20fd09f8a39fe4
