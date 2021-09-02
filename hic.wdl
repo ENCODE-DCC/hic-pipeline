@@ -217,6 +217,19 @@ workflow hic {
                  quality = qualities[i],
             }
         }
+
+        if (defined(chrsz)) {
+            call create_eigenvector { input:
+                hic_file = hic_file,
+                chrom_sizes = select_first([chrsz]),
+            }
+
+            call create_eigenvector as create_eigenvector_10kb { input:
+                hic_file = hic_file,
+                chrom_sizes = select_first([chrsz]),
+                resolution = 10000,
+            }
+        }
     }
 
     if (defined(input_hic)) {
@@ -228,20 +241,6 @@ workflow hic {
         if (!no_call_loops) {
             call hiccups as hiccups_input_hic { input:
                 hic_file = select_first([input_hic])
-            }
-        }
-    }
-
-    if (defined(chrsz)) {
-        call create_eigenvector { input:
-            hic_file = hic_file,
-            chrom_sizes = select_first([chrsz]),
-        }
-
-        if (length(select_all(create_hic.output_hic)) > 0) {
-            call create_eigenvector as create_eigenvector_mapq0 { input:
-                hic_file = select_first([create_hic.output_hic[0]]),
-                chrom_sizes = select_first([chrsz]),
             }
         }
     }
