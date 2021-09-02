@@ -22,14 +22,14 @@
       - path: test-output/eigenvector_5000_30.wig
         md5sum: 215e1cc9e28a9038143048a395e2b9fb
       - path: test-output/eigenvector_10000_30.bw
-        md5sum: 79d3857abb44d5ecfe5f33968d5f18df
+        md5sum: db131a020238e7083ae1f5b1407db3b9
       - path: test-output/eigenvector_10000_30.wig
-        md5sum: ba01941896c56a14bb20fd09f8a39fe4
+        md5sum: cede044b79e50c0d64fe9cca491c959c
       - path: test-output/eigenvector_5000_1.bw
-        md5sum: 94dc3d48db3f37d7389fc50f714f09e5
+        md5sum: 5c8d4885bbe29129a3c48d0f6200e45b
       - path: test-output/eigenvector_5000_1.wig
-        md5sum: 215e1cc9e28a9038143048a395e2b9fb
+        md5sum: a747905ec338bc49af8f77c14a3a891a
       - path: test-output/eigenvector_10000_1.bw
-        md5sum: 79d3857abb44d5ecfe5f33968d5f18df
+        md5sum: ed74a3a159dd99ebe773f2614a35f657
       - path: test-output/eigenvector_10000_1.wig
-        md5sum: ba01941896c56a14bb20fd09f8a39fe4
+        md5sum: 159a4dc8597067fea1315d1a1c4e53a2
