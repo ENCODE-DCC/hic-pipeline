@@ -8,6 +8,6 @@
       tests/integration/json/test_create_eigenvector.json
     files:
       - path: test-output/eigenvector_5000.bw
-        md5sum: 79d3857abb44d5ecfe5f33968d5f18df
+        md5sum: 94dc3d48db3f37d7389fc50f714f09e5
       - path: test-output/eigenvector_5000.wig
-        md5sum: ba01941896c56a14bb20fd09f8a39fe4
+        md5sum: 215e1cc9e28a9038143048a395e2b9fb
