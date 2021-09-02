@@ -222,12 +222,14 @@ workflow hic {
             call create_eigenvector { input:
                 hic_file = hic_file,
                 chrom_sizes = select_first([chrsz]),
+                output_filename_suffix = "_" + qualities[i],
             }
 
             call create_eigenvector as create_eigenvector_10kb { input:
                 hic_file = hic_file,
                 chrom_sizes = select_first([chrsz]),
                 resolution = 10000,
+                output_filename_suffix = "_" + qualities[i],
             }
         }
     }
@@ -739,6 +741,7 @@ task create_eigenvector {
         File chrom_sizes
         Int num_cpus = 16
         Int resolution = 5000
+        String output_filename_suffix = ""
         String normalization = "SCALE"
     }
 
@@ -756,8 +759,8 @@ task create_eigenvector {
     }
 
     output {
-        File eigenvector_wig = "eigenvector_~{resolution}.wig"
-        File eigenvector_bigwig = "eigenvector_~{resolution}.bw"
+        File eigenvector_wig = "eigenvector_~{resolution}~{output_filename_suffix}.wig"
+        File eigenvector_bigwig = "eigenvector_~{resolution}~{output_filename_suffix}.bw"
     }
 
     runtime {
