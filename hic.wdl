@@ -652,7 +652,7 @@ task arrowhead {
         Int quality = 0
     }
 
-    command {
+    command <<<
         set -euo pipefail
         java \
             -Ddevelopment=false \
@@ -660,12 +660,12 @@ task arrowhead {
             -Xmx16g \
             -jar /opt/scripts/common/juicer_tools.jar \
             arrowhead \
-            ${hic_file} \
+            ~{hic_file} \
             contact_domains
         gzip -n contact_domains/*
-        STEM=basename contact_domains/*.bedpe.gz .bedpe.gz
-        mv contact_domains/*.bedpe.gz $STEM_~{quality}.bedpe.gz
-    }
+        STEM=$(basename contact_domains/*.bedpe.gz .bedpe.gz)
+        mv contact_domains/*.bedpe.gz "${STEM}_~{quality}.bedpe.gz"
+    >>>
 
     output {
         File out_file = glob('*_~{quality}.bedpe.gz')[0]
