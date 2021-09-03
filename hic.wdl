@@ -217,6 +217,21 @@ workflow hic {
                  quality = qualities[i],
             }
         }
+
+        if (defined(chrsz)) {
+            call create_eigenvector { input:
+                hic_file = hic_file,
+                chrom_sizes = select_first([chrsz]),
+                output_filename_suffix = "_" + qualities[i],
+            }
+
+            call create_eigenvector as create_eigenvector_10kb { input:
+                hic_file = hic_file,
+                chrom_sizes = select_first([chrsz]),
+                resolution = 10000,
+                output_filename_suffix = "_" + qualities[i],
+            }
+        }
     }
 
     if (defined(input_hic)) {
@@ -717,6 +732,41 @@ task hiccups {
             "us-west1-a",
             "us-west1-b",
         ]
+    }
+}
+
+task create_eigenvector {
+    input {
+        File hic_file
+        File chrom_sizes
+        Int num_cpus = 16
+        Int resolution = 5000
+        String output_filename_suffix = ""
+        String normalization = "SCALE"
+    }
+
+    command {
+        newGW_Intra_Flip \
+            -n ~{normalization} \
+            -T ~{num_cpus} \
+            ~{hic_file} \
+            eigenvector_~{resolution}~{output_filename_suffix}.wig \
+            ~{resolution}
+        wigToBigWig \
+            eigenvector_~{resolution}~{output_filename_suffix}.wig \
+            ~{chrom_sizes} \
+            eigenvector_~{resolution}~{output_filename_suffix}.bw
+    }
+
+    output {
+        File eigenvector_wig = "eigenvector_~{resolution}~{output_filename_suffix}.wig"
+        File eigenvector_bigwig = "eigenvector_~{resolution}~{output_filename_suffix}.bw"
+    }
+
+    runtime {
+        cpu : "~{num_cpus}"
+        disks: "local-disk 100 SSD"
+        memory : "8 GB"
     }
 }
 

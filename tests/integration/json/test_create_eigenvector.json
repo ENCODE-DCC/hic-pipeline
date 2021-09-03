@@ -1,0 +1,4 @@
+{
+  "test_create_eigenvector.chrom_sizes": "tests/data/ce10_selected.chrom.sizes.tsv",
+  "test_create_eigenvector.hic_file": "tests/data/inter_30.hic"
+}

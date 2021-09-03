@@ -15,10 +15,12 @@ RUN apt-get update && \
     apt-get install -y \
         bzip2 \
         curl \
+        g++ \
         gawk \
         gcc \
         git \
         libbz2-dev \
+        libcurl4-openssl-dev \
         libz-dev \
         locales \
         make \
@@ -64,6 +66,38 @@ RUN curl -OL "https://github.com/4dn-dcic/pairix/archive/${PAIRIX_VERSION}.zip" 
     cp util/bam2pairs/bam2pairs /opt && \
     cd .. && \
     rm -rf "${PAIRIX_VERSION}.zip" "pairix-${PAIRIX_VERSION}"
+
+# Eigenvector
+RUN git clone https://github.com/moshe-olshansky/EigenVector.git && \
+    cd EigenVector && \
+    git checkout 68c399f4ac7d1b953724ab41ae0c4b32368392b1 && \
+    git clone https://github.com/aidenlab/straw.git && \
+    cd straw && \
+    git checkout 7d5ec096e116d6680455bcc81eee8e42c2adf6ba && \
+    cp C++/straw.cpp C++/straw.h ../C++/FlipSign && \
+    cd ../C++/FlipSign && \
+    g++ \
+        -O \
+        --std=c++11 \
+        -o newGW_Intra_Flip \
+        GWevIntra_new.cpp \
+        theBestEigen.c \
+        thdMul.c \
+        hgFlipSign.c \
+        straw.cpp \
+        -I. \
+        -lz \
+        -lcurl \
+        -lpthread && \
+    chmod +x newGW_Intra_Flip  && \
+    mv newGW_Intra_Flip  /usr/local/bin && \
+    rm -rf newGW_Intra_Flip
+
+RUN curl \
+    -OL \
+    https://github.com/ENCODE-DCC/kentUtils_bin_v381/raw/d0ba32f3aee6da02c0f75d8f998c5f1d921b047c/bin/wigToBigWig && \
+    chmod +x wigToBigWig && \
+    mv wigToBigWig /usr/local/bin
 
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
