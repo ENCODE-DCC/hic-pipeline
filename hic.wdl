@@ -13,9 +13,9 @@ struct BamAndLigationCount {
 
 workflow hic {
     meta {
-        version: "1.2.0"
-        caper_docker: "encodedcc/hic-pipeline:1.2.0"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.2.0"
+        version: "1.2.1"
+        caper_docker: "encodedcc/hic-pipeline:1.2.1"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.2.1"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -41,6 +41,7 @@ workflow hic {
         Boolean no_call_tads = false
         Int align_num_cpus = 32
         Int? create_hic_num_cpus
+        Int? add_norm_num_cpus
         String assembly_name = "undefined"
     }
 
@@ -180,7 +181,6 @@ workflow hic {
                 stats = calculate_stats.stats,
                 stats_hists = calculate_stats.stats_hists,
                 assembly_name = assembly_name,
-                normalization_methods = normalization_methods,
                 num_cpus = create_hic_num_cpus,
             }
         }
@@ -194,39 +194,45 @@ workflow hic {
                 stats = calculate_stats.stats,
                 stats_hists = calculate_stats.stats_hists,
                 assembly_name = normalize_assembly_name.normalized_assembly_name,
-                normalization_methods = normalization_methods,
                 num_cpus = create_hic_num_cpus,
             }
         }
 
-        File hic_file = select_first([
-            if (defined(create_hic.output_hic)) then create_hic.output_hic
+        File unnormalized_hic_file = select_first([
+            if (defined(create_hic.output_hic))
+            then create_hic.output_hic
             else create_hic_with_chrom_sizes.output_hic
         ])
 
+        call add_norm { input:
+            hic = unnormalized_hic_file,
+            normalization_methods = normalization_methods,
+            quality = qualities[i],
+            num_cpus = add_norm_num_cpus,
+        }
 
         if (!no_call_tads) {
             call arrowhead { input:
-                hic_file = hic_file,
+                hic_file = add_norm.output_hic,
                 quality = qualities[i],
             }
         }
         if (!no_call_loops) {
             call hiccups { input:
-                hic_file = hic_file,
+                hic_file = add_norm.output_hic,
                  quality = qualities[i],
             }
         }
 
         if (defined(chrsz)) {
             call create_eigenvector { input:
-                hic_file = hic_file,
+                hic_file = add_norm.output_hic,
                 chrom_sizes = select_first([chrsz]),
                 output_filename_suffix = "_" + qualities[i],
             }
 
             call create_eigenvector as create_eigenvector_10kb { input:
-                hic_file = hic_file,
+                hic_file = add_norm.output_hic,
                 chrom_sizes = select_first([chrsz]),
                 resolution = 10000,
                 output_filename_suffix = "_" + qualities[i],
@@ -603,7 +609,6 @@ task create_hic {
         File pre_index
         File stats
         File stats_hists
-        Array[String] normalization_methods = []
         Int quality
         String? assembly_name
         File? chrsz
@@ -623,7 +628,7 @@ task create_hic {
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
-            -Xmx590g \
+            -Xmx240g \
             -jar /opt/scripts/common/juicer_tools.jar \
             pre \
             -n \
@@ -636,18 +641,43 @@ task create_hic {
             --block-capacity 1000000 \
             --threads ~{num_cpus} \
             $PRE_FILE \
-            inter_~{quality}.hic \
+            inter_~{quality}_unnormalized.hic \
             ~{if defined(chrsz) then chrsz else assembly_name}
+    >>>
+
+    output {
+        File output_hic = "inter_~{quality}_unnormalized.hic"
+    }
+
+    runtime {
+        cpu : "~{num_cpus}"
+        disks: "local-disk 2000 SSD"
+        memory : "256 GB"
+    }
+}
+
+
+task add_norm {
+    input {
+        File hic
+        Array[String] normalization_methods = []
+        Int quality
+        Int num_cpus = 24
+    }
+
+    command {
+        set -euo pipefail
+        cp ~{hic} inter_~{quality}.hic
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
-            -Xmx590g \
+            -Xmx60g \
             -jar /opt/scripts/common/juicer_tools.jar \
             addNorm \
             ~{if length(normalization_methods) > 0 then "-k" else ""} ~{sep="," normalization_methods} \
             --threads ~{num_cpus} \
             inter_~{quality}.hic
-    >>>
+    }
 
     output {
         File output_hic = "inter_~{quality}.hic"
@@ -655,8 +685,8 @@ task create_hic {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 2000 SSD"
-        memory : "600 GB"
+        disks: "local-disk 128 SSD"
+        memory : "72 GB"
     }
 }
 
@@ -720,7 +750,7 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 SSD"
-        docker: "encodedcc/hic-pipeline:1.2.0_hiccups"
+        docker: "encodedcc/hic-pipeline:1.2.1_hiccups"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"

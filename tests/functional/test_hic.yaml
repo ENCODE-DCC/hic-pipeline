@@ -9,27 +9,31 @@
     files:
       - path: test-output/merged_dedup.bam
       - path: test-output/pairix.bsorted.pairs.gz
+      - path: test-output/inter_1_unnormalized.hic
+        md5sum: 9a59c0fc342d5552d7dc903d183027e2
       - path: test-output/inter_1.hic
-        md5sum: 61500d7cde333df8a13c7c44dc1e548e
+        md5sum: f099d71090c85e8f2d847863bb702f1b
+      - path: test-output/inter_30_unnormalized.hic
+        md5sum: 724fef603c5f3d1d683963cd8beaed31
       - path: test-output/inter_30.hic
-        md5sum: 1852d4ee0929f106ebdcb55163126944
+        md5sum: a75d91c949a179ba90e3f2cfbea3a5de
       - path: test-output/merged_nodups_30.txt.gz
         md5sum: ee923f74237094ac00cd701650af906c
       - path: test-output/stats_30.json
         md5sum: 3547781a62a5f2d008a908382b36f826
       - path: test-output/eigenvector_5000_30.bw
-        md5sum: 94dc3d48db3f37d7389fc50f714f09e5
+        md5sum: a566c66fcdfb9fe7ce00c99388cd4ca0
       - path: test-output/eigenvector_5000_30.wig
-        md5sum: 215e1cc9e28a9038143048a395e2b9fb
+        md5sum: 2786627cdf2cc8bc0753820e1921186b
       - path: test-output/eigenvector_10000_30.bw
-        md5sum: db131a020238e7083ae1f5b1407db3b9
+        md5sum: 10e2d58824e4ee3a3627a711781c58a8
       - path: test-output/eigenvector_10000_30.wig
-        md5sum: cede044b79e50c0d64fe9cca491c959c
+        md5sum: cfa5ed4d1425511fd1c59519cdc16951
       - path: test-output/eigenvector_5000_1.bw
         md5sum: 5c8d4885bbe29129a3c48d0f6200e45b
       - path: test-output/eigenvector_5000_1.wig
         md5sum: a747905ec338bc49af8f77c14a3a891a
       - path: test-output/eigenvector_10000_1.bw
-        md5sum: ed74a3a159dd99ebe773f2614a35f657
+        md5sum: c93c1e8a2d7217367c43d088805b4723
       - path: test-output/eigenvector_10000_1.wig
-        md5sum: 159a4dc8597067fea1315d1a1c4e53a2
+        md5sum: aa677433cf9c820288b3d6179f9d32d0

@@ -9,25 +9,3 @@
     stdout:
       contains_regex:
         - 'gzip -dc .*dummy.txt > \$RESTRICTION_SITES_FILENAME'
-  - name: test_create_hic_normalization_methods_comma_separated
-    tags:
-      - unit
-    command: >-
-      tests/caper_run.sh
-      tests/unit/wdl/test_create_hic.wdl
-      tests/unit/json/test_create_hic_normalization_methods_comma_separated.json
-    stdout:
-      contains:
-        - -k foo,bar,baz
-      must_not_contain:
-        - $RESTRICTION_SITES_FILENAME
-  - name: test_create_hic_empty_normalization_methods_does_not_add_option
-    tags:
-      - unit
-    command: >-
-      tests/caper_run.sh
-      tests/unit/wdl/test_create_hic.wdl
-      tests/unit/json/test_create_hic_empty_normalization_methods_does_not_add_option.json
-    stdout:
-      must_not_contain:
-        - -k

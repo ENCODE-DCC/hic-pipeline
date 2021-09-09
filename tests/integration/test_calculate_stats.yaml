@@ -8,9 +8,9 @@
       tests/integration/json/test_calculate_stats.json
     files:
       - path: test-output/stats_30.txt
-        md5sum: 25057ce555a844a7c032c69f079c6e4f
+        md5sum: 0fcc706086c31099dafb1b6e05afafe5
       - path: test-output/stats_30.json
-        md5sum: 879a357eca61736689ef939ff5578f54
+        md5sum: 2dd07c41a38cb02791bb12f495daad7d
       - path: test-output/stats_30_hists.m
         md5sum: 15d1f8b09ad377d5c9e9b5b6dd734a07
   - name: test_calculate_stats_no_restriction_sites
@@ -22,8 +22,8 @@
       tests/integration/json/test_calculate_stats_no_restriction_sites.json
     files:
       - path: test-output/stats_30.txt
-        md5sum: d45973907649cfd65b31ef660472ba29
+        md5sum: bb7acdc4c88063329ce27025285cde3b
       - path: test-output/stats_30.json
-        md5sum: 7ab3a474eaa83e5f518d0555768d0fe4
+        md5sum: 042d81b7e8cfd263261d404a2b93ae18
       - path: test-output/stats_30_hists.m
         md5sum: 9ae040182e6e4ce71278cd35c451e4ff

@@ -1,0 +1,23 @@
+---
+  - name: test_add_norm_normalization_methods_comma_separated
+    tags:
+      - unit
+    command: >-
+      tests/caper_run.sh
+      tests/unit/wdl/test_add_norm.wdl
+      tests/unit/json/test_add_norm_normalization_methods_comma_separated.json
+    stdout:
+      contains:
+        - -k foo,bar,baz
+      must_not_contain:
+        - $RESTRICTION_SITES_FILENAME
+  - name: test_add_norm_empty_normalization_methods_does_not_add_option
+    tags:
+      - unit
+    command: >-
+      tests/caper_run.sh
+      tests/unit/wdl/test_add_norm.wdl
+      tests/unit/json/test_add_norm_empty_normalization_methods_does_not_add_option.json
+    stdout:
+      must_not_contain:
+        - -k

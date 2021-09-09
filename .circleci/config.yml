@@ -100,6 +100,7 @@ jobs:
             pip install --upgrade pip
             pip install tox
             tox -e wdl -- --kwd --tag << parameters.tag >> --wt << parameters.num_parallel_workflows >>
+          no_output_timeout: 20m
 
   build:
     <<: *defaults
@@ -191,7 +192,7 @@ workflows:
             - lint
       - test_wdl:
           name: test_wdl_functional
-          resource_class: xlarge
+          resource_class: 2xlarge
           tag: functional
           num_parallel_workflows: 16
           requires:
