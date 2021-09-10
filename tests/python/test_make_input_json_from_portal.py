@@ -73,6 +73,7 @@ def test_get_enzymes_from_experiment_unknown_fragmentation_methods_raises():
 
 def test_get_fastqs_from_experiment():
     experiment = {
+        "accession": "ENCSR123ABC",
         "files": [
             {
                 "@id": "foo",
@@ -82,6 +83,10 @@ def test_get_fastqs_from_experiment():
                 "status": "released",
                 "file_format": "fastq",
                 "href": "download1",
+                "submitted_file_name": "/foo/bar_R1.fastq.gz",
+                "replicate": {
+                    "library": "/libraries/foo/",
+                },
             },
             {
                 "@id": "bar",
@@ -91,6 +96,10 @@ def test_get_fastqs_from_experiment():
                 "status": "released",
                 "file_format": "fastq",
                 "href": "download2",
+                "submitted_file_name": "/foo/bar_R2.fastq.gz",
+                "replicate": {
+                    "library": "/libraries/foo/",
+                },
             },
             {
                 "@id": "baz",
@@ -100,6 +109,10 @@ def test_get_fastqs_from_experiment():
                 "status": "in progress",
                 "file_format": "fastq",
                 "href": "download3",
+                "submitted_file_name": "/baz/qux_R1.fastq.gz",
+                "replicate": {
+                    "library": "/libraries/foo/",
+                },
             },
             {
                 "@id": "qux",
@@ -109,6 +122,10 @@ def test_get_fastqs_from_experiment():
                 "status": "in progress",
                 "file_format": "fastq",
                 "href": "download4",
+                "submitted_file_name": "/baz/qux_R2.fastq.gz",
+                "replicate": {
+                    "library": "/libraries/foo/",
+                },
             },
             {
                 "@id": "quux",
@@ -118,6 +135,10 @@ def test_get_fastqs_from_experiment():
                 "status": "released",
                 "file_format": "fastq",
                 "href": "download5",
+                "submitted_file_name": "/quux/corge_R1.fastq.gz",
+                "replicate": {
+                    "library": "/libraries/foo/",
+                },
             },
             {
                 "@id": "corge",
@@ -127,6 +148,10 @@ def test_get_fastqs_from_experiment():
                 "status": "released",
                 "file_format": "fastq",
                 "href": "download6",
+                "submitted_file_name": "/quux/corge_R2.fastq.gz",
+                "replicate": {
+                    "library": "/libraries/foo/",
+                },
             },
             {
                 "@id": "grault",
@@ -136,6 +161,10 @@ def test_get_fastqs_from_experiment():
                 "status": "replaced",
                 "file_format": "fastq",
                 "href": "download7",
+                "submitted_file_name": "/grault/garply_R1.fastq.gz",
+                "replicate": {
+                    "library": "/libraries/foo/",
+                },
             },
             {
                 "@id": "garply",
@@ -145,8 +174,12 @@ def test_get_fastqs_from_experiment():
                 "status": "replaced",
                 "file_format": "fastq",
                 "href": "download8",
+                "submitted_file_name": "/grault/garply_R2.fastq.gz",
+                "replicate": {
+                    "library": "/libraries/foo/",
+                },
             },
-        ]
+        ],
     }
     result = get_fastqs_from_experiment(experiment)
     assert result == [
@@ -154,16 +187,19 @@ def test_get_fastqs_from_experiment():
             {
                 "read_1": "https://www.encodeproject.org/download1",
                 "read_2": "https://www.encodeproject.org/download2",
+                "read_group": "@RG\\tID:bar\\tSM:ENCSR123ABC\\tPL:ILLUMINA\\tLB:foo",
             }
         ],
         [
             {
                 "read_1": "https://www.encodeproject.org/download3",
                 "read_2": "https://www.encodeproject.org/download4",
+                "read_group": "@RG\\tID:qux\\tSM:ENCSR123ABC\\tPL:ILLUMINA\\tLB:foo",
             },
             {
                 "read_1": "https://www.encodeproject.org/download5",
                 "read_2": "https://www.encodeproject.org/download6",
+                "read_group": "@RG\\tID:corge\\tSM:ENCSR123ABC\\tPL:ILLUMINA\\tLB:foo",
             },
         ],
     ]

@@ -40,7 +40,7 @@ def main():
     experiment = get_experiment(args.accession, auth=auth)
     fastqs = get_fastqs_from_experiment(experiment)
     if args.ligation_site_regex is None:
-        enzymes = get_enzymes_from_experiment(experiment)
+        enzymes = args.enzymes or get_enzymes_from_experiment(experiment)
         input_json = get_input_json(
             fastqs=fastqs, assembly_name=args.assembly_name, enzymes=enzymes
         )
@@ -87,6 +87,7 @@ def get_enzymes_from_experiment(experiment, enzymes=ENZYMES):
 
 def get_fastqs_from_experiment(experiment):
     fastq_pairs_by_replicate = {}
+    read_group_ids = set()
     for file in experiment["files"]:
         if file["file_format"] == "fastq" and file["status"] in ALLOWED_STATUSES:
             biological_replicate = file["biological_replicates"][0]
@@ -99,11 +100,28 @@ def get_fastqs_from_experiment(experiment):
                 fastq_pairs_by_replicate[biological_replicate] = []
             if file["paired_end"] == "2":
                 file, paired_with_file = paired_with_file, file
+            # Same as how juicer.sh does it, assumes "_R1" is used to indicated read 1
+            # It is perhaps a bit low level, but it is hard to construct a unique ID
+            # per read pair from other pieces of portal metadata. fastq signature is
+            # close but not readily useful
+            read_group_id = (
+                file["submitted_file_name"]
+                .split("/")[-1]
+                .replace(".fastq.gz", "")
+                .replace("_R1", "")
+            )
+            library_accession = file["replicate"]["library"].split("/")[2]
+            sample_name = experiment["accession"]
             fastq_pair = {
                 "read_1": urljoin(PORTAL_URL, file["href"]),
                 "read_2": urljoin(PORTAL_URL, paired_with_file["href"]),
+                "read_group": f"@RG\\tID:{read_group_id}\\tSM:{sample_name}\\tPL:ILLUMINA\\tLB:{library_accession}",
             }
             if fastq_pair not in fastq_pairs_by_replicate[biological_replicate]:
+                if read_group_id not in read_group_ids:
+                    read_group_ids.add(read_group_id)
+                else:
+                    raise ValueError("Read group ids must be unique")
                 fastq_pairs_by_replicate[biological_replicate].append(fastq_pair)
     output = [replicate for replicate in fastq_pairs_by_replicate.values()]
     return output
@@ -150,6 +168,9 @@ def get_parser():
         help="Accession of portal experiment to generate input for",
     )
     parser.add_argument("--outfile")
+    parser.add_argument(
+        "-e", "--enzymes", nargs="+", help="Restriction enzymes used in experiment"
+    )
     parser.add_argument(
         "--keypair-file", help="Path to keypairs.json", default="~/keypairs.json"
     )
