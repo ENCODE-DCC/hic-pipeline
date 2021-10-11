@@ -485,7 +485,7 @@ task dedup {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 5000 SSD"
+        disks: "local-disk 5000 HDD"
         memory: "32 GB"
     }
 }
@@ -651,7 +651,7 @@ task create_hic {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 2000 SSD"
+        disks: "local-disk 2000 HDD"
         memory : "256 GB"
     }
 }
@@ -685,7 +685,7 @@ task add_norm {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 128 SSD"
+        disks: "local-disk 128 HDD"
         memory : "72 GB"
     }
 }
@@ -718,7 +718,7 @@ task arrowhead {
 
     runtime {
         cpu : "1"
-        disks: "local-disk 100 SSD"
+        disks: "local-disk 100 HDD"
         memory : "32 GB"
     }
 }
@@ -749,7 +749,7 @@ task hiccups {
     runtime {
         cpu : "1"
         bootDiskSizeGb: "20"
-        disks: "local-disk 100 SSD"
+        disks: "local-disk 100 HDD"
         docker: "encodedcc/hic-pipeline:1.2.1_hiccups"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
@@ -795,7 +795,7 @@ task create_eigenvector {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 100 SSD"
+        disks: "local-disk 100 HDD"
         memory : "8 GB"
     }
 }
