@@ -45,6 +45,6 @@ task make_restriction_site_locations_ {
     runtime {
         cpu : "1"
         memory: "500 MB"
-        disks: "local-disk 10 SSD"
+        disks: "local-disk 10 HDD"
     }
 }
