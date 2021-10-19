@@ -14,9 +14,9 @@ struct BamAndLigationCount {
 
 workflow hic {
     meta {
-        version: "1.5.0"
-        caper_docker: "encodedcc/hic-pipeline:1.5.0"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.5.0"
+        version: "1.6.0"
+        caper_docker: "encodedcc/hic-pipeline:1.6.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.6.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -48,6 +48,17 @@ workflow hic {
         Int? create_hic_num_cpus
         Int? add_norm_num_cpus
         String assembly_name = "undefined"
+
+        # Inputs for GATK
+        File? reference_fasta
+        File? dbsnp_vcf
+        File? dbsnp_vcf_index
+        File? hapmap_vcf_index
+        File? hapmap_vcf
+        File? mills_vcf
+        File? mills_vcf_index
+        File? omni_vcf
+        File? omni_vcf_index
     }
 
     # Default MAPQ thresholds for generating .hic contact maps
@@ -814,7 +825,11 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 HDD"
+<<<<<<< HEAD
         docker: "encodedcc/hic-pipeline:1.5.0_hiccups"
+=======
+        docker: "encodedcc/hic-pipeline:1.6.0_hiccups"
+>>>>>>> PIP-1632-add-genotyping
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
