@@ -89,7 +89,7 @@ RUN git clone https://github.com/moshe-olshansky/EigenVector.git && \
         -lcurl \
         -lpthread && \
     chmod +x newGW_Intra_Flip  && \
-    mv newGW_Intra_Flip  /usr/local/bin && \
+    mv newGW_Intra_Flip /usr/local/bin && \
     rm -rf newGW_Intra_Flip
 
 RUN curl \
@@ -108,7 +108,7 @@ RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
 # Install Juicer tools
 RUN curl \
         -L \
-        https://github.com/aidenlab/Juicebox/releases/download/v2.13.06/juicer_tools_2.13.06.jar \
+        https://github.com/aidenlab/Juicebox/releases/download/v2.13.05/juicer_tools.2.13.05.jar \
         -o /opt/juicer/CPU/common/juicer_tools.jar && \
     chmod 666 /opt/juicer/CPU/common/juicer_tools.jar && \
     ln -s juicer/CPU scripts
