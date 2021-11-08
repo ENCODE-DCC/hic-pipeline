@@ -10,17 +10,17 @@
       - path: test-output/merged_dedup.bam
       - path: test-output/pairix.bsorted.pairs.gz
       - path: test-output/inter_1_unnormalized.hic
-        md5sum: 9a59c0fc342d5552d7dc903d183027e2
+        md5sum: 2be3444c9442d6e947a6ee653ec1aade
       - path: test-output/inter_1.hic
-        md5sum: f099d71090c85e8f2d847863bb702f1b
+        md5sum: f6b6f45408146457874cd58ad351451b
       - path: test-output/inter_30_unnormalized.hic
-        md5sum: 724fef603c5f3d1d683963cd8beaed31
+        md5sum: 30678b7f57491de9b49cbde160ce1068
       - path: test-output/inter_30.hic
-        md5sum: a75d91c949a179ba90e3f2cfbea3a5de
+        md5sum: 2c5d6700a157d8a9254d02394ca45da3
       - path: test-output/merged_nodups_30.txt.gz
-        md5sum: 2425f505269380f5ebfb1bdcf1025303
+        md5sum: ee923f74237094ac00cd701650af906c
       - path: test-output/stats_30.json
-        md5sum: 3547781a62a5f2d008a908382b36f826
+        md5sum: 32642f5a175b0fe904a024fd7a1b1a35
       - path: test-output/eigenvector_5000_30.bw
         md5sum: a566c66fcdfb9fe7ce00c99388cd4ca0
       - path: test-output/eigenvector_5000_30.wig

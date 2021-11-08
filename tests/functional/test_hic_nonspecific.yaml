@@ -8,7 +8,7 @@
       tests/functional/json/test_hic_nonspecific.json
     files:
       - path: test-output/inter_30.hic
-        md5sum: 00df8d2b84300f19babe1d3652aa6fa8
+        md5sum: dfacfc43559c4bc137defc14d5eba3aa
     stdout:
       contains:
         - call-chimeric_sam_nonspecific

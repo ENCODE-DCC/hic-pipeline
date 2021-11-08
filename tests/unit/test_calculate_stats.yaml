@@ -36,4 +36,4 @@
       tests/unit/json/test_calculate_stats_single_ended.json
     stdout:
       contains_regex:
-        - 'duplicate_count=\$\(samtools view -c -f 1024 -F 256 .*dummy.txt\)'
+        - 'samtools view -c -f 1024 -F 256 .*dummy.txt'
