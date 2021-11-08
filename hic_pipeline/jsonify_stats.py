@@ -133,7 +133,6 @@ def clean_key(key):
     key = key.replace("*", "")
     key = key.replace("...", "_")
     key = key.replace(".", "_")
-    key = key.replace("…", "_")
     key = key.replace("'", "_prime_")
     key = key.replace("%", "_percent_")
     key = key.replace(">", "_greater_than_")

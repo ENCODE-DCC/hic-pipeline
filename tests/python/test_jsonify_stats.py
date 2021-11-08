@@ -83,7 +83,7 @@ def test_parse_to_int_or_float(value, condition, expected):
         ("One or both reads unmapped", "one_or_both_reads_unmapped"),
         ("2 alignments", "2_alignments"),
         (" 2 alignments (A...B)", "2_alignments_a_b"),
-        (" 2 alignments (A1….A2B; A1B2...B1A2)", "2_alignments_a1_a2b_a1b2_b1a2"),
+        (" 2 alignments (A1...A2B; A1B2...B1A2)", "2_alignments_a1_a2b_a1b2_b1a2"),
         ("3 or more alignments", "3_or_more_alignments"),
         (
             "Library Complexity Estimate (1 alignment)*",
@@ -102,94 +102,6 @@ def test_update_with_total_and_percentages():
     parent_key = "qux"
     update_with_total_and_percentages(output, parsed, parent_key)
     assert output == {"baz": 3, "qux": 1, "pct_foo_qux": 3.0, "pct_bar_qux": 5.0}
-
-
-def test_jsonify_stats():
-    parsed_data = {
-        "sequenced_read_pairs": "332888",
-        "normal_paired": "321558 (96.60%)",
-        "chimeric_paired": "1 (0.00%)",
-        "chimeric_ambiguous": "26 (0.01%)",
-        "unmapped_reads": "11303 (3.40%)",
-        "single_alignment": "496 (0.15%)",
-        "avg_insert_size": "0.00",
-        "alignable_normal_and_chimeric_paired": "321559 (96.60%)",
-        "unique_reads": "321559 (100.00%, 96.60%)",
-        "duplicates": "0 (0.00%, 0.00%)",
-        "library_complexity_estimate": "N/A",
-        "intra_fragment_reads": "6,969 (2.09% / 2.17%)",
-        "below_mapq_threshold": "309,458 (92.96% / 96.24%)",
-        "hic_contacts": "5,132 (1.54% / 1.60%)",
-        "ligation_motif_present": "6 (0.00% / 0.00%)",
-        "3_prime_bias_long_range": "N/A",
-        "pair_type_percent_lior": "25% - 23% - 27% - 25%",
-        "lior_convergence": "10000000000",
-        "inter_chromosomal": "6 (0.00% / 0.00%)",
-        "intra_chromosomal": "5,126 (1.54% / 1.59%)",
-        "short_range_less_than_500bp": "1,040 (0.31% / 0.32%)",
-        "short_range_500bp_to_5kb": "3,387 (1.02% / 1.05%)",
-        "short_range_5kb_to_20kb": "110 (0.03% / 0.03%)",
-        "long_range_greater_than_20kb": "589 (0.18% / 0.18%)",
-    }
-
-    result = jsonify_stats(parsed_data)
-    assert result == {
-        "pct_sequenced_short_range_500bp_to_5kb": 1.05,
-        "pct_unique_short_range_500bp_to_5kb": 1.02,
-        "short_range_500bp_to_5kb": 3387,
-        "pct_sequenced_short_range_5kb_to_20kb": 0.03,
-        "pct_unique_short_range_5kb_to_20kb": 0.03,
-        "short_range_5kb_to_20kb": 110,
-        "pct_alignable_normal_and_chimeric_paired": 96.6,
-        "alignable_normal_and_chimeric_paired": 321559,
-        "avg_insert_size": 0.0,
-        "pct_sequenced_below_mapq_threshold": 96.24,
-        "pct_unique_below_mapq_threshold": 92.96,
-        "below_mapq_threshold": 309458,
-        "pct_chimeric_ambiguous": 0.01,
-        "chimeric_ambiguous": 26,
-        "pct_chimeric_paired": 0.0,
-        "chimeric_paired": 1,
-        "pct_alignable_duplicates": 0.0,
-        "pct_sequenced_duplicates": 0.0,
-        "duplicates": 0,
-        "pct_sequenced_hic_contacts": 1.6,
-        "pct_unique_hic_contacts": 1.54,
-        "hic_contacts": 5132,
-        "pct_sequenced_inter_chromosomal": 0.0,
-        "pct_unique_inter_chromosomal": 0.0,
-        "inter_chromosomal": 6,
-        "pct_sequenced_intra_chromosomal": 1.59,
-        "pct_unique_intra_chromosomal": 1.54,
-        "intra_chromosomal": 5126,
-        "pct_sequenced_intra_fragment_reads": 2.17,
-        "pct_unique_intra_fragment_reads": 2.09,
-        "intra_fragment_reads": 6969,
-        "pct_sequenced_short_range_less_than_500bp": 0.32,
-        "pct_unique_short_range_less_than_500bp": 0.31,
-        "short_range_less_than_500bp": 1040,
-        "pct_sequenced_ligation_motif_present": 0.0,
-        "pct_unique_ligation_motif_present": 0.0,
-        "ligation_motif_present": 6,
-        "lior_convergence": 10000000000,
-        "pct_sequenced_long_range_greater_than_20kb": 0.18,
-        "pct_unique_long_range_greater_than_20kb": 0.18,
-        "long_range_greater_than_20kb": 589,
-        "pct_normal_paired": 96.6,
-        "normal_paired": 321558,
-        "pct_inner_pair_type": 23.0,
-        "pct_left_pair_type": 25.0,
-        "pct_outer_pair_type": 27.0,
-        "pct_right_pair_type": 25.0,
-        "sequenced_read_pairs": 332888,
-        "pct_single_alignment": 0.15,
-        "single_alignment": 496,
-        "pct_alignable_unique_reads": 100.0,
-        "pct_sequenced_unique_reads": 96.6,
-        "unique_reads": 321559,
-        "pct_unmapped_reads": 3.4,
-        "unmapped_reads": 11303,
-    }
 
 
 def test_jsonify_stats_without_nas():
@@ -217,7 +129,7 @@ def test_process_paired_ended():
          One or both reads unmapped: 8979 (0.22%)
         2 alignments: 2522618 (61.84%)
          2 alignments (A...B): 0 (0.00%)
-         2 alignments (A1….A2B; A1B2...B1A2): 2522618 (61.84%)
+         2 alignments (A1...A2B; A1B2...B1A2): 2522618 (61.84%)
         3 or more alignments: 31489 (0.77%)
         Ligation Motif Present: N/A
         Average insert size: 0.00
