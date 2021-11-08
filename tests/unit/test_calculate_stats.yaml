@@ -14,7 +14,7 @@
       contains_regex:
         - 'gzip -dc .*dummy.txt > \$PRE_FILE'
         - 'gzip -dc .*dummy.txt > \$RESTRICTION_SITES_FILENAME'
-        - 'duplicate_count=\$\(samtools view -c -f 1089 -F 256 .*dummy.txt\)'
+        - 'samtools view -c -f 1089 -F 256 .*dummy.txt'
   - name: test_calculate_stats_no_restriction_sites_unit
     tags:
       - unit
@@ -36,4 +36,4 @@
       tests/unit/json/test_calculate_stats_single_ended.json
     stdout:
       contains_regex:
-        - 'samtools view -c -f 1024 -F 256 .*dummy.txt'
+        - 'samtools view -f 1024 -F 256 .*dummy.txt'
