@@ -101,7 +101,7 @@ RUN curl \
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     cd juicer && \
-    git checkout 3cbd828fff8d2ae9ac675d517fa8139038167123 && \
+    git checkout 7b21fd620ee1f07266206caa2a7992d08d51ba8e && \
     chmod +x CPU/* CPU/common/* misc/* && \
     find -mindepth 1 -maxdepth 1  -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
 
