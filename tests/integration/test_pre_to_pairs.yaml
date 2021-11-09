@@ -8,4 +8,4 @@
       tests/integration/json/test_pre_to_pairs.json
     files:
       - path: test-output/pairix.bsorted.pairs.gz
-        md5sum: 771a978c2737820c9d8dee03e6f89655
+        md5sum: d243d65cfa259a5d3e78d4ee8e1102fc
