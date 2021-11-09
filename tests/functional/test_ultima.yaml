@@ -9,6 +9,7 @@
     files:
       - path: test-output/merged_dedup.bam
       - path: test-output/pairix.bsorted.pairs.gz
+        md5sum: d5e74f908559ccffa977f890565751c8
       - path: test-output/inter_1_unnormalized.hic
         md5sum: e13f2ed7b2746aecf5c569346b4eece9
       - path: test-output/inter_1.hic
