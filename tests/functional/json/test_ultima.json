@@ -1,0 +1,17 @@
+{
+  "hic.assembly_name": "GRCh38",
+  "hic.chrsz": "tests/data/GRCh38_EBV.chrom.sizes.tsv",
+  "hic.fastq": [
+    [
+      {
+        "read_1": "tests/data/se_small.fastq.gz"
+      }
+    ]
+  ],
+  "hic.no_call_loops": true,
+  "hic.no_call_tads": true,
+  "hic.reference_index": "tests/data/hg38_chr19_chrM_GRCh38_no_alt_analysis_set_GCA_000001405.15.chr19_chrM.tar.gz",
+  "hic.restriction_enzymes": [
+    "none"
+  ]
+}
