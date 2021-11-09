@@ -36,6 +36,7 @@ workflow hic {
         Boolean no_pairs = false
         Boolean no_call_loops = false
         Boolean no_call_tads = false
+        Boolean no_eigenvectors = false
         Int align_num_cpus = 32
         Int? create_hic_num_cpus
         Int? add_norm_num_cpus
@@ -229,7 +230,7 @@ workflow hic {
             }
         }
 
-        if (defined(chrsz)) {
+        if (defined(chrsz) && !no_eigenvectors) {
             call create_eigenvector { input:
                 hic_file = add_norm.output_hic,
                 chrom_sizes = select_first([chrsz]),

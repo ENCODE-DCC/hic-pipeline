@@ -21,19 +21,3 @@
         md5sum: ee923f74237094ac00cd701650af906c
       - path: test-output/stats_30.json
         md5sum: 32642f5a175b0fe904a024fd7a1b1a35
-      - path: test-output/eigenvector_5000_30.bw
-        md5sum: a566c66fcdfb9fe7ce00c99388cd4ca0
-      - path: test-output/eigenvector_5000_30.wig
-        md5sum: 2786627cdf2cc8bc0753820e1921186b
-      - path: test-output/eigenvector_10000_30.bw
-        md5sum: 10e2d58824e4ee3a3627a711781c58a8
-      - path: test-output/eigenvector_10000_30.wig
-        md5sum: cfa5ed4d1425511fd1c59519cdc16951
-      - path: test-output/eigenvector_5000_1.bw
-        md5sum: 5c8d4885bbe29129a3c48d0f6200e45b
-      - path: test-output/eigenvector_5000_1.wig
-        md5sum: a747905ec338bc49af8f77c14a3a891a
-      - path: test-output/eigenvector_10000_1.bw
-        md5sum: c93c1e8a2d7217367c43d088805b4723
-      - path: test-output/eigenvector_10000_1.wig
-        md5sum: aa677433cf9c820288b3d6179f9d32d0
