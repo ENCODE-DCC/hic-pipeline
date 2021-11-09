@@ -8,7 +8,7 @@
       tests/functional/json/test_hic.json
     files:
       - path: test-output/merged_dedup.bam
-      - path: test-output/
+      - path: test-output/pairix.bsorted.pairs.gz
         md5sum: 0e82a8e6db855a237506306e299d0d5f
       - path: test-output/inter_1_unnormalized.hic
         md5sum: 2be3444c9442d6e947a6ee653ec1aade
