@@ -62,7 +62,7 @@ RUN curl -OL "https://github.com/4dn-dcic/pairix/archive/${PAIRIX_VERSION}.zip" 
     cd "pairix-${PAIRIX_VERSION}/" && \
     make && \
     cp bin/pairix bin/bgzip /usr/local/bin && \
-    cp util/merged_nodup2pairs.pl /opt && \
+    cp util/juicer_shortform2pairs.pl /opt && \
     cd .. && \
     rm -rf "${PAIRIX_VERSION}.zip" "pairix-${PAIRIX_VERSION}"
 

@@ -513,7 +513,7 @@ task pre_to_pairs {
         set -euo pipefail
         PRE_FILENAME=pre.txt
         gzip -dc ~{pre} > $PRE_FILENAME
-        perl "$(which merged_nodup2pairs.pl)" $PRE_FILENAME ~{chrom_sizes} pairix
+        perl "$(which juicer_shortform2pairs.pl)" $PRE_FILENAME ~{chrom_sizes} pairix
     }
 
     output {
