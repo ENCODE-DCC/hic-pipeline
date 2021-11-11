@@ -1,0 +1,24 @@
+---
+  - name: test_ultima
+    tags:
+      - functional
+    command: >-
+      tests/caper_run.sh
+      hic.wdl
+      tests/functional/json/test_ultima.json
+    files:
+      - path: test-output/merged_dedup.bam
+      - path: test-output/pairix.bsorted.pairs.gz
+        md5sum: 7ae64905517545f6bd3241090e84ff89
+      - path: test-output/inter_1_unnormalized.hic
+        md5sum: e13f2ed7b2746aecf5c569346b4eece9
+      - path: test-output/inter_1.hic
+        md5sum: 8b913039cbf2866e8d338c85c8150f0e
+      - path: test-output/inter_30_unnormalized.hic
+        md5sum: 656deabed56147188a99a4319a5b402d
+      - path: test-output/inter_30.hic
+        md5sum: 3ce5ef2a814cf62310acd46834178ff2
+      - path: test-output/merged_nodups_30.txt.gz
+        md5sum: 4ec5041c853973d63e6d4f6e24d4404c
+      - path: test-output/stats_30.json
+        md5sum: d46db12b6720b70268649638304d2a88

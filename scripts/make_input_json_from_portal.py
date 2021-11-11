@@ -30,6 +30,7 @@ REFERENCE_FILES = {
     }
 }
 ENZYMES = ("HindIII", "DpnII", "MboI", "none")
+_NO_ENZYME_FRAGMENTATION_METHODS = ("chemical (micrococcal nuclease)",)
 ALLOWED_STATUSES = ("released", "in progress")
 
 
@@ -74,6 +75,8 @@ def get_enzymes_from_experiment(experiment, enzymes=ENZYMES):
         raise ValueError(
             "Currently only experiments with one fragmentation method are supported"
         )
+    if fragmentation_methods[0] in _NO_ENZYME_FRAGMENTATION_METHODS:
+        return None
     for enzyme in enzymes:
         if enzyme in fragmentation_methods[0]:
             used_enzymes.append(enzyme)
@@ -91,32 +94,40 @@ def get_fastqs_from_experiment(experiment):
     for file in experiment["files"]:
         if file["file_format"] == "fastq" and file["status"] in ALLOWED_STATUSES:
             biological_replicate = file["biological_replicates"][0]
-            paired_with_id = file["paired_with"]
-            paired_with_file = [
-                f for f in experiment["files"] if f["@id"] == paired_with_id
-            ][0]
-            replicate_fastqs = fastq_pairs_by_replicate.get(biological_replicate)
-            if replicate_fastqs is None:
-                fastq_pairs_by_replicate[biological_replicate] = []
-            if file["paired_end"] == "2":
-                file, paired_with_file = paired_with_file, file
+            paired_with = file.get("paired_with")
             # Same as how juicer.sh does it, assumes "_R1" is used to indicated read 1
             # It is perhaps a bit low level, but it is hard to construct a unique ID
             # per read pair from other pieces of portal metadata. fastq signature is
             # close but not readily useful
+            library_accession = file["replicate"]["library"].split("/")[2]
+            sample_name = experiment["accession"]
             read_group_id = (
                 file["submitted_file_name"]
                 .split("/")[-1]
                 .replace(".fastq.gz", "")
                 .replace("_R1", "")
+                .replace("_R2", "")
             )
-            library_accession = file["replicate"]["library"].split("/")[2]
-            sample_name = experiment["accession"]
-            fastq_pair = {
-                "read_1": urljoin(PORTAL_URL, file["href"]),
-                "read_2": urljoin(PORTAL_URL, paired_with_file["href"]),
-                "read_group": f"@RG\\tID:{read_group_id}\\tSM:{sample_name}\\tPL:ILLUMINA\\tLB:{library_accession}",
-            }
+            read_group = f"@RG\\tID:{read_group_id}\\tSM:{sample_name}\\tPL:ILLUMINA\\tLB:{library_accession}"
+            if paired_with is not None:
+                paired_with_file = [
+                    f for f in experiment["files"] if f["@id"] == paired_with
+                ][0]
+                if file["paired_end"] == "2":
+                    file, paired_with_file = paired_with_file, file
+                fastq_pair = {
+                    "read_1": urljoin(PORTAL_URL, file["href"]),
+                    "read_2": urljoin(PORTAL_URL, paired_with_file["href"]),
+                    "read_group": read_group,
+                }
+            else:
+                fastq_pair = {
+                    "read_1": urljoin(PORTAL_URL, file["href"]),
+                    "read_group": read_group,
+                }
+            replicate_fastqs = fastq_pairs_by_replicate.get(biological_replicate)
+            if replicate_fastqs is None:
+                fastq_pairs_by_replicate[biological_replicate] = []
             if fastq_pair not in fastq_pairs_by_replicate[biological_replicate]:
                 if read_group_id not in read_group_ids:
                     read_group_ids.add(read_group_id)

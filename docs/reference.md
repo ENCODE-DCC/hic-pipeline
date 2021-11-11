@@ -80,12 +80,10 @@ Use the WDL `make_restriction_site_locations.wdl` to generate the restriction si
 * `restriction_sites` is a gzipped text file containing cut sites for the given restriction enzyme. For supported enzymes you can generate this using the [reference building entrypoint](#generating-restriction-site-files). Note that if you need to generate a sites file for a multiple digest or for an unsupported enzyme you will need to edit this script and run it yourself: https://github.com/aidenlab/juicer/blob/encode/misc/generate_site_positions.py
 * `chrsz` is a chromosome sizes file for the desired assembly. It is a gzipped and tab-separated text file whose rows take the form `[chromosome][TAB][size]`. You can find these on the ENCODE portal for some human and mouse assemblies, see [reference files](#reference-files)
 * `reference_index` is a pre-generated BWA index for the desired assembly. Depending on your assembly you may also be able to find these on the ENCODE portal, see [reference files](#reference-files)
-* `input_pairs` is a text file containing the paired fragments to use to generate the .hic contact maps, a detailed format description can be found here: https://github.com/aidenlab/juicer/wiki/Pre#long-format
-* `input_pairs_index` is an index of the `input_pairs` file as generated with `index_by_chr.awk` in task `bam_to_pre`"
 * `input_hic` is an input `.hic` file which will be used to call loops and domains
 * `normalization_methods` is an array of normalization methods to use for `.hic` file generation as per Juicer Tools `pre`. If not specified then will use `pre` defaults of `VC`, `VC_SQRT`, `KR`, and `SCALE`. Valid methods are `VC`, `VC_SQRT`, `KR`, `SCALE`, `GW_KR`, `GW_SCALE`, `GW_VC`, `INTER_KR`, `INTER_SCALE`, and `INTER_VC.
 * `reference_fasta` is FASTA file for the genome of interest to be used for generating restriction site locations. For the output locations file to have a descriptive filename it is also recommended to specify the `assembly_name`
-* `no_bam2pairs` is a boolean which if `true` results in skipping generating `.pairs` files, defaults to `false`
+* `no_pairs` is a boolean which if `true` results in skipping generating `.pairs` files, defaults to `false`
 * `no_call_loops` is a boolean which if `true` results in skipping calling loops, defaults to `false`. Since the loop calling requires GPUs it is recommended to set to `true` if you do not
 * `no_call_tads` is a boolean which if `true` skips calling domains with arrowhead, defaults to `false`
 * `align_num_cpus` is number of threads to use for `bwa` alignment, it is recommended to leave at the default value.

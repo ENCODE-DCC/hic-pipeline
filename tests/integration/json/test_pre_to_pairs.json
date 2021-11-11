@@ -1,0 +1,4 @@
+{
+  "test_pre_to_pairs.chrom_sizes": "tests/data/ce10_selected.chrom.sizes.tsv",
+  "test_pre_to_pairs.pre": "tests/data/merged_nodups.txt.gz"
+}

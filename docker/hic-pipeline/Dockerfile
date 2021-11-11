@@ -57,13 +57,12 @@ RUN curl -OL "https://github.com/samtools/samtools/releases/download/${SAMTOOLS_
     cd .. && \
     rm -rf "samtools-${SAMTOOLS_VERSION}" "samtools-${SAMTOOLS_VERSION}.tar"
 
-# Install pairix, only need bam2pairs + deps
 RUN curl -OL "https://github.com/4dn-dcic/pairix/archive/${PAIRIX_VERSION}.zip" && \
     unzip "${PAIRIX_VERSION}.zip" && \
     cd "pairix-${PAIRIX_VERSION}/" && \
     make && \
     cp bin/pairix bin/bgzip /usr/local/bin && \
-    cp util/bam2pairs/bam2pairs /opt && \
+    cp util/juicer_shortform2pairs.pl /opt && \
     cd .. && \
     rm -rf "${PAIRIX_VERSION}.zip" "pairix-${PAIRIX_VERSION}"
 
@@ -90,7 +89,7 @@ RUN git clone https://github.com/moshe-olshansky/EigenVector.git && \
         -lcurl \
         -lpthread && \
     chmod +x newGW_Intra_Flip  && \
-    mv newGW_Intra_Flip  /usr/local/bin && \
+    mv newGW_Intra_Flip /usr/local/bin && \
     rm -rf newGW_Intra_Flip
 
 RUN curl \
@@ -102,14 +101,14 @@ RUN curl \
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     cd juicer && \
-    git checkout 5aa2363ca4952f3f36b3a4b3be7cf9ff8851bcd8 && \
+    git checkout 7b21fd620ee1f07266206caa2a7992d08d51ba8e && \
     chmod +x CPU/* CPU/common/* misc/* && \
     find -mindepth 1 -maxdepth 1  -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
 
 # Install Juicer tools
 RUN curl \
         -L \
-        https://github.com/aidenlab/Juicebox/releases/download/v2.13.05/juicer_tools.2.13.05.jar \
+        https://github.com/aidenlab/Juicebox/releases/download/v2.13.06/juicer_tools_2.13.06.jar \
         -o /opt/juicer/CPU/common/juicer_tools.jar && \
     chmod 666 /opt/juicer/CPU/common/juicer_tools.jar && \
     ln -s juicer/CPU scripts
