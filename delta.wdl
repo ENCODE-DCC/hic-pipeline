@@ -14,12 +14,10 @@ workflow delta {
         String docker = "encodedcc/hic-pipeline:1.4.0_delta"
     }
 
-    scatter(resolution in resolutions) {
-        call deploy_delta { input:
-            hic = hic,
-            resolution = resolution,
-            docker = docker,
-        }
+    call deploy_delta { input:
+        hic = hic,
+        resolutions = resolutions,
+        docker = docker,
     }
 }
 
@@ -27,7 +25,7 @@ workflow delta {
 task deploy_delta {
     input {
         File hic
-        Int resolution
+        Array[Int] resolutions
         Float threshold = 0.85
         String normalization = "SCALE"
         String docker
@@ -41,17 +39,17 @@ task deploy_delta {
             /opt/deploy-delta/beta-models \
             . \
             predicted \
-            ~{resolution} \
+            ~{sep="," resolutions} \
             ~{normalization} \
             ~{threshold}
         gzip -n ./*.bedpe
     }
 
     output {
-        File loops = "predicted_loops_~{resolution}.bedpe.gz"
-        File domains = "predicted_domains_~{resolution}.bedpe.gz"
-        File stripes = "predicted_stripes_~{resolution}.bedpe.gz"
-        File loop_domains = "predicted_loop_domains_~{resolution}.bedpe.gz"
+        Array[File] loops = glob("predicted_loops_*")
+        Array[File] domains = glob("predicted_domains_*")
+        Array[File] stripes = glob("predicted_stripes_*")
+        Array[File] loop_domains = glob("predicted_loop_domains_*")
     }
 
     runtime {
