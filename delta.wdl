@@ -2,20 +2,22 @@ version 1.0
 
 workflow delta {
     meta {
-        version: "1.3.0"
-        caper_docker: "encodedcc/hic-pipeline:1.3.0_delta"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.3.0_delta"
+        version: "1.4.0"
+        caper_docker: "encodedcc/hic-pipeline:1.4.0_delta"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.4.0_delta"
     }
 
     input {
         File hic
         # Should be [5000, 10000] for in-situ, [1000, 5000] otherwise
         Array[Int] resolutions = [1000, 5000, 10000]
+        String docker = "encodedcc/hic-pipeline:1.4.0_delta"
     }
 
     call deploy_delta { input:
         hic = hic,
         resolutions = resolutions,
+        docker = docker,
     }
 }
 
@@ -26,6 +28,7 @@ task deploy_delta {
         Array[Int] resolutions
         Float threshold = 0.85
         String normalization = "SCALE"
+        String docker
     }
 
     command {
@@ -53,7 +56,7 @@ task deploy_delta {
         cpu : "2"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 SSD"
-        docker: "encodedcc/hic-pipeline:1.3.0_delta"
+        docker: "~{docker}"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "32 GB"
