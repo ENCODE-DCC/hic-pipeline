@@ -46,10 +46,10 @@ task deploy_delta {
     }
 
     output {
-        Array[File] loops = glob("predicted_loops_*")
-        Array[File] domains = glob("predicted_domains_*")
-        Array[File] stripes = glob("predicted_stripes_*")
-        Array[File] loop_domains = glob("predicted_loop_domains_*")
+        File loops = "predicted_loops_merged.bedpe.gz"
+        File domains = "predicted_domains_merged.bedpe.gz"
+        File stripes = "predicted_stripes_merged.bedpe.gz"
+        File loop_domains = "predicted_loop_domains_merged.bedpe.gz"
     }
 
     runtime {
