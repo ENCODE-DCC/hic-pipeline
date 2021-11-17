@@ -1,5 +1,7 @@
 version 1.0
 
+import "./delta.wdl"
+
 struct FastqPair {
     File read_1
     File? read_2
@@ -31,6 +33,11 @@ workflow hic {
 
         # Entrypoint for loop and TAD calls
         File? input_hic
+
+        # Parameters controlling delta calls
+        Boolean no_delta = false
+        # Should be [5000, 10000] for in-situ, [1000, 5000] for intact?
+        Array[Int] delta_resolutions = [5000, 10000]
 
         Array[String] normalization_methods = []
         Boolean no_pairs = false
@@ -227,7 +234,14 @@ workflow hic {
         if (!no_call_loops) {
             call hiccups { input:
                 hic_file = add_norm.output_hic,
-                 quality = qualities[i],
+                quality = qualities[i],
+            }
+        }
+
+        if (!no_delta) {
+            call delta.delta { input:
+                hic = add_norm.output_hic,
+                stem = "delta_" + qualities[i],
             }
         }
 

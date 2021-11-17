@@ -9,15 +9,24 @@ workflow delta {
 
     input {
         File hic
-        # Should be [5000, 10000] for in-situ, [1000, 5000] otherwise
-        Array[Int] resolutions = [1000, 5000, 10000]
+        String? stem
+        # Should be [5000, 10000] for in-situ, [1000, 5000] for intact?
+        Array[Int] resolutions = [5000, 10000]
         String docker = "encodedcc/hic-pipeline:1.4.0_delta"
     }
 
     call deploy_delta { input:
         hic = hic,
+        stem = stem,
         resolutions = resolutions,
         docker = docker,
+    }
+
+    output {
+        File loops = deploy_delta.loops
+        File domains = deploy_delta.domains
+        File stripes = deploy_delta.stripes
+        File loop_domains = deploy_delta.loop_domains
     }
 }
 
@@ -28,6 +37,7 @@ task deploy_delta {
         Array[Int] resolutions
         Float threshold = 0.85
         String normalization = "SCALE"
+        String stem = "predicted"
         String docker
     }
 
@@ -38,7 +48,7 @@ task deploy_delta {
             ~{hic} \
             /opt/deploy-delta/beta-models \
             . \
-            predicted \
+            ~{stem} \
             ~{sep="," resolutions} \
             ~{normalization} \
             ~{threshold}
@@ -46,10 +56,10 @@ task deploy_delta {
     }
 
     output {
-        File loops = "predicted_loops_merged.bedpe.gz"
-        File domains = "predicted_domains_merged.bedpe.gz"
-        File stripes = "predicted_stripes_merged.bedpe.gz"
-        File loop_domains = "predicted_loop_domains_merged.bedpe.gz"
+        File loops = "~{stem}_loops_merged.bedpe.gz"
+        File domains = "~{stem}_domains_merged.bedpe.gz"
+        File stripes = "~{stem}_stripes_merged.bedpe.gz"
+        File loop_domains = "~{stem}_loop_domains_merged.bedpe.gz"
     }
 
     runtime {
