@@ -36,7 +36,7 @@ workflow hic {
 
         # Parameters controlling delta calls
         Boolean no_delta = false
-        # Should be [5000, 10000] for in-situ, [1000, 5000] for intact?
+        # Should be [5000, 10000] for in-situ, [1000, 5000, 10000] for intact
         Array[Int] delta_resolutions = [5000, 10000]
 
         Array[String] normalization_methods = []
