@@ -9,7 +9,6 @@ workflow delta {
 
     input {
         File hic
-        String? stem
         # Should be [5000, 10000] for in-situ, [1000, 5000] for intact?
         Array[Int] resolutions = [5000, 10000]
         String docker = "encodedcc/hic-pipeline:1.4.0_delta"
@@ -17,7 +16,6 @@ workflow delta {
 
     call deploy_delta { input:
         hic = hic,
-        stem = stem,
         resolutions = resolutions,
         docker = docker,
     }

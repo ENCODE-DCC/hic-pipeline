@@ -238,13 +238,6 @@ workflow hic {
             }
         }
 
-        if (!no_delta) {
-            call delta.delta { input:
-                hic = add_norm.output_hic,
-                stem = "delta_" + qualities[i],
-            }
-        }
-
         if (defined(chrsz) && !no_eigenvectors) {
             call create_eigenvector { input:
                 hic_file = add_norm.output_hic,
@@ -258,6 +251,14 @@ workflow hic {
                 resolution = 10000,
                 output_filename_suffix = "_" + qualities[i],
             }
+        }
+    }
+
+
+    if (!no_delta) {
+        call delta.delta { input:
+            # Only run delta on MAPQ >= 30
+            hic = add_norm.output_hic[1]
         }
     }
 
