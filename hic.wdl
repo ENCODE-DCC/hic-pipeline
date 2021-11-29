@@ -14,9 +14,9 @@ struct BamAndLigationCount {
 
 workflow hic {
     meta {
-        version: "1.3.0"
-        caper_docker: "encodedcc/hic-pipeline:1.3.0"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.3.0"
+        version: "1.3.1"
+        caper_docker: "encodedcc/hic-pipeline:1.3.1"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.3.1"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -778,7 +778,7 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 HDD"
-        docker: "encodedcc/hic-pipeline:1.3.0_hiccups"
+        docker: "encodedcc/hic-pipeline:1.3.1_hiccups"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
