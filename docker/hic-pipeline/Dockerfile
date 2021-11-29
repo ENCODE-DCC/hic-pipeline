@@ -67,7 +67,7 @@ RUN curl -OL "https://github.com/4dn-dcic/pairix/archive/${PAIRIX_VERSION}.zip" 
     rm -rf "${PAIRIX_VERSION}.zip" "pairix-${PAIRIX_VERSION}"
 
 # Eigenvector
-RUN git clone https://github.com/moshe-olshansky/EigenVector.git && \
+RUN git clone https://github.com/aidenlab/EigenVector.git && \
     cd EigenVector && \
     git checkout 68c399f4ac7d1b953724ab41ae0c4b32368392b1 && \
     git clone https://github.com/aidenlab/straw.git && \
