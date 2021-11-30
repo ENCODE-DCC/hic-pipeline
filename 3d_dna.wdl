@@ -1,7 +1,6 @@
 version 1.0
 
-
-workflow 3d_dna {
+workflow phasing {
     meta {
         version: "1.4.0"
         caper_docker: "encodedcc/hic-pipeline:1.4.0"
@@ -22,11 +21,7 @@ workflow 3d_dna {
     }
 
     output {
-        File fasta_index = create_reference_fasta_index.fasta_index
-        File sequence_dictionary = create_gatk_references.sequence_dictionary
-        File interval_list = create_gatk_references.interval_list
-        File snp_vcf = gatk.snp_vcf
-        File indel_vcf = gatk.indel_vcf
+        File hic = run_3d_dna.hic
     }
 }
 
@@ -47,18 +42,18 @@ task run_3d_dna {
     output {
         # fasta files
         # chromosome-length scaffolds, small and tiny scaffolds
-        File fasta = "HiC.fasta"
+        File scaffolds_fasta = "HiC.fasta"
 
         # .hic files
         # sandboxed contact map corresponding to the HiC.fasta reference
-        File hic - "HiC.hic"
+        File hic = "HiC.hic"
         # after sealing stage
         File after_sealing_rawchrom_hic = "rawchrom.hic"
-        File after_sealing__final_hic = "final.hic"
+        File after_sealing_final_hic = "final.hic"
         # after polishing stage
-        File polished_hic = "polished"
+        File polished_hic = "polished.hic"
         # after editing and scaffolding
-        File resolved_hic = "resolved"
+        File resolved_hic = "resolved.hic"
 
         # Scaffold boundary files (Juicebox 2D annotation format)
         File scaffold_track = "scaffold_track.txt"
@@ -71,13 +66,13 @@ task run_3d_dna {
         # .assembly (supersedes .cprops and .asm files)
         # Custom file format that tracks modifications to the input contigs at various stages in the assembly
         # after the addition of gaps to the chromosome-length assembly;
-        File assembly - "HiC.assembly"
+        File assembly = "HiC.assembly"
         # after sealing stage
-        File after_sealing__final_hic = "final.assembly"
+        File after_sealing_final_assembly = "final.assembly"
         # after polishing stage
-        File polished_hic = "polished.assembly"
+        File polished_assembly = "polished.assembly"
         # after editing and scaffolding
-        File resolved_hic = "resolved.assembly"
+        File resolved_assembly = "resolved.assembly"
 
         # supplementary files
         # list of problematic regions (Juicebox 2D annotation format)
@@ -89,7 +84,7 @@ task run_3d_dna {
     }
 
     runtime {
-        cpu : "4"
+        cpu : "16"
         disks: "local-disk 200 HDD"
         docker: "~{docker}"
         memory: "32 GB"
