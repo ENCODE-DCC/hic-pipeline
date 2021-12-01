@@ -869,12 +869,11 @@ task slice {
             slice_results \
             cell_type
         gzip -n slice_results/*.bed
+        mv slice_results/slice_subcompartment_clusters.bed.gz slice_subcompartment_clusters_~{resolution}.bed.gz
     }
 
     output {
-        Array[File] clusters = glob("slice_results/*.bed.gz")
-        File subcompartments = "slice_results/slice_subcompartment_clusters.bed.gz"
-        File numpy = "slice_results/clusterSize_WCSS_AIC_BIC.npy"
+        File subcompartments = "slice_subcompartment_clusters_~{resolution}.bed.gz"
     }
 
     runtime {
