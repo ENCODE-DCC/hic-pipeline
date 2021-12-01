@@ -261,8 +261,21 @@ workflow hic {
     }
 
     if (!no_call_subcompartments) {
-        call slice { input:
-            hic_file = hic_file
+        File hic_file = select_first([add_norm.output_hic[1], input_hic])
+
+        call slice as slice_25kb { input:
+            hic_file = hic_file,
+            resolution = 25000,
+        }
+
+        call slice as slice_50kb { input:
+            hic_file = hic_file,
+            resolution = 50000,
+        }
+
+        call slice as slice_100kb { input:
+            hic_file = hic_file,
+            resolution = 100000,
         }
     }
 }
