@@ -116,8 +116,8 @@ RUN curl \
 RUN curl \
         -LO \
         https://github.com/sa501428/mixer-tools/releases/download/v4.07.08/MixerTools.4.7.8.jar && \
-    chmod 666 /opt/MixerTools.4.7.5.jar && \
-    ln -s /opt/MixerTools.4.7.5.jar /opt/MixerTools.jar
+    chmod 666 /opt/MixerTools.4.7.8.jar && \
+    ln -s /opt/MixerTools.4.7.8.jar /opt/MixerTools.jar
 
 # For sorting, LC_ALL is C
 ENV LC_ALL C
