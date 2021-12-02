@@ -863,6 +863,7 @@ task slice {
             -Xmx20G \
             -jar /opt/MixerTools.jar \
             slice \
+            --encode-mode \
             -r ~{resolution} \
             ~{hic_file} \
             ~{minimum_num_clusters},~{maximum_num_clusters},~{num_kmeans_runs} \
