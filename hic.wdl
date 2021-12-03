@@ -253,7 +253,6 @@ workflow hic {
         }
     }
 
-
     if (!no_delta) {
         call delta { input:
             # Only run delta on MAPQ >= 30
