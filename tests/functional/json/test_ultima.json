@@ -10,6 +10,7 @@
   ],
   "hic.no_call_loops": true,
   "hic.no_call_tads": true,
+  "hic.no_delta": true,
   "hic.no_eigenvectors": true,
   "hic.no_slice": true,
   "hic.reference_index": "tests/data/hg38_chr19_chrM_GRCh38_no_alt_analysis_set_GCA_000001405.15.chr19_chrM.tar.gz",

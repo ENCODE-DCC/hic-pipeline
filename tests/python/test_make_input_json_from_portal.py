@@ -9,12 +9,14 @@ from scripts.make_input_json_from_portal import (
 
 def test_get_input_json():
     result = get_input_json(
-        fastqs=["foo", "bar"], assembly_name="GRCh38", enzymes=["MboI"]
+        fastqs=[[{"read_1": "foo", "read_2": "bar"}]],
+        assembly_name="GRCh38",
+        enzymes=["MboI"],
     )
     assert result == {
         "hic.assembly_name": "GRCh38",
         "hic.chrsz": "https://www.encodeproject.org/files/GRCh38_EBV.chrom.sizes/@@download/GRCh38_EBV.chrom.sizes.tsv",
-        "hic.fastq": ["foo", "bar"],
+        "hic.fastq": [[{"read_1": "foo", "read_2": "bar"}]],
         "hic.reference_index": "https://www.encodeproject.org/files/ENCFF643CGH/@@download/ENCFF643CGH.tar.gz",
         "hic.restriction_enzymes": ["MboI"],
         "hic.restriction_sites": "https://www.encodeproject.org/files/ENCFF132WAM/@@download/ENCFF132WAM.txt.gz",
@@ -23,12 +25,13 @@ def test_get_input_json():
 
 def test_get_input_json_none_enzyme_has_no_restriction_sites():
     result = get_input_json(
-        fastqs=["foo", "bar"], assembly_name="GRCh38", enzymes=["none"]
+        fastqs=[[{"read_1": "foo"}]], assembly_name="GRCh38", enzymes=["none"]
     )
     assert result == {
         "hic.assembly_name": "GRCh38",
         "hic.chrsz": "https://www.encodeproject.org/files/GRCh38_EBV.chrom.sizes/@@download/GRCh38_EBV.chrom.sizes.tsv",
-        "hic.fastq": ["foo", "bar"],
+        "hic.delta_resolutions": [1000, 5000, 10000],
+        "hic.fastq": [[{"read_1": "foo"}]],
         "hic.reference_index": "https://www.encodeproject.org/files/ENCFF643CGH/@@download/ENCFF643CGH.tar.gz",
         "hic.restriction_enzymes": ["none"],
     }
@@ -48,6 +51,21 @@ def test_get_enzymes_from_experiment():
         enzymes=["myenzyme"],
     )
     assert result == ["myenzyme"]
+
+
+def test_get_enzymes_from_experiment_mnase_returns_none_enzyme():
+    result = get_enzymes_from_experiment(
+        {
+            "replicates": [
+                {
+                    "library": {
+                        "fragmentation_methods": ["chemical (micrococcal nuclease)"]
+                    }
+                }
+            ]
+        }
+    )
+    assert result == ["none"]
 
 
 def test_get_enzymes_from_experiment_multiple_fragmentation_methods_raises():

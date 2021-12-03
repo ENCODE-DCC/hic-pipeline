@@ -1,4 +1,27 @@
 ---
+version: 2.1
+
+parameters:
+  main_tag:
+    type: string
+    default: encodedcc/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}
+  hiccups_tag:
+    type: string
+    default: encodedcc/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}_hiccups
+  delta_tag:
+    type: string
+    default: encodedcc/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}_delta
+  main_cache_tag:
+    type: string
+    default: encodedcc/${CIRCLE_PROJECT_REPONAME}:template
+  hiccups_cache_tag:
+    type: string
+    default: encodedcc/${CIRCLE_PROJECT_REPONAME}:template_hiccups
+  delta_cache_tag:
+    type: string
+    default: encodedcc/${CIRCLE_PROJECT_REPONAME}:template_delta
+
+
 defaults: &defaults
   docker:
     - image: cimg/base:2020.01
@@ -29,16 +52,6 @@ commands:
       - run: sudo pip install tox
       - run: tox -e << parameters.toxenv >> -- << parameters.extra_args >>
 
-  set_environment_variables:
-    description: Set docker image env vars for builds and WDL test runs
-    steps:
-      - run:
-          command: |
-            echo "export HIC_DOCKER_IMAGE_TAG=encodedcc/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}" >> ${BASH_ENV}
-            echo "export DOCKERFILE_DIR=docker/hic-pipeline" >> ${BASH_ENV}
-            echo "export HICCUPS_DOCKER_IMAGE_TAG=encodedcc/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}_${CIRCLE_WORKFLOW_ID}_hiccups" >> ${BASH_ENV}
-            echo "export HICCUPS_DOCKERFILE_DIR=docker/hiccups" >> ${BASH_ENV}
-
   get_pipeline_version:
     description: get pipeline version from __init__.py
     steps:
@@ -58,7 +71,6 @@ commands:
               | tar xJ
             sudo mv shellcheck-stable/shellcheck /usr/local/bin
 
-version: 2.1
 jobs:
   lint:
     <<: *py37
@@ -92,10 +104,10 @@ jobs:
     resource_class: << parameters.resource_class >>
     steps:
       - checkout
-      - set_environment_variables
       - run:
           name: Run pytest-workflow WDL tests using tox
           command: |
+            export HIC_DOCKER_IMAGE_TAG=<< pipeline.parameters.main_tag >>
             pyenv global 3.7.0
             pip install --upgrade pip
             pip install tox
@@ -104,62 +116,55 @@ jobs:
 
   build:
     <<: *defaults
+    description: Build a given docker image and push to Docker Hub
+    parameters:
+      tag:
+        description: The image (name and tag) to push
+        type: string
+      dockerfile_directory:
+        description: The name of the environment variable pointing to folder containing the Dockerfile to build
+        type: string
+      cache_tag:
+        description: The tagged image to be used as a cache source
+        type: string
     steps:
       - checkout
       - setup_remote_docker
-      - set_environment_variables
       - run:
-          name: build main docker image
+          name: build
           command: |
             docker login -u=${DOCKERHUB_USER} -p=${DOCKERHUB_PASS}
-            docker pull encodedcc/${CIRCLE_PROJECT_REPONAME}:template
-            docker build . \
-              --cache-from encodedcc/${CIRCLE_PROJECT_REPONAME}:template \
-              -t ${HIC_DOCKER_IMAGE_TAG} \
-              -t encodedcc/${CIRCLE_PROJECT_REPONAME}:template \
-              -f ${DOCKERFILE_DIR}/Dockerfile
-            docker push ${HIC_DOCKER_IMAGE_TAG}
+            docker pull << parameters.cache_tag >>
+            docker \
+              build \
+              . \
+              --cache-from << parameters.cache_tag >> \
+              -t << parameters.tag >> \
+              -f << parameters.dockerfile_directory >>/Dockerfile
+            docker push << parameters.tag >>
             docker logout
 
-  build_hiccups:
+  push:
     <<: *defaults
+    description: Pull an existing tag, give it a new tag, and push the new tag.
+    parameters:
+      source_tag:
+        description: The tag of the image to be pulled
+        type: string
+      destination_tag:
+        description: The tag to push
+        type: string
     steps:
       - checkout
       - setup_remote_docker
-      - set_environment_variables
-      - run:
-          name: build hiccups docker image
-          command: |
-            docker login -u=${DOCKERHUB_USER} -p=${DOCKERHUB_PASS}
-            docker pull encodedcc/${CIRCLE_PROJECT_REPONAME}:template_hiccups
-            docker build . \
-              --cache-from encodedcc/${CIRCLE_PROJECT_REPONAME}:template_hiccups \
-              -t ${HICCUPS_DOCKER_IMAGE_TAG} \
-              -t encodedcc/${CIRCLE_PROJECT_REPONAME}:template_hiccups \
-              -f ${HICCUPS_DOCKERFILE_DIR}/Dockerfile
-            docker push ${HICCUPS_DOCKER_IMAGE_TAG}
-            docker logout
-
-  push_template:
-    <<: *defaults
-    steps:
-      - checkout
-      - setup_remote_docker
-      - set_environment_variables
       - get_pipeline_version
       - run:
+          name: push
           command: |
             docker login -u=${DOCKERHUB_USER} -p=${DOCKERHUB_PASS}
-            docker pull ${HIC_DOCKER_IMAGE_TAG}
-            docker pull ${HICCUPS_DOCKER_IMAGE_TAG}
-            docker tag ${HIC_DOCKER_IMAGE_TAG} encodedcc/hic-pipeline:${PIPELINE_VERSION}
-            docker tag ${HIC_DOCKER_IMAGE_TAG} encodedcc/hic-pipeline:template
-            docker tag ${HICCUPS_DOCKER_IMAGE_TAG} encodedcc/hic-pipeline:${PIPELINE_VERSION}_hiccups
-            docker tag ${HICCUPS_DOCKER_IMAGE_TAG} encodedcc/hic-pipeline:template_hiccups
-            docker push encodedcc/hic-pipeline:${PIPELINE_VERSION}
-            docker push encodedcc/hic-pipeline:template
-            docker push encodedcc/hic-pipeline:${PIPELINE_VERSION}_hiccups
-            docker push encodedcc/hic-pipeline:template_hiccups
+            docker pull << parameters.source_tag >>
+            docker tag  << parameters.source_tag >> << parameters.destination_tag >>
+            docker push << parameters.destination_tag >>
             docker logout
           no_output_timeout: 30m
 
@@ -167,12 +172,24 @@ workflows:
   version: 2
   build_workflow:
     jobs:
-      - build
-      - build_hiccups
+      - build:
+          name: build_main
+          tag: << pipeline.parameters.main_tag  >>
+          dockerfile_directory: docker/hic-pipeline
+          cache_tag: << pipeline.parameters.main_cache_tag >>
+      - build:
+          name: build_hiccups
+          tag: << pipeline.parameters.hiccups_tag >>
+          dockerfile_directory: docker/hiccups
+          cache_tag: << pipeline.parameters.hiccups_cache_tag >>
+      - build:
+          name: build_delta
+          tag: << pipeline.parameters.delta_tag >>
+          dockerfile_directory: docker/delta
+          cache_tag: << pipeline.parameters.delta_cache_tag >>
       - lint
       - test_py37:
           requires:
-            - build
             - lint
       - test_wdl:
           name: test_wdl_unit
@@ -180,7 +197,7 @@ workflows:
           tag: unit
           num_parallel_workflows: 16
           requires:
-            - build
+            - build_main
             - lint
       - test_wdl:
           name: test_wdl_integration
@@ -188,7 +205,7 @@ workflows:
           tag: integration
           num_parallel_workflows: 16
           requires:
-            - build
+            - build_main
             - lint
       - test_wdl:
           name: test_wdl_functional
@@ -196,16 +213,54 @@ workflows:
           tag: functional
           num_parallel_workflows: 16
           requires:
-            - build
+            - build_main
             - lint
-      - push_template:
+      - push:
+          name: push_main_template
+          source_tag: << pipeline.parameters.main_tag >>
+          destination_tag: << pipeline.parameters.main_cache_tag >>
+          requires:
+            - build_main
+            - lint
+      - push:
+          name: push_hiccups_template
+          source_tag: << pipeline.parameters.hiccups_tag >>
+          destination_tag: << pipeline.parameters.hiccups_cache_tag >>
+          requires:
+            - build_hiccups
+      - push:
+          name: push_delta_template
+          source_tag: << pipeline.parameters.delta_tag >>
+          destination_tag: << pipeline.parameters.delta_cache_tag >>
+          requires:
+            - build_delta
+      - push:
+          name: push_main
+          source_tag: << pipeline.parameters.main_tag >>
+          destination_tag: encodedcc/${CIRCLE_PROJECT_REPONAME}:${PIPELINE_VERSION}
+          requires:
+            - build_main
           filters:
             branches:
               only:
                 - dev
+      - push:
+          name: push_hiccups
+          source_tag: << pipeline.parameters.hiccups_tag >>
+          destination_tag: encodedcc/${CIRCLE_PROJECT_REPONAME}:${PIPELINE_VERSION}_hiccups
           requires:
             - build_hiccups
-            - test_wdl_unit
-            - test_wdl_integration
-            - test_wdl_functional
-            - test_py37
+          filters:
+            branches:
+              only:
+                - dev
+      - push:
+          name: push_delta
+          source_tag: << pipeline.parameters.delta_tag >>
+          destination_tag: encodedcc/${CIRCLE_PROJECT_REPONAME}:${PIPELINE_VERSION}_delta
+          requires:
+            - build_delta
+          filters:
+            branches:
+              only:
+                - dev

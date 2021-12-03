@@ -14,9 +14,9 @@ struct BamAndLigationCount {
 
 workflow hic {
     meta {
-        version: "1.4.0"
-        caper_docker: "encodedcc/hic-pipeline:1.4.0"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.4.0"
+        version: "1.5.0"
+        caper_docker: "encodedcc/hic-pipeline:1.5.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.5.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -31,6 +31,12 @@ workflow hic {
 
         # Entrypoint for loop and TAD calls
         File? input_hic
+
+        # Parameters controlling delta calls
+        Boolean no_delta = false
+        # Should be [5000, 10000] for in-situ, [1000, 5000, 10000] for intact
+        Array[Int] delta_resolutions = [5000, 10000]
+        String delta_docker = "encodedcc/hic-pipeline:1.5.0_delta"
 
         Array[String] normalization_methods = []
         Boolean no_pairs = false
@@ -227,7 +233,7 @@ workflow hic {
         if (!no_call_loops) {
             call hiccups { input:
                 hic_file = add_norm.output_hic,
-                 quality = qualities[i],
+                quality = qualities[i],
             }
         }
 
@@ -247,6 +253,16 @@ workflow hic {
         }
     }
 
+    if (!no_delta) {
+        call delta { input:
+            # Only run delta on MAPQ >= 30
+            # hic = select_first([input_hic, add_norm.output_hic[1]]),
+            hic = if length(add_norm.output_hic) > 1 then add_norm.output_hic[1] else select_first([input_hic]),
+            docker = delta_docker,
+            resolutions = delta_resolutions,
+        }
+    }
+
     if (defined(input_hic)) {
         if (!no_call_tads) {
             call arrowhead as arrowhead_input_hic { input:
@@ -261,7 +277,7 @@ workflow hic {
     }
 
     if (!no_slice) {
-        File hic_file = select_first([add_norm.output_hic[1], input_hic])
+        File hic_file = if length(add_norm.output_hic) > 1 then add_norm.output_hic[1] else select_first([input_hic])
 
         call slice as slice_25kb { input:
             hic_file = hic_file,
@@ -798,10 +814,60 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 HDD"
-        docker: "encodedcc/hic-pipeline:1.4.0_hiccups"
+        docker: "encodedcc/hic-pipeline:1.5.0_hiccups"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
+        zones: [
+            "us-central1-c",
+            "us-central1-f",
+            "us-east1-b",
+            "us-east1-c",
+            "us-west1-a",
+            "us-west1-b",
+        ]
+    }
+}
+
+task delta {
+    input {
+        File hic
+        Array[Int] resolutions
+        Float threshold = 0.85
+        String normalization = "SCALE"
+        String stem = "predicted"
+        String docker
+    }
+
+    command {
+        set -euo pipefail
+        python \
+            "$(which Deploy.py)" \
+            ~{hic} \
+            /opt/deploy-delta/beta-models \
+            . \
+            ~{stem} \
+            ~{sep="," resolutions} \
+            ~{normalization} \
+            ~{threshold}
+        gzip -n ./*.bedpe
+    }
+
+    output {
+        File loops = "~{stem}_loops_merged.bedpe.gz"
+        File domains = "~{stem}_domains_merged.bedpe.gz"
+        File stripes = "~{stem}_stripes_merged.bedpe.gz"
+        File loop_domains = "~{stem}_loop_domains_merged.bedpe.gz"
+    }
+
+    runtime {
+        cpu : "2"
+        bootDiskSizeGb: "20"
+        disks: "local-disk 100 SSD"
+        docker: "~{docker}"
+        gpuType: "nvidia-tesla-p100"
+        gpuCount: 1
+        memory: "32 GB"
         zones: [
             "us-central1-c",
             "us-central1-f",
