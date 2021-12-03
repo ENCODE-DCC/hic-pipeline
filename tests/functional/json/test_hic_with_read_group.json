@@ -12,8 +12,8 @@
   ],
   "hic.no_call_loops": true,
   "hic.no_call_tads": true,
-  "hic.no_slice": true,
   "hic.no_delta": true,
+  "hic.no_slice": true,
   "hic.reference_index": "tests/data/ce10_selected.tar.gz",
   "hic.restriction_enzymes": [
     "MboI"
