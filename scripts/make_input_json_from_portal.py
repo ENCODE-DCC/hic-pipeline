@@ -76,7 +76,7 @@ def get_enzymes_from_experiment(experiment, enzymes=ENZYMES):
             "Currently only experiments with one fragmentation method are supported"
         )
     if fragmentation_methods[0] in _NO_ENZYME_FRAGMENTATION_METHODS:
-        return None
+        return ["none"]
     for enzyme in enzymes:
         if enzyme in fragmentation_methods[0]:
             used_enzymes.append(enzyme)
@@ -154,6 +154,9 @@ def get_input_json(fastqs, assembly_name, enzymes=None, ligation_site_regex=None
 
     if ligation_site_regex is not None:
         input_json["hic.ligation_site_regex"] = ligation_site_regex
+
+    if "read_2" not in fastqs[0][0]:
+        input_json["hic.delta_resolutions"] = [1000, 5000, 10000]
     return input_json
 
 
