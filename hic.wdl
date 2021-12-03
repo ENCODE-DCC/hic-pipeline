@@ -1,7 +1,5 @@
 version 1.0
 
-import "./delta.wdl"
-
 struct FastqPair {
     File read_1
     File? read_2
@@ -38,6 +36,7 @@ workflow hic {
         Boolean no_delta = false
         # Should be [5000, 10000] for in-situ, [1000, 5000, 10000] for intact
         Array[Int] delta_resolutions = [5000, 10000]
+        String delta_docker = "encodedcc/hic-pipeline:1.4.0_delta"
 
         Array[String] normalization_methods = []
         Boolean no_pairs = false
@@ -256,9 +255,11 @@ workflow hic {
 
 
     if (!no_delta) {
-        call delta.delta { input:
+        call delta { input:
             # Only run delta on MAPQ >= 30
-            hic = add_norm.output_hic[1]
+            hic = select_first([add_norm.output_hic[1], input_hic]),
+            docker = delta_docker,
+            resolutions = delta_resolutions,
         }
     }
 
@@ -817,6 +818,56 @@ task hiccups {
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
+        zones: [
+            "us-central1-c",
+            "us-central1-f",
+            "us-east1-b",
+            "us-east1-c",
+            "us-west1-a",
+            "us-west1-b",
+        ]
+    }
+}
+
+task delta {
+    input {
+        File hic
+        Array[Int] resolutions
+        Float threshold = 0.85
+        String normalization = "SCALE"
+        String stem = "predicted"
+        String docker
+    }
+
+    command {
+        set -euo pipefail
+        python \
+            "$(which Deploy.py)" \
+            ~{hic} \
+            /opt/deploy-delta/beta-models \
+            . \
+            ~{stem} \
+            ~{sep="," resolutions} \
+            ~{normalization} \
+            ~{threshold}
+        gzip -n ./*.bedpe
+    }
+
+    output {
+        File loops = "~{stem}_loops_merged.bedpe.gz"
+        File domains = "~{stem}_domains_merged.bedpe.gz"
+        File stripes = "~{stem}_stripes_merged.bedpe.gz"
+        File loop_domains = "~{stem}_loop_domains_merged.bedpe.gz"
+    }
+
+    runtime {
+        cpu : "2"
+        bootDiskSizeGb: "20"
+        disks: "local-disk 100 SSD"
+        docker: "~{docker}"
+        gpuType: "nvidia-tesla-p100"
+        gpuCount: 1
+        memory: "32 GB"
         zones: [
             "us-central1-c",
             "us-central1-f",
