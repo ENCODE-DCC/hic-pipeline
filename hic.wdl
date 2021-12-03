@@ -14,9 +14,9 @@ struct BamAndLigationCount {
 
 workflow hic {
     meta {
-        version: "1.3.1"
-        caper_docker: "encodedcc/hic-pipeline:1.3.1"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.3.1"
+        version: "1.4.0"
+        caper_docker: "encodedcc/hic-pipeline:1.4.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.4.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -37,6 +37,7 @@ workflow hic {
         Boolean no_call_loops = false
         Boolean no_call_tads = false
         Boolean no_eigenvectors = false
+        Boolean no_slice = false
         Int align_num_cpus = 32
         Int? create_hic_num_cpus
         Int? add_norm_num_cpus
@@ -256,6 +257,25 @@ workflow hic {
             call hiccups as hiccups_input_hic { input:
                 hic_file = select_first([input_hic])
             }
+        }
+    }
+
+    if (!no_slice) {
+        File hic_file = select_first([add_norm.output_hic[1], input_hic])
+
+        call slice as slice_25kb { input:
+            hic_file = hic_file,
+            resolution = 25000,
+        }
+
+        call slice as slice_50kb { input:
+            hic_file = hic_file,
+            resolution = 50000,
+        }
+
+        call slice as slice_100kb { input:
+            hic_file = hic_file,
+            resolution = 100000,
         }
     }
 }
@@ -778,7 +798,7 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 HDD"
-        docker: "encodedcc/hic-pipeline:1.3.1_hiccups"
+        docker: "encodedcc/hic-pipeline:1.4.0_hiccups"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
@@ -825,6 +845,42 @@ task create_eigenvector {
         cpu : "~{num_cpus}"
         disks: "local-disk 100 HDD"
         memory : "8 GB"
+    }
+}
+
+task slice {
+    input {
+        File hic_file
+        Int resolution = 25000
+        Int minimum_num_clusters = 2
+        Int maximum_num_clusters = 13
+        Int num_kmeans_runs = 4
+    }
+
+    command {
+        set -euo pipefail
+        java \
+            -Xmx20G \
+            -jar /opt/MixerTools.jar \
+            slice \
+            --encode-mode \
+            -r ~{resolution} \
+            ~{hic_file} \
+            ~{minimum_num_clusters},~{maximum_num_clusters},~{num_kmeans_runs} \
+            slice_results \
+            cell_type
+        gzip -n slice_results/*.bed
+        mv slice_results/slice_subcompartment_clusters.bed.gz slice_subcompartment_clusters_~{resolution}.bed.gz
+    }
+
+    output {
+        File subcompartments = "slice_subcompartment_clusters_~{resolution}.bed.gz"
+    }
+
+    runtime {
+        cpu : "1"
+        disks: "local-disk 100 SSD"
+        memory : "24 GB"
     }
 }
 
