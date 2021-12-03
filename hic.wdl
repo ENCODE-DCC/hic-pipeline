@@ -256,7 +256,7 @@ workflow hic {
     if (!no_delta) {
         call delta { input:
             # Only run delta on MAPQ >= 30
-            hic = select_first([add_norm.output_hic[1], input_hic]),
+            hic = select_first([input_hic, add_norm.output_hic[1]]),
             docker = delta_docker,
             resolutions = delta_resolutions,
         }
@@ -276,7 +276,7 @@ workflow hic {
     }
 
     if (!no_slice) {
-        File hic_file = select_first([add_norm.output_hic[1], input_hic])
+        File hic_file = select_first([input_hic, add_norm.output_hic[1]])
 
         call slice as slice_25kb { input:
             hic_file = hic_file,
