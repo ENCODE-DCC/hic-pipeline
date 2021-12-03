@@ -37,7 +37,7 @@ workflow hic {
         Boolean no_call_loops = false
         Boolean no_call_tads = false
         Boolean no_eigenvectors = false
-        Boolean no_call_subcompartments = false
+        Boolean no_slice = false
         Int align_num_cpus = 32
         Int? create_hic_num_cpus
         Int? add_norm_num_cpus
@@ -260,7 +260,7 @@ workflow hic {
         }
     }
 
-    if (!no_call_subcompartments) {
+    if (!no_slice) {
         File hic_file = select_first([add_norm.output_hic[1], input_hic])
 
         call slice as slice_25kb { input:
