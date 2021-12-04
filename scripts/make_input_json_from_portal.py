@@ -30,7 +30,10 @@ REFERENCE_FILES = {
     }
 }
 ENZYMES = ("HindIII", "DpnII", "MboI", "none")
-_NO_ENZYME_FRAGMENTATION_METHODS = ("chemical (micrococcal nuclease)", "chemical (DNaseI)")
+_NO_ENZYME_FRAGMENTATION_METHODS = (
+    "chemical (micrococcal nuclease)",
+    "chemical (DNaseI)",
+)
 ALLOWED_STATUSES = ("released", "in progress")
 
 
