@@ -108,8 +108,8 @@ def get_fastqs_from_experiment(experiment):
                 .replace("_R1", "")
                 .replace("_R2", "")
             )
-            read_group = f"@RG\\tID:{read_group_id}\\tSM:{sample_name}\\tPL:ILLUMINA\\tLB:{library_accession}"
             if paired_with is not None:
+                platform = "ILLUMINA"
                 paired_with_file = [
                     f for f in experiment["files"] if f["@id"] == paired_with
                 ][0]
@@ -118,13 +118,15 @@ def get_fastqs_from_experiment(experiment):
                 fastq_pair = {
                     "read_1": urljoin(PORTAL_URL, file["href"]),
                     "read_2": urljoin(PORTAL_URL, paired_with_file["href"]),
-                    "read_group": read_group,
                 }
             else:
+                platform = "LS454"
                 fastq_pair = {
                     "read_1": urljoin(PORTAL_URL, file["href"]),
-                    "read_group": read_group,
                 }
+            fastq_pair[
+                "read_group"
+            ] = f"@RG\\tID:{read_group_id}\\tSM:{sample_name}\\tPL:{platform}\\tLB:{library_accession}"
             replicate_fastqs = fastq_pairs_by_replicate.get(biological_replicate)
             if replicate_fastqs is None:
                 fastq_pairs_by_replicate[biological_replicate] = []
