@@ -825,11 +825,7 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 HDD"
-<<<<<<< HEAD
-        docker: "encodedcc/hic-pipeline:1.5.0_hiccups"
-=======
         docker: "encodedcc/hic-pipeline:1.6.0_hiccups"
->>>>>>> PIP-1632-add-genotyping
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
