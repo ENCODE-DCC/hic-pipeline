@@ -1,0 +1,17 @@
+---
+  - name: test_megamap
+    tags:
+      - functional
+    command: >-
+      tests/caper_run.sh
+      megamap.wdl
+      tests/functional/json/test_megamap.json
+    files:
+      - path: test-output/GRCh38_no_alt_analysis_set_GCA_000001405.15.interval_list
+        md5sum: 1393f5634d40a39501cc471210ca61fd
+      - path: test-output/GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta.fai
+        md5sum: 5fddbc109c82980f9436aa5c21a57c61
+      - path: test-output/GRCh38_no_alt_analysis_set_GCA_000001405.15.dict
+        md5sum: 396dfb7498837e24fc229461b15fcfd5
+      - path: test-output/snp.out.vcf.gz
+      - path: test-output/indel.out.vcf.gz

@@ -6,13 +6,13 @@ LABEL maintainer.email "encode-help@lists.stanford.edu"
 # Package versions
 ENV BWA_VERSION=0.7.17
 ENV PAIRIX_VERSION=0.3.6
-ENV SAMTOOLS_VERSION=1.6
 
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
     add-apt-repository -y ppa:openjdk-r/ppa && \
     apt-get update && \
     apt-get install -y \
+        bc \
         bzip2 \
         curl \
         g++ \
@@ -25,12 +25,15 @@ RUN apt-get update && \
         locales \
         make \
         openjdk-11-jdk \
+        parallel \
         python3 \
         unzip \
     && rm -rf /var/lib/apt/lists/*
 
 # GAWK has the 'and' function, needed for chimeric_blacklist
 RUN echo 'alias awk=gawk' >> ~/.bashrc
+
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
 # Need to be sure we have this for stats
 RUN locale-gen en_US.UTF-8
@@ -46,8 +49,8 @@ RUN curl -OL "https://github.com/lh3/bwa/archive/v${BWA_VERSION}.zip" && \
     cd .. && \
     rm -rf "bwa-v${BWA_VERSION}"
 
-# Install Samtools
-RUN curl -OL "https://github.com/samtools/samtools/releases/download/${SAMTOOLS_VERSION}/samtools-${SAMTOOLS_VERSION}.tar.bz2" && \
+RUN export SAMTOOLS_VERSION=1.14 && \
+    curl -OL "https://github.com/samtools/samtools/releases/download/${SAMTOOLS_VERSION}/samtools-${SAMTOOLS_VERSION}.tar.bz2" && \
     bunzip2 "samtools-${SAMTOOLS_VERSION}.tar.bz2" && \
     tar xf "samtools-${SAMTOOLS_VERSION}.tar" && \
     cd "samtools-${SAMTOOLS_VERSION}" && \
@@ -93,10 +96,10 @@ RUN git clone https://github.com/aidenlab/EigenVector.git && \
     rm -rf newGW_Intra_Flip
 
 RUN curl \
-    -OL \
-    https://github.com/ENCODE-DCC/kentUtils_bin_v381/raw/d0ba32f3aee6da02c0f75d8f998c5f1d921b047c/bin/wigToBigWig && \
-    chmod +x wigToBigWig && \
-    mv wigToBigWig /usr/local/bin
+        -OL \
+        https://github.com/ENCODE-DCC/kentUtils_bin_v381/raw/d0ba32f3aee6da02c0f75d8f998c5f1d921b047c/bin/wigToBigWig && \
+        chmod +x wigToBigWig && \
+        mv wigToBigWig /usr/local/bin
 
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
@@ -119,9 +122,28 @@ RUN curl \
     chmod 666 /opt/MixerTools.4.7.8.jar && \
     ln -s /opt/MixerTools.4.7.8.jar /opt/MixerTools.jar
 
+RUN curl \
+        -LO \
+        https://github.com/broadinstitute/gatk/releases/download/4.2.2.0/gatk-4.2.2.0.zip && \
+    unzip -qq gatk-4.2.2.0.zip && \
+    cd gatk-4.2.2.0 && \
+    rm \
+        -rf \
+        README.md \
+        gatk-completion.sh \
+        gatk-package-4.2.2.0-spark.jar \
+        gatkPythonPackageArchive.zip \
+        gatkcondaenv.yml \
+        gatkdoc \
+        scripts
+
+RUN git clone https://github.com/aidenlab/hic2gatk.git && \
+    cd hic2gatk && \
+    git checkout dee2a9f6f2b0e95f0cb3e8d47eef9798cb8101aa
+
 # For sorting, LC_ALL is C
 ENV LC_ALL C
-ENV PATH=/opt:/opt/scripts:/opt/scripts/common:/opt/juicer/misc:$PATH
+ENV PATH=/opt:/opt/scripts:/opt/scripts/common:/opt/juicer/misc:/opt/gatk-4.2.2.0:/opt/hic2gatk:$PATH
 
 RUN mkdir -p hic-pipeline/hic_pipeline
 COPY hic_pipeline hic-pipeline/hic_pipeline/
