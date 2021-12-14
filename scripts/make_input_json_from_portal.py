@@ -33,6 +33,7 @@ ENZYMES = ("HindIII", "DpnII", "MboI", "none")
 _NO_ENZYME_FRAGMENTATION_METHODS = (
     "chemical (micrococcal nuclease)",
     "chemical (DNaseI)",
+    "shearing (Covaris S2)",
 )
 ALLOWED_STATUSES = ("released", "in progress")
 
