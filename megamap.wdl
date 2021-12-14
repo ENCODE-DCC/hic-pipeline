@@ -33,6 +33,12 @@ workflow megamap {
         bams = bams,
     }
 
+    call hic.bam_to_pre as converted { input:
+        bam = merged.bam,
+        quality = 1,
+        # merged_nodups = True?,
+    }
+
     call create_fasta_index as create_reference_fasta_index { input:
         fasta = reference_fasta,
     }
@@ -61,12 +67,9 @@ workflow megamap {
         num_cpus = gatk_num_cpus,
     }
 
-    output {
-        File fasta_index = create_reference_fasta_index.fasta_index
-        File sequence_dictionary = create_gatk_references.sequence_dictionary
-        File interval_list = create_gatk_references.interval_list
-        File snp_vcf = gatk.snp_vcf
-        File indel_vcf = gatk.indel_vcf
+    call run_3d_dna { input:
+        reference_fasta = reference_fasta,
+        merged_nodups = converted.pre,
     }
 }
 
@@ -181,5 +184,70 @@ task gatk {
         cpu : "~{num_cpus}"
         memory: "128 GB"
         disks: "local-disk 1000 HDD"
+    }
+}
+
+
+task run_3d_dna {
+    input {
+        File reference_fasta
+        File merged_nodups
+    }
+
+    command <<<
+        export MERGED_NODUPS_FILENAME=merged_nodups.txt
+        gzip -dc ~{merged_nodups} > $MERGED_NODUPS_FILENAME
+        bash /opt/run-3ddna-pipeline.sh ~{reference_fasta} $MERGED_NODUPS_FILENAME
+        ls
+    >>>
+
+    output {
+        # fasta files
+        # chromosome-length scaffolds, small and tiny scaffolds
+        File scaffolds_fasta = "HiC.fasta"
+
+        # .hic files
+        # sandboxed contact map corresponding to the HiC.fasta reference
+        File hic = "HiC.hic"
+        # after sealing stage
+        File after_sealing_rawchrom_hic = "rawchrom.hic"
+        File after_sealing_final_hic = "final.hic"
+        # after polishing stage
+        File polished_hic = "polished.hic"
+        # after editing and scaffolding
+        File resolved_hic = "resolved.hic"
+
+        # Scaffold boundary files (Juicebox 2D annotation format)
+        File scaffold_track = "scaffold_track.txt"
+        File superscaffold_track = "superscaf_track.txt"
+
+        # Tracks illustrating putative misjoins;
+        File bed = "FINAL.bed"
+        File wig = "FINAL.wig"
+
+        # .assembly (supersedes .cprops and .asm files)
+        # Custom file format that tracks modifications to the input contigs at various stages in the assembly
+        # after the addition of gaps to the chromosome-length assembly;
+        File assembly = "HiC.assembly"
+        # after sealing stage
+        File after_sealing_final_assembly = "final.assembly"
+        # after polishing stage
+        File polished_assembly = "polished.assembly"
+        # after editing and scaffolding
+        File resolved_assembly = "resolved.assembly"
+
+        # supplementary files
+        # list of problematic regions (Juicebox 2D annotation format)
+        Array[File] edits_for_step = glob("edits.for.step.*.txt")
+        Array[File] mismatches_at_step = glob("mismatches.at.step.*.txt")
+        Array[File] suspect_2D_at_step = glob("suspect_2D.at.step.*.txt")
+        # pairwise alignment data for alternative haplotype candidates, parsed from LASTZ output.
+        File pairwise_alignments = "alignments.txt"
+    }
+
+    runtime {
+        cpu : "16"
+        disks: "local-disk 200 HDD"
+        memory: "32 GB"
     }
 }
