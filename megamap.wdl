@@ -195,9 +195,10 @@ task run_3d_dna {
     }
 
     command <<<
+        set -euo pipefail
         export MERGED_NODUPS_FILENAME=merged_nodups.txt
         gzip -dc ~{merged_nodups} > $MERGED_NODUPS_FILENAME
-        bash /opt/run-3ddna-pipeline.sh ~{reference_fasta} $MERGED_NODUPS_FILENAME
+        bash /opt/3d-dna/run-3ddna-pipeline.sh ~{reference_fasta} $MERGED_NODUPS_FILENAME
         ls
     >>>
 
