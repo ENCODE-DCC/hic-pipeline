@@ -36,6 +36,8 @@ workflow hic {
         Boolean no_delta = false
         # Should be [5000, 10000] for in-situ, [1000, 5000, 10000] for intact
         Array[Int] delta_resolutions = [5000, 10000]
+        # Change to "ultimate-models" for intact
+        String delta_models = "beta-models"
         String delta_docker = "encodedcc/hic-pipeline:1.5.0_delta"
 
         Array[String] normalization_methods = []
@@ -267,10 +269,10 @@ workflow hic {
     if (!no_delta) {
         call delta { input:
             # Only run delta on MAPQ >= 30
-            # hic = select_first([input_hic, add_norm.output_hic[1]]),
             hic = if length(add_norm.output_hic) > 1 then add_norm.output_hic[1] else select_first([input_hic]),
             docker = delta_docker,
             resolutions = delta_resolutions,
+            delta_models = delta_models,
         }
     }
 
@@ -847,6 +849,7 @@ task delta {
         Float threshold = 0.85
         String normalization = "SCALE"
         String stem = "predicted"
+        String delta_models = "beta-models"
         String docker
     }
 
@@ -855,7 +858,7 @@ task delta {
         python \
             "$(which Deploy.py)" \
             ~{hic} \
-            /opt/deploy-delta/beta-models \
+            /opt/deploy-delta/~{delta_models} \
             . \
             ~{stem} \
             ~{sep="," resolutions} \
