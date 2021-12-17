@@ -162,7 +162,7 @@ def get_input_json(fastqs, assembly_name, enzymes=None, ligation_site_regex=None
         input_json["hic.ligation_site_regex"] = ligation_site_regex
 
     if "read_2" not in fastqs[0][0]:
-        input_json["hic.delta_resolutions"] = [1000, 5000, 10000]
+        input_json["hic.delta_resolutions"] = [5000, 2000, 1000]
         input_json["hic.delta_models_path"] = "ultimate-models"
     return input_json
 
