@@ -4,9 +4,9 @@ import "./hic.wdl"
 
 workflow megamap {
     meta {
-        version: "1.6.1"
-        caper_docker: "encodedcc/hic-pipeline:1.6.1"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.6.1"
+        version: "1.6.2"
+        caper_docker: "encodedcc/hic-pipeline:1.6.2"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.6.2"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
