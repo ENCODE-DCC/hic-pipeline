@@ -37,6 +37,26 @@ def test_get_input_json_none_enzyme_has_no_restriction_sites():
     }
 
 
+def test_get_input_json_no_slice_no_delta():
+    result = get_input_json(
+        fastqs=[[{"read_1": "foo"}]],
+        assembly_name="GRCh38",
+        enzymes=["none"],
+        no_slice=True,
+        no_delta=True,
+    )
+    assert result == {
+        "hic.assembly_name": "GRCh38",
+        "hic.chrsz": "https://www.encodeproject.org/files/GRCh38_EBV.chrom.sizes/@@download/GRCh38_EBV.chrom.sizes.tsv",
+        "hic.delta_resolutions": [1000, 5000, 10000],
+        "hic.fastq": [[{"read_1": "foo"}]],
+        "hic.reference_index": "https://www.encodeproject.org/files/ENCFF643CGH/@@download/ENCFF643CGH.tar.gz",
+        "hic.restriction_enzymes": ["none"],
+        "hic.no_slice": True,
+        "hic.no_delta": True,
+    }
+
+
 def test_get_enzymes_from_experiment():
     result = get_enzymes_from_experiment(
         {

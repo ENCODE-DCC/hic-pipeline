@@ -47,13 +47,19 @@ def main():
     if args.ligation_site_regex is None:
         enzymes = args.enzymes or get_enzymes_from_experiment(experiment)
         input_json = get_input_json(
-            fastqs=fastqs, assembly_name=args.assembly_name, enzymes=enzymes
+            fastqs=fastqs,
+            assembly_name=args.assembly_name,
+            enzymes=enzymes,
+            no_delta=args.no_delta,
+            no_slice=args.no_slice,
         )
     else:
         input_json = get_input_json(
             fastqs=fastqs,
             assembly_name=args.assembly_name,
             ligation_site_regex=args.ligation_site_regex,
+            no_delta=args.no_delta,
+            no_slice=args.no_slice,
         )
     outfile = args.outfile or "{}.json".format(args.accession)
     write_json_to_file(input_json, outfile)
@@ -144,7 +150,14 @@ def get_fastqs_from_experiment(experiment):
     return output
 
 
-def get_input_json(fastqs, assembly_name, enzymes=None, ligation_site_regex=None):
+def get_input_json(
+    fastqs,
+    assembly_name,
+    enzymes=None,
+    ligation_site_regex=None,
+    no_slice=False,
+    no_delta=False,
+):
     input_json = {
         "hic.fastq": fastqs,
         "hic.assembly_name": assembly_name,
@@ -163,6 +176,12 @@ def get_input_json(fastqs, assembly_name, enzymes=None, ligation_site_regex=None
 
     if "read_2" not in fastqs[0][0]:
         input_json["hic.delta_resolutions"] = [1000, 5000, 10000]
+
+    if no_slice:
+        input_json["hic.no_slice"] = True
+    if no_delta:
+        input_json["hic.no_delta"] = True
+
     return input_json
 
 
@@ -188,6 +207,8 @@ def get_parser():
         help="Accession of portal experiment to generate input for",
     )
     parser.add_argument("--outfile")
+    parser.add_argument("--no-slice", action="store_true")
+    parser.add_argument("--no-delta", action="store_true")
     parser.add_argument(
         "-e", "--enzymes", nargs="+", help="Restriction enzymes used in experiment"
     )
