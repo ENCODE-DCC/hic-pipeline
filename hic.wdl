@@ -14,9 +14,9 @@ struct BamAndLigationCount {
 
 workflow hic {
     meta {
-        version: "1.6.1"
-        caper_docker: "encodedcc/hic-pipeline:1.6.1"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.6.1"
+        version: "1.6.2"
+        caper_docker: "encodedcc/hic-pipeline:1.6.2"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.6.2"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -45,6 +45,8 @@ workflow hic {
         Boolean no_eigenvectors = false
         Boolean no_slice = false
         Int align_num_cpus = 32
+        Int? align_disk_size_gb
+        Int? dedup_disk_size_gb
         Int? create_hic_num_cpus
         Int? add_norm_num_cpus
         String assembly_name = "undefined"
@@ -93,6 +95,7 @@ workflow hic {
                 idx_tar = select_first([reference_index]),
                 ligation_site = select_first([ligation_site]),
                 num_cpus = align_num_cpus,
+                disk_size_gb = align_disk_size_gb,
             }
         }
 
@@ -130,7 +133,8 @@ workflow hic {
         }
 
         call dedup { input:
-            bam = merge.bam
+            bam = merge.bam,
+            disk_size_gb = dedup_disk_size_gb,
         }
 
         call bam_to_pre as bam_to_pre_for_stats { input:
@@ -365,6 +369,7 @@ task align {
         File idx_tar        # reference bwa index tar
         String ligation_site
         Int num_cpus = 32
+        Int disk_size_gb = 1000
     }
 
     command {
@@ -417,7 +422,7 @@ task align {
     runtime {
         cpu : "~{num_cpus}"
         memory: "64 GB"
-        disks: "local-disk 1000 HDD"
+        disks: "local-disk ~{disk_size_gb} HDD"
     }
 }
 
@@ -527,6 +532,7 @@ task dedup {
     input {
         File bam
         Int num_cpus = 8
+        Int disk_size_gb = 5000
     }
 
     command <<<
@@ -545,7 +551,7 @@ task dedup {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 5000 HDD"
+        disks: "local-disk ~{disk_size_gb} HDD"
         memory: "32 GB"
     }
 }
@@ -825,7 +831,7 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 HDD"
-        docker: "encodedcc/hic-pipeline:1.6.1_hiccups"
+        docker: "encodedcc/hic-pipeline:1.6.2_hiccups"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"

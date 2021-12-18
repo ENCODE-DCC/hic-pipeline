@@ -2,9 +2,9 @@ version 1.0
 
 workflow make_restriction_site_locations {
     meta {
-        version: "1.6.1"
-        caper_docker: "encodedcc/hic-pipeline:1.6.1"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.6.1"
+        version: "1.6.2"
+        caper_docker: "encodedcc/hic-pipeline:1.6.2"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.6.2"
     }
 
     parameter_meta {
