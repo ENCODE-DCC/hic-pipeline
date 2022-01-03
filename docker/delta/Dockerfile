@@ -24,7 +24,7 @@ RUN git clone https://github.com/aidenlab/straw.git && \
 
 RUN git clone https://github.com/sa501428/deploy-delta.git && \
     cd deploy-delta && \
-    git checkout v1.9 && \
+    git checkout v2.0-encode && \
     chmod +x Deploy.py
 
 ENV PATH=/opt/deploy-delta:$PATH

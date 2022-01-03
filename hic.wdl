@@ -14,9 +14,9 @@ struct BamAndLigationCount {
 
 workflow hic {
     meta {
-        version: "1.6.2"
-        caper_docker: "encodedcc/hic-pipeline:1.6.2"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.6.2"
+        version: "1.7.0"
+        caper_docker: "encodedcc/hic-pipeline:1.7.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.7.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -36,6 +36,8 @@ workflow hic {
         Boolean no_delta = false
         # Should be [5000, 10000] for in-situ, [1000, 5000, 10000] for intact
         Array[Int] delta_resolutions = [5000, 10000]
+        # Change to "ultimate-models" for intact
+        String delta_models_path = "beta-models"
         String delta_docker = "encodedcc/hic-pipeline:1.5.0_delta"
 
         Array[String] normalization_methods = []
@@ -45,7 +47,7 @@ workflow hic {
         Boolean no_eigenvectors = false
         Boolean no_slice = false
         Int align_num_cpus = 32
-        Int? align_disk_size_gb
+        Int align_disk_size_gb = 1000
         Int? dedup_disk_size_gb
         Int? create_hic_num_cpus
         Int? add_norm_num_cpus
@@ -271,10 +273,10 @@ workflow hic {
     if (!no_delta) {
         call delta { input:
             # Only run delta on MAPQ >= 30
-            # hic = select_first([input_hic, add_norm.output_hic[1]]),
             hic = if length(add_norm.output_hic) > 1 then add_norm.output_hic[1] else select_first([input_hic]),
             docker = delta_docker,
             resolutions = delta_resolutions,
+            models_path = delta_models_path,
         }
     }
 
@@ -831,7 +833,7 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 HDD"
-        docker: "encodedcc/hic-pipeline:1.6.2_hiccups"
+        docker: "encodedcc/hic-pipeline:1.7.0_hiccups"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
@@ -853,6 +855,7 @@ task delta {
         Float threshold = 0.85
         String normalization = "SCALE"
         String stem = "predicted"
+        String models_path = "beta-models"
         String docker
     }
 
@@ -861,7 +864,7 @@ task delta {
         python \
             "$(which Deploy.py)" \
             ~{hic} \
-            /opt/deploy-delta/beta-models \
+            /opt/deploy-delta/~{models_path} \
             . \
             ~{stem} \
             ~{sep="," resolutions} \
