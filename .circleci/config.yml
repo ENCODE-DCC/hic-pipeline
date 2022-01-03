@@ -211,7 +211,7 @@ workflows:
           name: test_wdl_functional
           resource_class: 2xlarge
           tag: functional
-          num_parallel_workflows: 16
+          num_parallel_workflows: 8
           requires:
             - build_main
             - lint
