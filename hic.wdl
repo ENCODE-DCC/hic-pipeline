@@ -47,7 +47,7 @@ workflow hic {
         Boolean no_eigenvectors = false
         Boolean no_slice = false
         Int align_num_cpus = 32
-        Int? align_disk_size_gb
+        Int align_disk_size_gb = 1000
         Int? dedup_disk_size_gb
         Int? create_hic_num_cpus
         Int? add_norm_num_cpus
