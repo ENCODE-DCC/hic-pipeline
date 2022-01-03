@@ -33,12 +33,6 @@ workflow megamap {
         bams = bams,
     }
 
-    call hic.bam_to_pre as converted { input:
-        bam = merged.bam,
-        quality = 1,
-        # merged_nodups = True?,
-    }
-
     call create_fasta_index as create_reference_fasta_index { input:
         fasta = reference_fasta,
     }
@@ -68,8 +62,8 @@ workflow megamap {
     }
 
     call run_3d_dna { input:
-        reference_fasta = reference_fasta,
-        merged_nodups = converted.pre,
+        vcf = gatk.snp_vcf,
+        bam = merged.bam,
     }
 }
 
@@ -190,15 +184,16 @@ task gatk {
 
 task run_3d_dna {
     input {
-        File reference_fasta
-        File merged_nodups
+        File vcf
+        File bam
     }
 
     command <<<
         set -euo pipefail
-        export MERGED_NODUPS_FILENAME=merged_nodups.txt
-        gzip -dc ~{merged_nodups} > $MERGED_NODUPS_FILENAME
-        bash /opt/3d-dna/run-3ddna-pipeline.sh ~{reference_fasta} $MERGED_NODUPS_FILENAME
+        bash \
+            /opt/3d-dna/phasing/run-hic-phaser-encode.sh \
+            ~{vcf} \
+            ~{bam}
         ls
     >>>
 

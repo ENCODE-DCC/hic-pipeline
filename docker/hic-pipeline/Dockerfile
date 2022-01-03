@@ -104,8 +104,7 @@ RUN git clone https://github.com/ENCODE-DCC/kentUtils_bin_v381.git && \
 
 RUN git clone --branch encode https://github.com/aidenlab/3d-dna.git && \
     cd 3d-dna && \
-    git checkout 3abfc7e5a2ddd0430a124c0f7aad1f36bf4f840f && \
-    chmod +x run-3ddna-pipeline.sh
+    git checkout 3abfc7e5a2ddd0430a124c0f7aad1f36bf4f840f
 
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
