@@ -102,9 +102,9 @@ RUN git clone https://github.com/ENCODE-DCC/kentUtils_bin_v381.git && \
     cd ../../ && \
     rm -rf kentUtils_bin_v381
 
-RUN git clone --branch phasing https://github.com/aidenlab/3d-dna.git && \
+RUN git clone --branch encode https://github.com/aidenlab/3d-dna.git && \
     cd 3d-dna && \
-    git checkout 6474c44a638b0e00f75d9067598ed1f7c6869be6 && \
+    git checkout 3abfc7e5a2ddd0430a124c0f7aad1f36bf4f840f && \
     chmod +x run-3ddna-pipeline.sh
 
 # Install Juicer
