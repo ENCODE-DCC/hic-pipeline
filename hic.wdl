@@ -877,7 +877,11 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 HDD"
+<<<<<<< HEAD
         docker: "~{docker}"
+=======
+        docker: "encodedcc/hic-pipeline:1.8.0_hiccups"
+>>>>>>> rebase and update version
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
