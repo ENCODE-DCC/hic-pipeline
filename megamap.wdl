@@ -191,7 +191,7 @@ task run_3d_dna {
     command <<<
         set -euo pipefail
         bash \
-            /opt/3d-dna/phasing/run-hic-phaser-encode.sh \
+            /opt/3d-dna/phase/run-hic-phaser-encode.sh \
             ~{vcf} \
             ~{bam}
         ls
