@@ -186,13 +186,17 @@ task run_3d_dna {
     input {
         File vcf
         File bam
+        Int num_cpus = 16
     }
 
     command <<<
         set -euo pipefail
+        export VCF_FILENAME=~{basename(vcf, ".gz")}
+        gzip -dc ~{vcf} > ${VCF_FILENAME}
         bash \
             /opt/3d-dna/phase/run-hic-phaser-encode.sh \
-            ~{vcf} \
+            --threads ~{num_cpus} \
+            ${VCF_FILENAME} \
             ~{bam}
         ls
     >>>
@@ -242,7 +246,7 @@ task run_3d_dna {
     }
 
     runtime {
-        cpu : "16"
+        cpu : "~{num_cpus}"
         disks: "local-disk 200 HDD"
         memory: "32 GB"
     }
