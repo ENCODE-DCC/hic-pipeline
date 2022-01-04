@@ -198,51 +198,28 @@ task run_3d_dna {
             --threads ~{num_cpus} \
             ${VCF_FILENAME} \
             ~{bam}
+        gzip -n *.txt *.vcf *.assembly
         ls
     >>>
 
     output {
-        # fasta files
-        # chromosome-length scaffolds, small and tiny scaffolds
-        File scaffolds_fasta = "HiC.fasta"
+        File snp_vcf = "snp.out.vcf.gz"
+        File hic_vcf = "snp.out_HiC.vcf.gz"
 
         # .hic files
-        # sandboxed contact map corresponding to the HiC.fasta reference
-        File hic = "HiC.hic"
-        # after sealing stage
-        File after_sealing_rawchrom_hic = "rawchrom.hic"
-        File after_sealing_final_hic = "final.hic"
-        # after polishing stage
-        File polished_hic = "polished.hic"
-        # after editing and scaffolding
-        File resolved_hic = "resolved.hic"
+        File hic_in= "snp.out.in.hic"
+        File hic = "snp.out.out.hic"
+        File hic_diploid = "diploid.hic"
 
         # Scaffold boundary files (Juicebox 2D annotation format)
-        File scaffold_track = "scaffold_track.txt"
-        File superscaffold_track = "superscaf_track.txt"
+        File scaffold_track = "snp.out.out_asm.scaffold_track.txt.gz"
+        File superscaffold_track = "snp.out.out_asm.superscaf_track.txt.gz"
 
-        # Tracks illustrating putative misjoins;
-        File bed = "FINAL.bed"
-        File wig = "FINAL.wig"
+        File assembly_in = "snp.out.in.assembly.gz"
+        File assembly = "snp.out.out.assembly.gz"
 
-        # .assembly (supersedes .cprops and .asm files)
-        # Custom file format that tracks modifications to the input contigs at various stages in the assembly
-        # after the addition of gaps to the chromosome-length assembly;
-        File assembly = "HiC.assembly"
-        # after sealing stage
-        File after_sealing_final_assembly = "final.assembly"
-        # after polishing stage
-        File polished_assembly = "polished.assembly"
-        # after editing and scaffolding
-        File resolved_assembly = "resolved.assembly"
-
-        # supplementary files
-        # list of problematic regions (Juicebox 2D annotation format)
-        Array[File] edits_for_step = glob("edits.for.step.*.txt")
-        Array[File] mismatches_at_step = glob("mismatches.at.step.*.txt")
-        Array[File] suspect_2D_at_step = glob("suspect_2D.at.step.*.txt")
-        # pairwise alignment data for alternative haplotype candidates, parsed from LASTZ output.
-        File pairwise_alignments = "alignments.txt"
+        File diploid_mnd = "diploid.mnd.txt.gz"
+        File snp_mnd = "snp.mnd.txt.gz"
     }
 
     runtime {
