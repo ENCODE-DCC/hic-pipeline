@@ -10,6 +10,7 @@
   "megamap.mills_vcf": "tests/data/dummy.txt",
   "megamap.mills_vcf_index": "tests/data/dummy.txt",
   "megamap.no_bundle": true,
+  "megamap.no_phasing": true,
   "megamap.omni_vcf": "tests/data/dummy.txt",
   "megamap.omni_vcf_index": "tests/data/dummy.txt",
   "megamap.reference_fasta": "https://www.encodeproject.org/files/GRCh38_no_alt_analysis_set_GCA_000001405.15/@@download/GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta.gz"

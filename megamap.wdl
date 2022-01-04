@@ -25,6 +25,7 @@ workflow megamap {
         File omni_vcf
         File omni_vcf_index
         Int? gatk_num_cpus
+        Boolean no_phasing = false
         # Only for testing purposes
         Boolean no_bundle = false
     }
@@ -61,9 +62,11 @@ workflow megamap {
         num_cpus = gatk_num_cpus,
     }
 
-    call run_3d_dna { input:
-        vcf = gatk.snp_vcf,
-        bam = merged.bam,
+    if (!no_phasing) {
+        call run_3d_dna { input:
+            vcf = gatk.snp_vcf,
+            bam = merged.bam,
+        }
     }
 }
 
