@@ -228,6 +228,6 @@ task run_3d_dna {
     runtime {
         cpu : "~{num_cpus}"
         disks: "local-disk 200 HDD"
-        memory: "32 GB"
+        memory: "100 GB"
     }
 }
