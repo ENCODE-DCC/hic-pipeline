@@ -217,6 +217,8 @@ task run_3d_dna {
         # Scaffold boundary files (Juicebox 2D annotation format)
         File scaffold_track = "snp.out.out_asm.scaffold_track.txt.gz"
         File superscaffold_track = "snp.out.out_asm.superscaf_track.txt.gz"
+        File scaffold_track_in = "snp.out.in_asm.scaffold_track.txt.gz"
+        File superscaffold_track_in = "snp.out.in_asm.superscaf_track.txt.gz"
 
         File assembly_in = "snp.out.in.assembly.gz"
         File assembly = "snp.out.out.assembly.gz"
