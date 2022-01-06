@@ -189,7 +189,7 @@ task run_3d_dna {
     input {
         File vcf
         File bam
-        Int num_cpus = 16
+        Int num_cpus = 8
     }
 
     command <<<
