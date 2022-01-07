@@ -1,5 +1,5 @@
 __title__ = "hic-pipeline"
-__version__ = "1.7.0"
+__version__ = "1.7.1"
 __description__ = "ENCODE Hi-C uniform processing pipeline."
 __url__ = "https://github.com/ENCODE-DCC/hic-pipeline"
 __uri__ = __url__
