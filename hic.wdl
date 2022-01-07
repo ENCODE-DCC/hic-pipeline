@@ -14,9 +14,9 @@ struct BamAndLigationCount {
 
 workflow hic {
     meta {
-        version: "1.7.1"
-        caper_docker: "encodedcc/hic-pipeline:1.7.1"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.7.1"
+        version: "1.8.0"
+        caper_docker: "encodedcc/hic-pipeline:1.8.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.8.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -38,7 +38,7 @@ workflow hic {
         Array[Int] delta_resolutions = [5000, 10000]
         # Change to "ultimate-models" for intact
         String delta_models_path = "beta-models"
-        String delta_docker = "encodedcc/hic-pipeline:1.7.1_delta"
+        String delta_docker = "encodedcc/hic-pipeline:1.8.0_delta"
 
         Array[String] normalization_methods = []
         Boolean no_pairs = false
@@ -833,7 +833,7 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 HDD"
-        docker: "encodedcc/hic-pipeline:1.7.1_hiccups"
+        docker: "encodedcc/hic-pipeline:1.8.0_hiccups"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
@@ -880,7 +880,7 @@ task hiccups_2 {
         cpu : "~{num_cpus}"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 HDD"
-        docker: "encodedcc/hic-pipeline:1.7.0_hiccups"
+        docker: "encodedcc/hic-pipeline:1.8.0_hiccups"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "64 GB"
