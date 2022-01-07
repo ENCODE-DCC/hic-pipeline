@@ -848,6 +848,53 @@ task hiccups {
     }
 }
 
+task hiccups_2 {
+    input {
+        File hic
+        Int quality = 0
+        Int num_cpus = 2
+    }
+
+    command {
+        set -euo pipefail
+        java \
+            -Ddevelopment=false \
+            -Djava.awt.headless=true \
+            -Xmx60G \
+            -Xms60G \
+            -jar /opt/feature_tools.jar \
+            hiccups2 \
+            -k SCALE \
+            --threads ~{num_cpus} \
+            ~{hic} \
+            output
+        gzip -n output/merged_loops.bedpe
+        mv loops/merged_loops.bedpe.gz merged_loops_~{quality}.bedpe.gz
+    }
+
+    output {
+        File merged_loops = "merged_loops_~{quality}.bedpe.gz"
+    }
+
+    runtime {
+        cpu : "~{num_cpus}"
+        bootDiskSizeGb: "20"
+        disks: "local-disk 100 HDD"
+        docker: "encodedcc/hic-pipeline:1.7.0_hiccups"
+        gpuType: "nvidia-tesla-p100"
+        gpuCount: 1
+        memory: "64 GB"
+        zones: [
+            "us-central1-c",
+            "us-central1-f",
+            "us-east1-b",
+            "us-east1-c",
+            "us-west1-a",
+            "us-west1-b",
+        ]
+    }
+}
+
 task delta {
     input {
         File hic
