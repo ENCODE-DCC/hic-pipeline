@@ -35,6 +35,7 @@ workflow hic {
         # Parameters controlling delta calls
         Boolean no_delta = false
         String delta_docker = "encodedcc/hic-pipeline:1.8.0_delta"
+        String hiccups_docker = "encodedcc/hic-pipeline:1.8.0_hiccups"
 
         Boolean intact = false
         Array[String] normalization_methods = []
@@ -241,12 +242,14 @@ workflow hic {
                 call hiccups { input:
                     hic_file = add_norm.output_hic,
                     quality = qualities[i],
+                    docker = hiccups_docker,
                 }
             }
             if (intact) {
                 call hiccups_2 { input:
                     hic = add_norm.output_hic,
                     quality = qualities[i],
+                    docker = hiccups_docker,
                 }
             }
         }
@@ -287,11 +290,13 @@ workflow hic {
             if (!intact) {
                 call hiccups as hiccups_input_hic { input:
                     hic_file = select_first([input_hic]),
+                    docker = hiccups_docker,
                 }
             }
             if (intact) {
                 call hiccups_2 as hiccups_2_input_hic { input:
                     hic = select_first([input_hic]),
+                    docker = hiccups_docker,
                 }
             }
         }
@@ -814,6 +819,7 @@ task hiccups {
     input {
         File hic_file
         Int quality = 0
+        String docker
     }
 
     command {
@@ -837,7 +843,7 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 HDD"
-        docker: "encodedcc/hic-pipeline:1.8.0_hiccups"
+        docker: "~{docker}"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
@@ -857,6 +863,7 @@ task hiccups_2 {
         File hic
         Int quality = 0
         Int num_cpus = 2
+        String docker
     }
 
     command {
@@ -884,7 +891,7 @@ task hiccups_2 {
         cpu : "~{num_cpus}"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 HDD"
-        docker: "encodedcc/hic-pipeline:1.8.0_hiccups"
+        docker: "~{docker}"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "64 GB"
