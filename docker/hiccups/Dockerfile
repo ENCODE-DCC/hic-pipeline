@@ -39,7 +39,7 @@ RUN curl \
     ln -s juicer/CPU scripts
 
 RUN curl \
-        -L \
+        -LO \
         https://github.com/aidenlab/Juicebox/releases/download/v.2.13.07/feature_tools.jar
 
 # For sorting, LC_ALL is C
