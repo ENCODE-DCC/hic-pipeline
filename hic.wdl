@@ -34,12 +34,9 @@ workflow hic {
 
         # Parameters controlling delta calls
         Boolean no_delta = false
-        # Should be [5000, 10000] for in-situ, [1000, 5000, 10000] for intact
-        Array[Int] delta_resolutions = [5000, 10000]
-        # Change to "ultimate-models" for intact
-        String delta_models_path = "beta-models"
         String delta_docker = "encodedcc/hic-pipeline:1.8.0_delta"
 
+        Boolean intact = false
         Array[String] normalization_methods = []
         Boolean no_pairs = false
         Boolean no_call_loops = false
@@ -52,18 +49,10 @@ workflow hic {
         Int? create_hic_num_cpus
         Int? add_norm_num_cpus
         String assembly_name = "undefined"
-
-        # Inputs for GATK
-        File? reference_fasta
-        File? dbsnp_vcf
-        File? dbsnp_vcf_index
-        File? hapmap_vcf_index
-        File? hapmap_vcf
-        File? mills_vcf
-        File? mills_vcf_index
-        File? omni_vcf
-        File? omni_vcf_index
     }
+
+    String delta_models_path = if intact then "ultimate-models" else "beta-models"
+    Array[Int] delta_resolutions = if intact then [5000, 2000, 1000] else [5000, 10000]
 
     # Default MAPQ thresholds for generating .hic contact maps
     Array[Int] DEFAULT_HIC_QUALITIES = [1, 30]
@@ -248,9 +237,17 @@ workflow hic {
             }
         }
         if (!no_call_loops) {
-            call hiccups { input:
-                hic_file = add_norm.output_hic,
-                quality = qualities[i],
+            if (!intact) {
+                call hiccups { input:
+                    hic_file = add_norm.output_hic,
+                    quality = qualities[i],
+                }
+            }
+            if (intact) {
+                call hiccups_2 { input:
+                    hic = add_norm.output_hic,
+                    quality = qualities[i],
+                }
             }
         }
 
@@ -287,8 +284,15 @@ workflow hic {
             }
         }
         if (!no_call_loops) {
-            call hiccups as hiccups_input_hic { input:
-                hic_file = select_first([input_hic])
+            if (!intact) {
+                call hiccups as hiccups_input_hic { input:
+                    hic_file = select_first([input_hic]),
+                }
+            }
+            if (intact) {
+                call hiccups_2 as hiccups_2_input_hic { input:
+                    hic = select_first([input_hic]),
+                }
             }
         }
     }

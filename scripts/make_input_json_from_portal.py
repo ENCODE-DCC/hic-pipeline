@@ -175,8 +175,7 @@ def get_input_json(
         input_json["hic.ligation_site_regex"] = ligation_site_regex
 
     if "read_2" not in fastqs[0][0]:
-        input_json["hic.delta_resolutions"] = [5000, 2000, 1000]
-        input_json["hic.delta_models_path"] = "ultimate-models"
+        input_json["hic.intact"] = True
 
     if no_slice:
         input_json["hic.no_slice"] = True
