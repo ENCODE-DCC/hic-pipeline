@@ -878,8 +878,8 @@ task hiccups_2 {
             -k SCALE \
             --threads ~{num_cpus} \
             ~{hic} \
-            output
-        gzip -n output/merged_loops.bedpe
+            loops
+        gzip -n loops/merged_loops.bedpe
         mv loops/merged_loops.bedpe.gz merged_loops_~{quality}.bedpe.gz
     }
 
