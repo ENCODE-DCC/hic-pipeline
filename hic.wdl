@@ -252,6 +252,7 @@ workflow hic {
 
                 call localizer { input:
                     hic = add_norm.output_hic,
+                    loops = hiccups.merged_loops,
                     quality = qualities[i],
                 }
             }
@@ -264,6 +265,7 @@ workflow hic {
 
                 call localizer as localizer_intact { input:
                     hic = add_norm.output_hic,
+                    loops = hiccups.merged_loops,
                     quality = qualities[i],
                 }
             }
