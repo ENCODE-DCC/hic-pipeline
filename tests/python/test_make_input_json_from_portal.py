@@ -30,11 +30,10 @@ def test_get_input_json_none_enzyme_has_no_restriction_sites():
     assert result == {
         "hic.assembly_name": "GRCh38",
         "hic.chrsz": "https://www.encodeproject.org/files/GRCh38_EBV.chrom.sizes/@@download/GRCh38_EBV.chrom.sizes.tsv",
-        "hic.delta_resolutions": [5000, 2000, 1000],
         "hic.fastq": [[{"read_1": "foo"}]],
         "hic.reference_index": "https://www.encodeproject.org/files/ENCFF643CGH/@@download/ENCFF643CGH.tar.gz",
         "hic.restriction_enzymes": ["none"],
-        "hic.delta_models_path": "ultimate-models",
+        "hic.intact": True,
     }
 
 
@@ -49,8 +48,7 @@ def test_get_input_json_no_slice_no_delta():
     assert result == {
         "hic.assembly_name": "GRCh38",
         "hic.chrsz": "https://www.encodeproject.org/files/GRCh38_EBV.chrom.sizes/@@download/GRCh38_EBV.chrom.sizes.tsv",
-        "hic.delta_resolutions": [5000, 2000, 1000],
-        "hic.delta_models_path": "ultimate-models",
+        "hic.intact": True,
         "hic.fastq": [[{"read_1": "foo"}]],
         "hic.reference_index": "https://www.encodeproject.org/files/ENCFF643CGH/@@download/ENCFF643CGH.tar.gz",
         "hic.restriction_enzymes": ["none"],

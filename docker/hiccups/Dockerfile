@@ -38,6 +38,10 @@ RUN curl \
     chmod 666 /opt/juicer/CPU/common/juicer_tools.jar && \
     ln -s juicer/CPU scripts
 
+RUN curl \
+        -LO \
+        https://github.com/aidenlab/Juicebox/releases/download/v.2.13.07/feature_tools.jar
+
 # For sorting, LC_ALL is C
 ENV LC_ALL C
 ENV PATH=/opt:/opt/scripts:/opt/scripts/common:$PATH

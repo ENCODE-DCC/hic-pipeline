@@ -14,9 +14,9 @@ struct BamAndLigationCount {
 
 workflow hic {
     meta {
-        version: "1.7.1"
-        caper_docker: "encodedcc/hic-pipeline:1.7.1"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.7.1"
+        version: "1.8.0"
+        caper_docker: "encodedcc/hic-pipeline:1.8.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.8.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -34,12 +34,10 @@ workflow hic {
 
         # Parameters controlling delta calls
         Boolean no_delta = false
-        # Should be [5000, 10000] for in-situ, [1000, 5000, 10000] for intact
-        Array[Int] delta_resolutions = [5000, 10000]
-        # Change to "ultimate-models" for intact
-        String delta_models_path = "beta-models"
-        String delta_docker = "encodedcc/hic-pipeline:1.7.1_delta"
+        String delta_docker = "encodedcc/hic-pipeline:1.8.0_delta"
+        String hiccups_docker = "encodedcc/hic-pipeline:1.8.0_hiccups"
 
+        Boolean intact = false
         Array[String] normalization_methods = []
         Boolean no_pairs = false
         Boolean no_call_loops = false
@@ -52,18 +50,13 @@ workflow hic {
         Int? create_hic_num_cpus
         Int? add_norm_num_cpus
         String assembly_name = "undefined"
-
-        # Inputs for GATK
-        File? reference_fasta
-        File? dbsnp_vcf
-        File? dbsnp_vcf_index
-        File? hapmap_vcf_index
-        File? hapmap_vcf
-        File? mills_vcf
-        File? mills_vcf_index
-        File? omni_vcf
-        File? omni_vcf_index
     }
+
+    String delta_models_path = if intact then "ultimate-models" else "beta-models"
+    Array[Int] delta_resolutions = if intact then [5000, 2000, 1000] else [5000, 10000]
+    Array[Int] create_hic_in_situ_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100]
+    Array[Int] create_hic_intact_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100, 50, 20, 10]
+    Array[Int] create_hic_resolutions = if intact then create_hic_intact_resolutions else create_hic_in_situ_resolutions
 
     # Default MAPQ thresholds for generating .hic contact maps
     Array[Int] DEFAULT_HIC_QUALITIES = [1, 30]
@@ -210,6 +203,7 @@ workflow hic {
                 quality = qualities[i],
                 stats = calculate_stats.stats,
                 stats_hists = calculate_stats.stats_hists,
+                resolutions = create_hic_resolutions,
                 assembly_name = assembly_name,
                 num_cpus = create_hic_num_cpus,
             }
@@ -223,6 +217,7 @@ workflow hic {
                 quality = qualities[i],
                 stats = calculate_stats.stats,
                 stats_hists = calculate_stats.stats_hists,
+                resolutions = create_hic_resolutions,
                 assembly_name = normalize_assembly_name.normalized_assembly_name,
                 num_cpus = create_hic_num_cpus,
             }
@@ -248,9 +243,19 @@ workflow hic {
             }
         }
         if (!no_call_loops) {
-            call hiccups { input:
-                hic_file = add_norm.output_hic,
-                quality = qualities[i],
+            if (!intact) {
+                call hiccups { input:
+                    hic_file = add_norm.output_hic,
+                    quality = qualities[i],
+                    docker = hiccups_docker,
+                }
+            }
+            if (intact) {
+                call hiccups_2 { input:
+                    hic = add_norm.output_hic,
+                    quality = qualities[i],
+                    docker = hiccups_docker,
+                }
             }
         }
 
@@ -287,8 +292,17 @@ workflow hic {
             }
         }
         if (!no_call_loops) {
-            call hiccups as hiccups_input_hic { input:
-                hic_file = select_first([input_hic])
+            if (!intact) {
+                call hiccups as hiccups_input_hic { input:
+                    hic_file = select_first([input_hic]),
+                    docker = hiccups_docker,
+                }
+            }
+            if (intact) {
+                call hiccups_2 as hiccups_2_input_hic { input:
+                    hic = select_first([input_hic]),
+                    docker = hiccups_docker,
+                }
             }
         }
     }
@@ -693,6 +707,7 @@ task create_hic {
         File stats
         File stats_hists
         Int quality
+        Array[Int] resolutions
         String? assembly_name
         File? chrsz
         File? restriction_sites
@@ -719,7 +734,7 @@ task create_hic {
             -s ~{stats} \
             -g ~{stats_hists} \
             ~{if defined(assembly_name) then "-y " + assembly_name else ""} \
-            -r 2500000,1000000,500000,250000,100000,50000,25000,10000,5000,2000,1000,500,200,100 \
+            -r ~{sep="," resolutions} \
             -i $PRE_INDEX_FILE \
             --block-capacity 1000000 \
             --threads ~{num_cpus} \
@@ -810,6 +825,7 @@ task hiccups {
     input {
         File hic_file
         Int quality = 0
+        String docker
     }
 
     command {
@@ -833,10 +849,58 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 HDD"
-        docker: "encodedcc/hic-pipeline:1.7.1_hiccups"
+        docker: "~{docker}"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
+        zones: [
+            "us-central1-c",
+            "us-central1-f",
+            "us-east1-b",
+            "us-east1-c",
+            "us-west1-a",
+            "us-west1-b",
+        ]
+    }
+}
+
+task hiccups_2 {
+    input {
+        File hic
+        Int quality = 0
+        Int num_cpus = 2
+        String docker
+    }
+
+    command {
+        set -euo pipefail
+        java \
+            -Ddevelopment=false \
+            -Djava.awt.headless=true \
+            -Xmx60G \
+            -Xms60G \
+            -jar /opt/feature_tools.jar \
+            hiccups2 \
+            -k SCALE \
+            --threads ~{num_cpus} \
+            ~{hic} \
+            loops
+        gzip -n loops/merged_loops.bedpe
+        mv loops/merged_loops.bedpe.gz merged_loops_~{quality}.bedpe.gz
+    }
+
+    output {
+        File merged_loops = "merged_loops_~{quality}.bedpe.gz"
+    }
+
+    runtime {
+        cpu : "~{num_cpus}"
+        bootDiskSizeGb: "20"
+        disks: "local-disk 100 HDD"
+        docker: "~{docker}"
+        gpuType: "nvidia-tesla-p100"
+        gpuCount: 1
+        memory: "64 GB"
         zones: [
             "us-central1-c",
             "us-central1-f",

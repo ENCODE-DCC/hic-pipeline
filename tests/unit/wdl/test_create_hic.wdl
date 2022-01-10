@@ -9,6 +9,7 @@ workflow test_create_hic {
         File stats
         File stats_hists
         File chrsz
+        Array[Int] resolutions
         File? restriction_sites
         String assembly_name
         Int quality
@@ -21,6 +22,7 @@ workflow test_create_hic {
         stats_hists = stats_hists,
         chrsz = chrsz,
         restriction_sites = restriction_sites,
+        resolutions = resolutions,
         quality = quality,
         assembly_name = assembly_name,
     }
