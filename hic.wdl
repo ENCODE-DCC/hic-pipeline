@@ -249,12 +249,22 @@ workflow hic {
                     quality = qualities[i],
                     docker = hiccups_docker,
                 }
+
+                call localizer { input:
+                    hic = add_norm.output_hic,
+                    quality = qualities[i],
+                }
             }
             if (intact) {
                 call hiccups_2 { input:
                     hic = add_norm.output_hic,
                     quality = qualities[i],
                     docker = hiccups_docker,
+                }
+
+                call localizer as localizer_intact { input:
+                    hic = add_norm.output_hic,
+                    quality = qualities[i],
                 }
             }
         }
@@ -297,11 +307,19 @@ workflow hic {
                     hic_file = select_first([input_hic]),
                     docker = hiccups_docker,
                 }
+                call localizer as localizer_input_hic { input:
+                    hic = select_first([input_hic]),
+                    loops = hiccups_input_hic.merged_loops,
+                }
             }
             if (intact) {
                 call hiccups_2 as hiccups_2_input_hic { input:
                     hic = select_first([input_hic]),
                     docker = hiccups_docker,
+                }
+                call localizer as localizer_intact_input_hic { input:
+                    hic = select_first([input_hic]),
+                    loops = hiccups_2_input_hic.merged_loops,
                 }
             }
         }
@@ -909,6 +927,50 @@ task hiccups_2 {
             "us-west1-a",
             "us-west1-b",
         ]
+    }
+}
+
+task localizer {
+    input {
+        File hic
+        File loops
+        Int quality = 0
+        Int num_cpus = 24
+    }
+
+    command {
+        set -euo pipefail
+        export LOOPS_FILE=loops.bedpe
+        gzip -dc ~{loops} > $LOOPS_FILE
+        java \
+            -Ddevelopment=false \
+            -Djava.awt.headless=true \
+            -Xmx60G \
+            -Xms60G \
+            -jar /opt/feature_tools.jar \
+            localizer \
+            -k SCALE \
+            -r 100 \
+            -w 1 \
+            --threads ~{num_cpus} \
+            ~{hic} \
+            $LOOPS_FILE \
+            localized
+        ls
+        echo "localized"
+        ls localized
+        gzip -n localized/merged_loops.bedpe
+        mv localized/merged_loops.bedpe.gz localized_loops_~{quality}.bedpe.gz
+    }
+
+    output {
+        File localized_loops = "localized_loops_~{quality}.bedpe.gz"
+    }
+
+    runtime {
+        cpu : "~{num_cpus}"
+        disks: "local-disk 100 HDD"
+        memory: "64 GB"
     }
 }
 
