@@ -6,5 +6,6 @@
   "test_create_hic.quality": "30",
   "test_create_hic.restriction_sites": "tests/data/dummy.txt",
   "test_create_hic.stats": "tests/data/dummy.txt",
-  "test_create_hic.stats_hists": "tests/data/dummy.txt"
+  "test_create_hic.stats_hists": "tests/data/dummy.txt",
+  "test_create_hic.resolutions": [1, 2, 3]
 }

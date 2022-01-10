@@ -54,6 +54,9 @@ workflow hic {
 
     String delta_models_path = if intact then "ultimate-models" else "beta-models"
     Array[Int] delta_resolutions = if intact then [5000, 2000, 1000] else [5000, 10000]
+    Array[Int] create_hic_in_situ_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100]
+    Array[Int] create_hic_intact_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100, 50, 20, 10]
+    Array[Int] create_hic_resolutions = if intact then create_hic_intact_resolutions else create_hic_in_situ_resolutions
 
     # Default MAPQ thresholds for generating .hic contact maps
     Array[Int] DEFAULT_HIC_QUALITIES = [1, 30]
@@ -200,6 +203,7 @@ workflow hic {
                 quality = qualities[i],
                 stats = calculate_stats.stats,
                 stats_hists = calculate_stats.stats_hists,
+                resolutions = create_hic_resolutions,
                 assembly_name = assembly_name,
                 num_cpus = create_hic_num_cpus,
             }
@@ -213,6 +217,7 @@ workflow hic {
                 quality = qualities[i],
                 stats = calculate_stats.stats,
                 stats_hists = calculate_stats.stats_hists,
+                resolutions = create_hic_resolutions,
                 assembly_name = normalize_assembly_name.normalized_assembly_name,
                 num_cpus = create_hic_num_cpus,
             }
@@ -702,6 +707,7 @@ task create_hic {
         File stats
         File stats_hists
         Int quality
+        Array[Int] resolutions
         String? assembly_name
         File? chrsz
         File? restriction_sites
@@ -728,7 +734,7 @@ task create_hic {
             -s ~{stats} \
             -g ~{stats_hists} \
             ~{if defined(assembly_name) then "-y " + assembly_name else ""} \
-            -r 2500000,1000000,500000,250000,100000,50000,25000,10000,5000,2000,1000,500,200,100 \
+            -r ~{sep="," resolutions} \
             -i $PRE_INDEX_FILE \
             --block-capacity 1000000 \
             --threads ~{num_cpus} \

@@ -7,5 +7,7 @@
       tests/unit/wdl/test_create_hic.wdl
       tests/unit/json/test_create_hic_with_restriction_sites.json
     stdout:
+      contains:
+        - -r 1,2,3
       contains_regex:
         - 'gzip -dc .*dummy.txt > \$RESTRICTION_SITES_FILENAME'
