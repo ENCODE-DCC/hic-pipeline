@@ -199,6 +199,7 @@ task run_3d_dna {
         bash \
             /opt/3d-dna/phase/run-hic-phaser-encode.sh \
             --threads ~{num_cpus} \
+            --to-stage update_vcf \
             ${VCF_FILENAME} \
             ~{bam}
         gzip -n *.txt *.vcf *.assembly
@@ -210,9 +211,9 @@ task run_3d_dna {
         File hic_vcf = "snp.out_HiC.vcf.gz"
 
         # .hic files
-        File hic_in= "snp.out.in.hic"
-        File hic = "snp.out.out.hic"
-        File hic_diploid = "diploid.hic"
+        # File hic_in= "snp.out.in.hic"
+        # File hic = "snp.out.out.hic"
+        # File hic_diploid = "diploid.hic"
 
         # Scaffold boundary files (Juicebox 2D annotation format)
         File scaffold_track = "snp.out.out_asm.scaffold_track.txt.gz"
