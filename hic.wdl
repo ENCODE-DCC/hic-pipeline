@@ -265,7 +265,7 @@ workflow hic {
 
                 call localizer as localizer_intact { input:
                     hic = add_norm.output_hic,
-                    loops = hiccups.merged_loops,
+                    loops = hiccups_2.merged_loops,
                     quality = qualities[i],
                 }
             }
