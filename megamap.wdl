@@ -224,8 +224,8 @@ task run_3d_dna {
         File assembly_in = "snp.out.in.assembly.gz"
         File assembly = "snp.out.out.assembly.gz"
 
-        File diploid_mnd = "diploid.mnd.txt.gz"
-        File snp_mnd = "snp.mnd.txt.gz"
+        # File diploid_mnd = "diploid.mnd.txt.gz"
+        # File snp_mnd = "snp.mnd.txt.gz"
     }
 
     runtime {
