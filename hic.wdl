@@ -249,13 +249,8 @@ workflow hic {
                     quality = qualities[i],
                     docker = hiccups_docker,
                 }
-
-                call localizer { input:
-                    hic = add_norm.output_hic,
-                    loops = hiccups.merged_loops,
-                    quality = qualities[i],
-                }
             }
+
             if (intact) {
                 call hiccups_2 { input:
                     hic = add_norm.output_hic,
@@ -314,11 +309,8 @@ workflow hic {
                     hic_file = select_first([input_hic]),
                     docker = hiccups_docker,
                 }
-                call localizer as localizer_input_hic { input:
-                    hic = select_first([input_hic]),
-                    loops = hiccups_input_hic.merged_loops,
-                }
             }
+
             if (intact) {
                 call hiccups_2 as hiccups_2_input_hic { input:
                     hic = select_first([input_hic]),
