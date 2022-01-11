@@ -118,6 +118,10 @@ RUN curl \
 
 RUN curl \
         -LO \
+        https://github.com/aidenlab/Juicebox/releases/download/v.2.13.07/feature_tools.jar
+
+RUN curl \
+        -LO \
         https://github.com/sa501428/mixer-tools/releases/download/v4.07.09/MixerTools.4.7.9.jar&& \
     chmod 666 /opt/MixerTools.4.7.9.jar && \
     ln -s /opt/MixerTools.4.7.9.jar /opt/MixerTools.jar

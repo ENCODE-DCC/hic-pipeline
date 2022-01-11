@@ -295,6 +295,11 @@ workflow hic {
             resolutions = delta_resolutions,
             models_path = delta_models_path,
         }
+
+        call localizer as localizer_delta { input:
+            hic = if length(add_norm.output_hic) > 1 then add_norm.output_hic[1] else select_first([input_hic]),
+            loops = delta.loops,
+        }
     }
 
     if (defined(input_hic)) {
