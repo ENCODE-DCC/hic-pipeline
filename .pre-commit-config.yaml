@@ -18,13 +18,7 @@ repos:
       - id: isort
         language_version: python3.7
 
-  - repo: git://github.com/detailyang/pre-commit-shell
-    sha: v1.0.6
-    hooks:
-      - id: shell-lint
-        args: [--severity=warning]
-
-  - repo: git://github.com/detailyang/pre-commit-shell
+  - repo: https://github.com/detailyang/pre-commit-shell
     sha: v1.0.6
     hooks:
       - id: shell-lint
