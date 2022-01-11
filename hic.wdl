@@ -963,11 +963,8 @@ task localizer {
             ~{hic} \
             $LOOPS_FILE \
             localized
-        ls
-        echo "localized"
-        ls localized
-        gzip -n localized/merged_loops.bedpe
-        mv localized/merged_loops.bedpe.gz localized_loops_~{quality}.bedpe.gz
+        gzip -n localized/localizedList_primary_100.bedpe
+        mv localized/localizedList_primary_100.bedpe.gz localized_loops_~{quality}.bedpe.gz
     }
 
     output {
