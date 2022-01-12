@@ -118,7 +118,7 @@ RUN curl \
 
 RUN curl \
         -LO \
-        https://github.com/aidenlab/Juicebox/releases/download/v.2.13.07/feature_tools.jar
+        https://github.com/aidenlab/Juicebox/releases/download/v.2.14.00/feature_tools.jar
 
 RUN curl \
         -LO \
