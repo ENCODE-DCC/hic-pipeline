@@ -14,9 +14,9 @@ struct BamAndLigationCount {
 
 workflow hic {
     meta {
-        version: "1.8.0"
-        caper_docker: "encodedcc/hic-pipeline:1.8.0"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.8.0"
+        version: "1.9.0"
+        caper_docker: "encodedcc/hic-pipeline:1.9.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.9.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -34,8 +34,8 @@ workflow hic {
 
         # Parameters controlling delta calls
         Boolean no_delta = false
-        String delta_docker = "encodedcc/hic-pipeline:1.8.0_delta"
-        String hiccups_docker = "encodedcc/hic-pipeline:1.8.0_hiccups"
+        String delta_docker = "encodedcc/hic-pipeline:1.9.0_delta"
+        String hiccups_docker = "encodedcc/hic-pipeline:1.9.0_hiccups"
 
         Boolean intact = false
         Array[String] normalization_methods = []
@@ -250,11 +250,18 @@ workflow hic {
                     docker = hiccups_docker,
                 }
             }
+
             if (intact) {
                 call hiccups_2 { input:
                     hic = add_norm.output_hic,
                     quality = qualities[i],
                     docker = hiccups_docker,
+                }
+
+                call localizer as localizer_intact { input:
+                    hic = add_norm.output_hic,
+                    loops = hiccups_2.merged_loops,
+                    quality = qualities[i],
                 }
             }
         }
@@ -283,6 +290,11 @@ workflow hic {
             resolutions = delta_resolutions,
             models_path = delta_models_path,
         }
+
+        call localizer as localizer_delta { input:
+            hic = if length(add_norm.output_hic) > 1 then add_norm.output_hic[1] else select_first([input_hic]),
+            loops = delta.loops,
+        }
     }
 
     if (defined(input_hic)) {
@@ -298,10 +310,15 @@ workflow hic {
                     docker = hiccups_docker,
                 }
             }
+
             if (intact) {
                 call hiccups_2 as hiccups_2_input_hic { input:
                     hic = select_first([input_hic]),
                     docker = hiccups_docker,
+                }
+                call localizer as localizer_intact_input_hic { input:
+                    hic = select_first([input_hic]),
+                    loops = hiccups_2_input_hic.merged_loops,
                 }
             }
         }
@@ -909,6 +926,47 @@ task hiccups_2 {
             "us-west1-a",
             "us-west1-b",
         ]
+    }
+}
+
+task localizer {
+    input {
+        File hic
+        File loops
+        Int quality = 0
+        Int num_cpus = 24
+    }
+
+    command {
+        set -euo pipefail
+        export LOOPS_FILE=loops.bedpe
+        gzip -dc ~{loops} > $LOOPS_FILE
+        java \
+            -Ddevelopment=false \
+            -Djava.awt.headless=true \
+            -Xmx60G \
+            -Xms60G \
+            -jar /opt/feature_tools.jar \
+            localizer \
+            -k SCALE \
+            -r 100 \
+            -w 1 \
+            --threads ~{num_cpus} \
+            ~{hic} \
+            $LOOPS_FILE \
+            localized
+        gzip -n localized/localizedList_primary_100.bedpe
+        mv localized/localizedList_primary_100.bedpe.gz localized_loops_~{quality}.bedpe.gz
+    }
+
+    output {
+        File localized_loops = "localized_loops_~{quality}.bedpe.gz"
+    }
+
+    runtime {
+        cpu : "~{num_cpus}"
+        disks: "local-disk 100 HDD"
+        memory: "64 GB"
     }
 }
 
