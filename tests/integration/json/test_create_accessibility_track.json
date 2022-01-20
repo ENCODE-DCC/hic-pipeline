@@ -1,5 +1,5 @@
 {
-  "test_create_accessibility_track.chrom_sizes": "tests/data/GRCh38_EBV.chrom.sizes.tsv",
+  "test_create_accessibility_track.chrom_sizes": "tests/data/GRCh38_EBV_full.chrom.sizes.tsv",
   "test_create_accessibility_track.num_cpus": 1,
   "test_create_accessibility_track.pre": "tests/data/intact_merged_nodups_30.txt.gz"
 }
