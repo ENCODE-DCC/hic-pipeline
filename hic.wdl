@@ -176,6 +176,13 @@ workflow hic {
             quality = qualities[i],
         }
 
+        if (intact) {
+            call create_accessiblity_track { input:
+                pre = bam_to_pre.pre,
+                chrom_sizes = select_first([chrsz]),
+            }
+        }
+
         call calculate_stats { input:
             alignment_stats = flatten(
                 select_all(
@@ -1089,6 +1096,34 @@ task slice {
         cpu : "1"
         disks: "local-disk 100 SSD"
         memory : "24 GB"
+    }
+}
+
+task create_accessiblity_track {
+    input {
+        File pre
+        File chrom_sizes
+        Int num_cpus = 2
+    }
+
+    command <<<
+        set -euo pipefail
+        PRE_FILE=pre.txt
+        gzip -dc ~{pre} > $PRE_FILE
+        awk \
+            'BEGIN{OFS="\t"}{cut[$2" "$3]++; cut[$6" "$7]++}END{for(i in cut){split(i, arr, " "); print arr[1], arr[2]-1, arr[2], cut[i]}}' \
+            $PRE_FILE | sort -k1,1 -k2,2n --parallel=~{num_cpus} -S6G > merged30.bedgraph
+        bedGraphToBigWig merged30.bedgraph ~{chrom_sizes} inter_30.bw
+    >>>
+
+    output {
+        File bigwig = "inter_30.bw"
+    }
+
+    runtime {
+        cpu : "~{num_cpus}"
+        memory: "8 GB"
+        disks: "local-disk 1000 HDD"
     }
 }
 
