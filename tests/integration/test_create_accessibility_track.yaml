@@ -8,4 +8,4 @@
       tests/integration/json/test_create_accessibility_track.json
     files:
       - path: test-output/inter_30.bw
-        md5sum: 4bcef45bc07b2426be3b6528a1f6e25c
+        md5sum: 89a3ac43762676915282bccdfbb33db8
