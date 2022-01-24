@@ -176,7 +176,7 @@ workflow hic {
             quality = qualities[i],
         }
 
-        if (intact) {
+        if (intact && qualities[i] == 30) {
             call create_accessiblity_track { input:
                 pre = bam_to_pre.pre,
                 chrom_sizes = select_first([chrsz]),
@@ -1124,6 +1124,7 @@ task create_accessiblity_track {
         cpu : "~{num_cpus}"
         memory: "8 GB"
         disks: "local-disk 1000 HDD"
+        docker: "encodedcc/hic-pipeline:PIP-1665-add-accessiblity_f854ee70-7c25-4c27-9df8-67b432a1a13c"
     }
 }
 
