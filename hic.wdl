@@ -1112,7 +1112,7 @@ task create_accessiblity_track {
         gzip -dc ~{pre} > $PRE_FILE
         awk \
             'BEGIN{OFS="\t"}{cut[$2" "$3]++; cut[$6" "$7]++}END{for(i in cut){split(i, arr, " "); print arr[1], arr[2]-1, arr[2], cut[i]}}' \
-            $PRE_FILE | sort -k1,1 -k2,2n --parallel=~{num_cpus} -S6G > merged30.bedgraph
+            $PRE_FILE | sort -k1,1 -k2,2n -S6G > merged30.bedgraph
         bedGraphToBigWig merged30.bedgraph ~{chrom_sizes} inter_30.bw
     >>>
 
@@ -1122,9 +1122,8 @@ task create_accessiblity_track {
 
     runtime {
         cpu : "~{num_cpus}"
-        memory: "8 GB"
+        memory: "256 GB"
         disks: "local-disk 1000 HDD"
-        docker: "encodedcc/hic-pipeline:PIP-1665-add-accessiblity_f854ee70-7c25-4c27-9df8-67b432a1a13c"
     }
 }
 
