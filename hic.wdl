@@ -177,7 +177,7 @@ workflow hic {
         }
 
         if (intact && qualities[i] == 30) {
-            call create_accessiblity_track { input:
+            call create_accessibility_track { input:
                 pre = bam_to_pre.pre,
                 chrom_sizes = select_first([chrsz]),
             }
@@ -1099,11 +1099,10 @@ task slice {
     }
 }
 
-task create_accessiblity_track {
+task create_accessibility_track {
     input {
         File pre
         File chrom_sizes
-        Int num_cpus = 2
     }
 
     command <<<
@@ -1121,7 +1120,7 @@ task create_accessiblity_track {
     }
 
     runtime {
-        cpu : "~{num_cpus}"
+        cpu : "8"
         memory: "256 GB"
         disks: "local-disk 1000 HDD"
     }

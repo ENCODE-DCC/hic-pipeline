@@ -9,7 +9,7 @@ workflow test_create_accessibility_track {
         Int num_cpus
     }
 
-    call hic.create_accessiblity_track { input:
+    call hic.create_accessibility_track { input:
         pre = pre,
         chrom_sizes = chrom_sizes,
         num_cpus = num_cpus,
