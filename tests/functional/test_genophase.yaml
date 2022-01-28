@@ -1,11 +1,11 @@
 ---
-  - name: test_megamap
+  - name: test_genophase
     tags:
       - functional
     command: >-
       tests/caper_run.sh
-      megamap.wdl
-      tests/functional/json/test_megamap.json
+      genophase.wdl
+      tests/functional/json/test_genophase.json
     files:
       - path: test-output/GRCh38_no_alt_analysis_set_GCA_000001405.15.interval_list
         md5sum: 1393f5634d40a39501cc471210ca61fd

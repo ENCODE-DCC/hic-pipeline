@@ -2,7 +2,7 @@ version 1.0
 
 import "./hic.wdl"
 
-workflow megamap {
+workflow genophase {
     meta {
         version: "1.10.0"
         caper_docker: "encodedcc/hic-pipeline:1.10.0"
