@@ -1121,7 +1121,7 @@ task create_accessibility_track {
 
     runtime {
         cpu : "8"
-        memory: "256 GB"
+        memory: "384 GB"
         disks: "local-disk 1000 HDD"
     }
 }
