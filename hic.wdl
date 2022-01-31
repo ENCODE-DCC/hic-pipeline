@@ -654,6 +654,8 @@ task merge {
     input {
         Array[File] bams
         Int num_cpus = 8
+        Int ram_gb = 16
+        Int disk_size_gb = 6000
         String output_bam_filename = "merged"
         RuntimeEnvironment runtime_environment
     }
@@ -675,8 +677,8 @@ task merge {
 
     runtime {
         cpu : "~{num_cpus}"
-        memory: "16 GB"
-        disks: "local-disk 6000 HDD"
+        memory: "~{ram_gb} GB"
+        disks: "local-disk ~{disk_size_gb} HDD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
     }

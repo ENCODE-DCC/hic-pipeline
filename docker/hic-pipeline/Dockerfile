@@ -38,6 +38,12 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 # Need to be sure we have this for stats
 RUN locale-gen en_US.UTF-8
 
+# Fix warning for diploidify
+# https://www.educative.io/edpresso/error-mesg-ttyname-failed-inappropriate-ioctl-for-device
+# Need to escape the &s
+# https://unix.stackexchange.com/questions/32907/what-characters-do-i-need-to-escape-when-using-sed-in-a-sh-script
+RUN sed -i 's/mesg n || true/tty -s \&\& mesg n/' /root/.profile
+
 WORKDIR /opt/
 
 # Install BWA
@@ -105,7 +111,7 @@ RUN git clone https://github.com/ENCODE-DCC/kentUtils_bin_v381.git && \
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     cd juicer && \
-    git checkout 7b21fd620ee1f07266206caa2a7992d08d51ba8e && \
+    git checkout 50d557f1d4725a475071fce5975839602bd311e5 && \
     chmod +x CPU/* CPU/common/* misc/* && \
     find -mindepth 1 -maxdepth 1  -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
 
@@ -115,7 +121,9 @@ RUN curl \
         https://github.com/aidenlab/Juicebox/releases/download/v2.13.06/juicer_tools_2.13.06.jar \
         -o /opt/juicer/CPU/common/juicer_tools.jar && \
     chmod 666 /opt/juicer/CPU/common/juicer_tools.jar && \
-    ln -s juicer/CPU scripts
+    ln -s juicer/CPU scripts && \
+    ln -s /opt/juicer/CPU/common/juicer_tools /opt/juicer/CPU/juicer_tools && \
+    ln -s /opt/juicer/CPU/common/juicer_tools.jar /opt/juicer/CPU/juicer_tools.jar
 
 RUN curl \
         -LO \
