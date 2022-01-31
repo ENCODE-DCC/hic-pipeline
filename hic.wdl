@@ -49,6 +49,8 @@ workflow hic {
         Int? dedup_disk_size_gb
         Int? create_hic_num_cpus
         Int? add_norm_num_cpus
+        Int? create_accessibility_track_ram_gb
+        Int? create_accessibility_track_disk_size_gb
         String assembly_name = "undefined"
     }
 
@@ -180,6 +182,8 @@ workflow hic {
             call create_accessibility_track { input:
                 pre = bam_to_pre.pre,
                 chrom_sizes = select_first([chrsz]),
+                ram_gb = create_accessibility_track_ram_gb,
+                disk_size_gb = create_accessibility_track_disk_size_gb,
             }
         }
 
@@ -1103,6 +1107,8 @@ task create_accessibility_track {
     input {
         File pre
         File chrom_sizes
+        Int ram_gb = 348
+        Int disk_size_gb = 1000
     }
 
     command <<<
@@ -1120,9 +1126,9 @@ task create_accessibility_track {
     }
 
     runtime {
-        cpu : "8"
-        memory: "384 GB"
-        disks: "local-disk 1000 HDD"
+        cpu : "1"
+        memory: "~{ram_gb} GB"
+        disks: "local-disk ~{disk_size_gb} HDD"
     }
 }
 
