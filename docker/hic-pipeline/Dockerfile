@@ -95,11 +95,12 @@ RUN git clone https://github.com/aidenlab/EigenVector.git && \
     mv newGW_Intra_Flip /usr/local/bin && \
     rm -rf newGW_Intra_Flip
 
-RUN curl \
-        -OL \
-        https://github.com/ENCODE-DCC/kentUtils_bin_v381/raw/d0ba32f3aee6da02c0f75d8f998c5f1d921b047c/bin/wigToBigWig && \
-        chmod +x wigToBigWig && \
-        mv wigToBigWig /usr/local/bin
+RUN git clone https://github.com/ENCODE-DCC/kentUtils_bin_v381.git && \
+    cd kentUtils_bin_v381/bin && \
+    chmod +x wigToBigWig bedGraphToBigWig && \
+    mv wigToBigWig bedGraphToBigWig /usr/local/bin && \
+    cd ../../ && \
+    rm -rf kentUtils_bin_v381
 
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \

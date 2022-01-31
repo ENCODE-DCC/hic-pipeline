@@ -1,0 +1,11 @@
+---
+  - name: test_create_accessibility_track
+    tags:
+      - integration
+    command: >-
+      tests/caper_run.sh
+      tests/integration/wdl/test_create_accessibility_track.wdl
+      tests/integration/json/test_create_accessibility_track.json
+    files:
+      - path: test-output/inter_30.bw
+        md5sum: 89a3ac43762676915282bccdfbb33db8

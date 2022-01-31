@@ -14,9 +14,9 @@ struct BamAndLigationCount {
 
 workflow hic {
     meta {
-        version: "1.9.0"
-        caper_docker: "encodedcc/hic-pipeline:1.9.0"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.9.0"
+        version: "1.10.0"
+        caper_docker: "encodedcc/hic-pipeline:1.10.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.10.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -34,8 +34,8 @@ workflow hic {
 
         # Parameters controlling delta calls
         Boolean no_delta = false
-        String delta_docker = "encodedcc/hic-pipeline:1.9.0_delta"
-        String hiccups_docker = "encodedcc/hic-pipeline:1.9.0_hiccups"
+        String delta_docker = "encodedcc/hic-pipeline:1.10.0_delta"
+        String hiccups_docker = "encodedcc/hic-pipeline:1.10.0_hiccups"
 
         Boolean intact = false
         Array[String] normalization_methods = []
@@ -49,6 +49,8 @@ workflow hic {
         Int? dedup_disk_size_gb
         Int? create_hic_num_cpus
         Int? add_norm_num_cpus
+        Int? create_accessibility_track_ram_gb
+        Int? create_accessibility_track_disk_size_gb
         String assembly_name = "undefined"
     }
 
@@ -174,6 +176,15 @@ workflow hic {
         call bam_to_pre { input:
             bam = select_first([merge_replicates.bam]),
             quality = qualities[i],
+        }
+
+        if (intact && qualities[i] == 30) {
+            call create_accessibility_track { input:
+                pre = bam_to_pre.pre,
+                chrom_sizes = select_first([chrsz]),
+                ram_gb = create_accessibility_track_ram_gb,
+                disk_size_gb = create_accessibility_track_disk_size_gb,
+            }
         }
 
         call calculate_stats { input:
@@ -1089,6 +1100,35 @@ task slice {
         cpu : "1"
         disks: "local-disk 100 SSD"
         memory : "24 GB"
+    }
+}
+
+task create_accessibility_track {
+    input {
+        File pre
+        File chrom_sizes
+        Int ram_gb = 348
+        Int disk_size_gb = 1000
+    }
+
+    command <<<
+        set -euo pipefail
+        PRE_FILE=pre.txt
+        gzip -dc ~{pre} > $PRE_FILE
+        awk \
+            'BEGIN{OFS="\t"}{cut[$2" "$3]++; cut[$6" "$7]++}END{for(i in cut){split(i, arr, " "); print arr[1], arr[2]-1, arr[2], cut[i]}}' \
+            $PRE_FILE | sort -k1,1 -k2,2n -S6G > merged30.bedgraph
+        bedGraphToBigWig merged30.bedgraph ~{chrom_sizes} inter_30.bw
+    >>>
+
+    output {
+        File bigwig = "inter_30.bw"
+    }
+
+    runtime {
+        cpu : "1"
+        memory: "~{ram_gb} GB"
+        disks: "local-disk ~{disk_size_gb} HDD"
     }
 }
 
