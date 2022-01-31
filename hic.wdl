@@ -19,9 +19,9 @@ struct RuntimeEnvironment {
 
 workflow hic {
     meta {
-        version: "1.12.2"
-        caper_docker: "encodedcc/hic-pipeline:1.12.2"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.12.2"
+        version: "1.13.0"
+        caper_docker: "encodedcc/hic-pipeline:1.13.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.13.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
         description: "ENCODE Hi-C pipeline, see https://github.com/ENCODE-DCC/hic-pipeline for details."
     }
@@ -65,10 +65,10 @@ workflow hic {
         Int? create_accessibility_track_disk_size_gb
         String assembly_name = "undefined"
 
-        String docker = "encodedcc/hic-pipeline:1.12.2"
-        String singularity = "docker://encodedcc/hic-pipeline:1.12.2"
-        String delta_docker = "encodedcc/hic-pipeline:1.12.2_delta"
-        String hiccups_docker = "encodedcc/hic-pipeline:1.12.2_hiccups"
+        String docker = "encodedcc/hic-pipeline:1.13.0"
+        String singularity = "docker://encodedcc/hic-pipeline:1.13.0"
+        String delta_docker = "encodedcc/hic-pipeline:1.13.0_delta"
+        String hiccups_docker = "encodedcc/hic-pipeline:1.13.0_hiccups"
     }
 
     RuntimeEnvironment runtime_environment = {
