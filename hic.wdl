@@ -14,9 +14,9 @@ struct BamAndLigationCount {
 
 workflow hic {
     meta {
-        version: "1.9.0"
-        caper_docker: "encodedcc/hic-pipeline:1.9.0"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.9.0"
+        version: "1.10.0"
+        caper_docker: "encodedcc/hic-pipeline:1.10.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.10.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -34,8 +34,8 @@ workflow hic {
 
         # Parameters controlling delta calls
         Boolean no_delta = false
-        String delta_docker = "encodedcc/hic-pipeline:1.9.0_delta"
-        String hiccups_docker = "encodedcc/hic-pipeline:1.9.0_hiccups"
+        String delta_docker = "encodedcc/hic-pipeline:1.10.0_delta"
+        String hiccups_docker = "encodedcc/hic-pipeline:1.10.0_hiccups"
 
         Boolean intact = false
         Array[String] normalization_methods = []
