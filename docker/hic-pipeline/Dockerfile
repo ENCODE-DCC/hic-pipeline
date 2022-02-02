@@ -102,6 +102,10 @@ RUN git clone https://github.com/ENCODE-DCC/kentUtils_bin_v381.git && \
     cd ../../ && \
     rm -rf kentUtils_bin_v381
 
+RUN git clone --branch phasing https://github.com/aidenlab/3d-dna.git && \
+    cd 3d-dna && \
+    git checkout 634b49b9a93ac166914dc3baae586489bb793c92
+
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     cd juicer && \

@@ -2,11 +2,11 @@ version 1.0
 
 import "./hic.wdl"
 
-workflow megamap {
+workflow genophase {
     meta {
-        version: "1.10.0"
-        caper_docker: "encodedcc/hic-pipeline:1.10.0"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.10.0"
+        version: "1.11.0"
+        caper_docker: "encodedcc/hic-pipeline:1.11.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.11.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -25,6 +25,12 @@ workflow megamap {
         File omni_vcf
         File omni_vcf_index
         Int? gatk_num_cpus
+        Int? gatk_disk_size_gb
+        Int? gatk_ram_gb
+        Int? run_3d_dna_num_cpus
+        Int? run_3d_dna_disk_size_gb
+        Int? run_3d_dna_ram_gb
+        Boolean no_phasing = false
         # Only for testing purposes
         Boolean no_bundle = false
     }
@@ -59,14 +65,18 @@ workflow megamap {
         dbsnp_vcf_index = dbsnp_vcf_index,
         no_bundle = no_bundle,
         num_cpus = gatk_num_cpus,
+        ram_gb = gatk_ram_gb,
+        disk_size_gb = gatk_disk_size_gb,
     }
 
-    output {
-        File fasta_index = create_reference_fasta_index.fasta_index
-        File sequence_dictionary = create_gatk_references.sequence_dictionary
-        File interval_list = create_gatk_references.interval_list
-        File snp_vcf = gatk.snp_vcf
-        File indel_vcf = gatk.indel_vcf
+    if (!no_phasing) {
+        call run_3d_dna { input:
+            vcf = gatk.snp_vcf,
+            bam = merged.bam,
+            num_cpus = run_3d_dna_num_cpus,
+            ram_gb = run_3d_dna_ram_gb,
+            disk_size_gb = run_3d_dna_disk_size_gb,
+        }
     }
 }
 
@@ -140,6 +150,8 @@ task gatk {
         # Only for testing purposes
         Boolean no_bundle = false
         Int num_cpus = 16
+        Int ram_gb = 128
+        Int disk_size_gb = 1000
     }
 
     String final_snp_vcf_name = "snp.out.vcf"
@@ -179,7 +191,56 @@ task gatk {
 
     runtime {
         cpu : "~{num_cpus}"
-        memory: "128 GB"
-        disks: "local-disk 1000 HDD"
+        memory: "~{ram_gb} GB"
+        disks: "local-disk ~{disk_size_gb} HDD"
+    }
+}
+
+
+task run_3d_dna {
+    input {
+        File vcf
+        File bam
+        Int num_cpus = 8
+        Int disk_size_gb = 2000
+        Int ram_gb = 100
+    }
+
+    command <<<
+        set -euo pipefail
+        export VCF_FILENAME=~{basename(vcf, ".gz")}
+        gzip -dc ~{vcf} > ${VCF_FILENAME}
+        bash \
+            /opt/3d-dna/phase/run-hic-phaser-encode.sh \
+            --threads ~{num_cpus} \
+            --to-stage update_vcf \
+            ${VCF_FILENAME} \
+            ~{bam}
+        gzip -n *.txt *.vcf *.assembly
+        ls
+    >>>
+
+    output {
+        File snp_vcf = "snp.out.vcf.gz"
+        File hic_vcf = "snp.out_HiC.vcf.gz"
+
+        # .hic files
+        File hic_in= "snp.out.in.hic"
+        File hic = "snp.out.out.hic"
+
+        # Scaffold boundary files (Juicebox 2D annotation format)
+        File scaffold_track = "snp.out.out_asm.scaffold_track.txt.gz"
+        File superscaffold_track = "snp.out.out_asm.superscaf_track.txt.gz"
+        File scaffold_track_in = "snp.out.in_asm.scaffold_track.txt.gz"
+        File superscaffold_track_in = "snp.out.in_asm.superscaf_track.txt.gz"
+
+        File assembly_in = "snp.out.in.assembly.gz"
+        File assembly = "snp.out.out.assembly.gz"
+    }
+
+    runtime {
+        cpu : "~{num_cpus}"
+        disks: "local-disk ~{disk_size_gb} HDD"
+        memory: "~{ram_gb} GB"
     }
 }
