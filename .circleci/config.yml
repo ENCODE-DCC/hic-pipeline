@@ -79,19 +79,21 @@ commands:
         type: string
     steps:
       - run:
+          name: Add runtime environment to input JSONs
           command: |
             for i in tests/unit/json/*.json tests/integration/json/*.json; do
               python tests/add_runtime_environment_to_input.py $i << parameters.docker_tag >>
             done
 
   add_docker_to_inputs:
-    description: Add runtime environment to input JSONs
+    description: Add docker to input JSONs
     parameters:
       docker_tag:
         description: Docker image tag to use for tests
         type: string
     steps:
       - run:
+          name: Add docker to input JSONs
           command: |
             for i in tests/functional/json/*.json; do
               python tests/add_docker_to_input.py $i << parameters.docker_tag >>
