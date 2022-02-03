@@ -156,7 +156,8 @@ workflow hic {
                     ]
                 )
             ),
-            output_bam_filename = "merged_" + i
+            output_bam_filename = "merged_" + i,
+            runtime_environment = runtime_environment,
         }
 
         call dedup { input:

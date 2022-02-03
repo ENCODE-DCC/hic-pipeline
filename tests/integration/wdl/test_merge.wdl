@@ -9,7 +9,7 @@ workflow test_merge {
     }
 
     call hic.merge { input:
-        bams = bams
+        bams = bams,
         runtime_environment = runtime_environment,
     }
 }

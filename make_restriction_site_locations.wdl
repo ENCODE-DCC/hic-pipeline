@@ -1,5 +1,10 @@
 version 1.0
 
+struct RuntimeEnvironment {
+    String docker
+    String singularity
+}
+
 workflow make_restriction_site_locations {
     meta {
         version: "1.11.0"
@@ -17,12 +22,21 @@ workflow make_restriction_site_locations {
         File reference_fasta
         String assembly_name
         String restriction_enzyme
+        String docker = "encodedcc/hic-pipeline:1.11.0"
+        String singularity = "docker://encodedcc/hic-pipeline:1.11.0"
+    }
+
+
+    RuntimeEnvironment runtime_environment = {
+      "docker": docker,
+      "singularity": singularity
     }
 
     call make_restriction_site_locations_ { input:
             reference_fasta = reference_fasta,
             assembly_name = assembly_name,
             restriction_enzyme = restriction_enzyme,
+            runtime_environment = runtime_environment,
         }
     }
 
@@ -31,6 +45,7 @@ task make_restriction_site_locations_ {
         File reference_fasta
         String assembly_name
         String restriction_enzyme
+        RuntimeEnvironment runtime_environment
     }
 
     command <<<
@@ -46,5 +61,7 @@ task make_restriction_site_locations_ {
         cpu : "1"
         memory: "500 MB"
         disks: "local-disk 10 HDD"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
