@@ -12,6 +12,7 @@ workflow test_calculate_stats {
         String ligation_site
         Int quality
         Boolean single_ended = false
+        RuntimeEnvironment runtime_environment
     }
 
     call hic.calculate_stats { input:
@@ -23,5 +24,6 @@ workflow test_calculate_stats {
         ligation_site = ligation_site,
         quality = quality,
         single_ended = single_ended,
+        runtime_environment = runtime_environment,
     }
 }

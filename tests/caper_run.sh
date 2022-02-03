@@ -12,11 +12,6 @@ if [ $# -lt 2 ]; then
     exit 1
 fi
 
-if [ -z "${HIC_DOCKER_IMAGE_TAG}" ]; then
-    echo "Must specify HIC_DOCKER_IMAGE_TAG via environment variable."
-    exit 1
-fi
-
 WDL=$1
 INPUT=$2
 WORKFLOW_OPTIONS="tests/pytest_workflow_options.json"
@@ -30,9 +25,9 @@ if [ $# -gt 2 ]; then
     WORKFLOW_OPTIONS="tests/pytest_workflow_no_relative_output_paths.json"
 fi
 
-echo "Running caper with WDL ${WDL}, input ${INPUT}, workflow options ${WORKFLOW_OPTIONS}, and image ${HIC_DOCKER_IMAGE_TAG}"
+echo "Running caper with WDL ${WDL}, input ${INPUT}, workflow options ${WORKFLOW_OPTIONS}"
 
-caper run "${WDL}" -i "${INPUT}" --docker "${HIC_DOCKER_IMAGE_TAG}" -o "./${WORKFLOW_OPTIONS}"
+caper run "${WDL}" -i "${INPUT}" -o "./${WORKFLOW_OPTIONS}"
 
 if [[ -f "cromwell.out" ]]; then
     cat cromwell.out

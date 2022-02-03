@@ -1,0 +1,21 @@
+{
+  "hic.assembly_name": "ce10",
+  "hic.chrsz": "https://storage.googleapis.com/dockstore_test_input/hic-pipeline/ce10_selected.chrom.sizes.tsv",
+  "hic.fastq": [
+    [
+      {
+        "read_1": "https://storage.googleapis.com/dockstore_test_input/hic-pipeline/merged_read1.fastq.gz",
+        "read_2": "https://storage.googleapis.com/dockstore_test_input/hic-pipeline/merged_read2.fastq.gz"
+      }
+    ]
+  ],
+  "hic.no_call_loops": true,
+  "hic.no_call_tads": true,
+  "hic.no_delta": true,
+  "hic.no_slice": true,
+  "hic.reference_index": "https://storage.googleapis.com/dockstore_test_input/hic-pipeline/ce10_selected.tar.gz",
+  "hic.restriction_enzymes": [
+    "MboI"
+  ],
+  "hic.restriction_sites": "https://storage.googleapis.com/dockstore_test_input/hic-pipeline/ce10_selected_MboI.txt.gz"
+}
