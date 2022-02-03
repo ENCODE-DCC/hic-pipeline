@@ -23,6 +23,7 @@ workflow hic {
         caper_docker: "encodedcc/hic-pipeline:1.11.0"
         caper_singularity: "docker://encodedcc/hic-pipeline:1.11.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
+        description: "ENCODE Hi-C pipeline, see https://github.com/ENCODE-DCC/hic-pipeline for details."
     }
 
     input {
