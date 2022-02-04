@@ -7,11 +7,13 @@ workflow test_normalize_assembly_name {
         String assembly_name
         String normalized_assembly_name_output_path
         String assembly_is_supported_output_path
+        RuntimeEnvironment runtime_environment
     }
 
     call hic.normalize_assembly_name { input:
         assembly_name = assembly_name,
         normalized_assembly_name_output_path = normalized_assembly_name_output_path,
         assembly_is_supported_output_path = assembly_is_supported_output_path,
+        runtime_environment = runtime_environment,
     }
 }

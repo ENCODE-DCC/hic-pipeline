@@ -11,6 +11,7 @@ workflow test_calculate_stats {
         File chrom_sizes
         String ligation_site
         Int quality
+        RuntimeEnvironment runtime_environment
     }
 
     call hic.calculate_stats { input:
@@ -21,5 +22,6 @@ workflow test_calculate_stats {
         chrom_sizes = chrom_sizes,
         ligation_site = ligation_site,
         quality = quality,
+        runtime_environment = runtime_environment,
     }
 }

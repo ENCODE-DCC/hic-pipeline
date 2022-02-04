@@ -33,20 +33,31 @@ workflow genophase {
         Boolean no_phasing = false
         # Only for testing purposes
         Boolean no_bundle = false
+
+        String docker = "encodedcc/hic-pipeline:1.11.0"
+        String singularity = "docker://encodedcc/hic-pipeline:1.11.0"
+    }
+
+    RuntimeEnvironment runtime_environment = {
+      "docker": docker,
+      "singularity": singularity
     }
 
     call hic.merge as merged { input:
         bams = bams,
+        runtime_environment = runtime_environment,
     }
 
     call create_fasta_index as create_reference_fasta_index { input:
         fasta = reference_fasta,
+        runtime_environment = runtime_environment,
     }
 
     call create_gatk_references { input:
         reference_fasta = reference_fasta,
         reference_fasta_index = create_reference_fasta_index.fasta_index,
-        output_stem = basename(reference_fasta, ".fasta.gz")
+        output_stem = basename(reference_fasta, ".fasta.gz"),
+        runtime_environment = runtime_environment,
     }
 
     call gatk { input:
@@ -67,6 +78,7 @@ workflow genophase {
         num_cpus = gatk_num_cpus,
         ram_gb = gatk_ram_gb,
         disk_size_gb = gatk_disk_size_gb,
+        runtime_environment = runtime_environment,
     }
 
     if (!no_phasing) {
@@ -76,6 +88,7 @@ workflow genophase {
             num_cpus = run_3d_dna_num_cpus,
             ram_gb = run_3d_dna_ram_gb,
             disk_size_gb = run_3d_dna_disk_size_gb,
+            runtime_environment = runtime_environment,
         }
     }
 }
@@ -83,6 +96,7 @@ workflow genophase {
 task create_fasta_index {
     input {
         File fasta
+        RuntimeEnvironment runtime_environment
     }
 
     command <<<
@@ -94,6 +108,11 @@ task create_fasta_index {
     output {
         File fasta_index = "~{basename(fasta, '.gz')}.fai"
     }
+
+    runtime {
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
+    }
 }
 
 task create_gatk_references {
@@ -101,6 +120,7 @@ task create_gatk_references {
         File reference_fasta
         File reference_fasta_index
         String output_stem
+        RuntimeEnvironment runtime_environment
     }
 
     command <<<
@@ -129,6 +149,8 @@ task create_gatk_references {
         cpu : "1"
         memory: "16 GB"
         disks: "local-disk 100 HDD"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
@@ -152,6 +174,7 @@ task gatk {
         Int num_cpus = 16
         Int ram_gb = 128
         Int disk_size_gb = 1000
+        RuntimeEnvironment runtime_environment
     }
 
     String final_snp_vcf_name = "snp.out.vcf"
@@ -193,6 +216,8 @@ task gatk {
         cpu : "~{num_cpus}"
         memory: "~{ram_gb} GB"
         disks: "local-disk ~{disk_size_gb} HDD"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
@@ -204,6 +229,7 @@ task run_3d_dna {
         Int num_cpus = 8
         Int disk_size_gb = 2000
         Int ram_gb = 100
+        RuntimeEnvironment runtime_environment
     }
 
     command <<<
@@ -242,5 +268,7 @@ task run_3d_dna {
         cpu : "~{num_cpus}"
         disks: "local-disk ~{disk_size_gb} HDD"
         memory: "~{ram_gb} GB"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }

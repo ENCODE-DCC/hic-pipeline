@@ -12,12 +12,18 @@ struct BamAndLigationCount {
     Boolean single_ended
 }
 
+struct RuntimeEnvironment {
+    String docker
+    String singularity
+}
+
 workflow hic {
     meta {
         version: "1.11.0"
         caper_docker: "encodedcc/hic-pipeline:1.11.0"
         caper_singularity: "docker://encodedcc/hic-pipeline:1.11.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
+        description: "ENCODE Hi-C pipeline, see https://github.com/ENCODE-DCC/hic-pipeline for details."
     }
 
     input {
@@ -34,8 +40,6 @@ workflow hic {
 
         # Parameters controlling delta calls
         Boolean no_delta = false
-        String delta_docker = "encodedcc/hic-pipeline:1.11.0_delta"
-        String hiccups_docker = "encodedcc/hic-pipeline:1.11.0_hiccups"
 
         Boolean intact = false
         Array[String] normalization_methods = []
@@ -52,6 +56,26 @@ workflow hic {
         Int? create_accessibility_track_ram_gb
         Int? create_accessibility_track_disk_size_gb
         String assembly_name = "undefined"
+
+        String docker = "encodedcc/hic-pipeline:1.11.0"
+        String singularity = "docker://encodedcc/hic-pipeline:1.11.0"
+        String delta_docker = "encodedcc/hic-pipeline:1.11.0_delta"
+        String hiccups_docker = "encodedcc/hic-pipeline:1.11.0_hiccups"
+    }
+
+    RuntimeEnvironment runtime_environment = {
+      "docker": docker,
+      "singularity": singularity
+    }
+
+    RuntimeEnvironment hiccups_runtime_environment = {
+      "docker": hiccups_docker,
+      "singularity": singularity
+    }
+
+    RuntimeEnvironment delta_runtime_environment = {
+      "docker": delta_docker,
+      "singularity": singularity
     }
 
     String delta_models_path = if intact then "ultimate-models" else "beta-models"
@@ -67,7 +91,8 @@ workflow hic {
     if (!defined(input_hic)) {
         if (!defined(ligation_site_regex)) {
             call get_ligation_site_regex { input:
-                restriction_enzymes = restriction_enzymes
+                restriction_enzymes = restriction_enzymes,
+                runtime_environment = runtime_environment,
             }
         }
 
@@ -75,13 +100,15 @@ workflow hic {
 
         if (!is_nonspecific && !defined(restriction_sites)) {
             call exit_early { input:
-                message = "Must provide restriction sites file if enzyme is not `none`"
+                message = "Must provide restriction sites file if enzyme is not `none`",
+                runtime_environment = runtime_environment,
             }
         }
     }
 
     call normalize_assembly_name { input:
-        assembly_name = assembly_name
+        assembly_name = assembly_name,
+        runtime_environment = runtime_environment,
     }
 
     scatter(i in range(length(fastq))) {
@@ -93,6 +120,7 @@ workflow hic {
                 ligation_site = select_first([ligation_site]),
                 num_cpus = align_num_cpus,
                 disk_size_gb = align_disk_size_gb,
+                runtime_environment = runtime_environment,
             }
         }
 
@@ -102,6 +130,7 @@ workflow hic {
                     bam = bam_and_ligation_count.bam,
                     ligation_count = bam_and_ligation_count.ligation_count,
                     single_ended = bam_and_ligation_count.single_ended,
+                    runtime_environment = runtime_environment,
                 }
             }
         }
@@ -113,6 +142,7 @@ workflow hic {
                     ligation_count = bam_and_ligation_count.ligation_count,
                     restriction_sites = select_first([restriction_sites]),
                     single_ended = bam_and_ligation_count.single_ended,
+                    runtime_environment = runtime_environment,
                 }
             }
         }
@@ -126,18 +156,21 @@ workflow hic {
                     ]
                 )
             ),
-            output_bam_filename = "merged_" + i
+            output_bam_filename = "merged_" + i,
+            runtime_environment = runtime_environment,
         }
 
         call dedup { input:
             bam = merge.bam,
             disk_size_gb = dedup_disk_size_gb,
+            runtime_environment = runtime_environment,
         }
 
         call bam_to_pre as bam_to_pre_for_stats { input:
             bam = dedup.deduped_bam,
             quality = 1,
-            output_filename_suffix = "_lib" + i
+            output_filename_suffix = "_lib" + i,
+            runtime_environment = runtime_environment,
         }
 
         call calculate_stats as calculate_stats_on_library { input:
@@ -150,23 +183,27 @@ workflow hic {
             chrom_sizes = select_first([chrsz]),
             ligation_site = select_first([ligation_site]),
             output_filename_suffix = "_lib" + i,
-            single_ended = align.bam_and_ligation_count[0].single_ended
+            single_ended = align.bam_and_ligation_count[0].single_ended,
+            runtime_environment = runtime_environment,
         }
     }
 
     if (!defined(input_hic)) {
         call merge as merge_replicates { input:
             bams = dedup.deduped_bam,
+            runtime_environment = runtime_environment,
         }
         # convert alignable bam to pairs to be consistent with 4DN
         if ( !no_pairs && defined(chrsz)) {
             call bam_to_pre as bam_to_pre_mapq0 { input:
                 bam = merge_replicates.bam,
                 quality = 0,
+                runtime_environment = runtime_environment,
             }
             call pre_to_pairs { input:
                 pre = bam_to_pre_mapq0.pre,
-                chrom_sizes  = select_first([chrsz])
+                chrom_sizes  = select_first([chrsz]),
+                runtime_environment = runtime_environment,
             }
         }
     }
@@ -176,6 +213,7 @@ workflow hic {
         call bam_to_pre { input:
             bam = select_first([merge_replicates.bam]),
             quality = qualities[i],
+            runtime_environment = runtime_environment,
         }
 
         if (intact && qualities[i] == 30) {
@@ -184,6 +222,7 @@ workflow hic {
                 chrom_sizes = select_first([chrsz]),
                 ram_gb = create_accessibility_track_ram_gb,
                 disk_size_gb = create_accessibility_track_disk_size_gb,
+                runtime_environment = runtime_environment,
             }
         }
 
@@ -202,6 +241,7 @@ workflow hic {
             ligation_site = select_first([ligation_site]),
             quality = qualities[i],
             single_ended = align.bam_and_ligation_count[0][0].single_ended,
+            runtime_environment = runtime_environment,
         }
 
         # If Juicer Tools doesn't support the assembly then need to pass chrom sizes
@@ -217,6 +257,7 @@ workflow hic {
                 resolutions = create_hic_resolutions,
                 assembly_name = assembly_name,
                 num_cpus = create_hic_num_cpus,
+                runtime_environment = runtime_environment,
             }
         }
 
@@ -231,6 +272,7 @@ workflow hic {
                 resolutions = create_hic_resolutions,
                 assembly_name = normalize_assembly_name.normalized_assembly_name,
                 num_cpus = create_hic_num_cpus,
+                runtime_environment = runtime_environment,
             }
         }
 
@@ -245,12 +287,14 @@ workflow hic {
             normalization_methods = normalization_methods,
             quality = qualities[i],
             num_cpus = add_norm_num_cpus,
+            runtime_environment = runtime_environment,
         }
 
         if (!no_call_tads) {
             call arrowhead { input:
                 hic_file = add_norm.output_hic,
                 quality = qualities[i],
+                runtime_environment = runtime_environment,
             }
         }
         if (!no_call_loops) {
@@ -258,7 +302,7 @@ workflow hic {
                 call hiccups { input:
                     hic_file = add_norm.output_hic,
                     quality = qualities[i],
-                    docker = hiccups_docker,
+                    runtime_environment = hiccups_runtime_environment,
                 }
             }
 
@@ -266,13 +310,14 @@ workflow hic {
                 call hiccups_2 { input:
                     hic = add_norm.output_hic,
                     quality = qualities[i],
-                    docker = hiccups_docker,
+                    runtime_environment = hiccups_runtime_environment,
                 }
 
                 call localizer as localizer_intact { input:
                     hic = add_norm.output_hic,
                     loops = hiccups_2.merged_loops,
                     quality = qualities[i],
+                    runtime_environment = runtime_environment,
                 }
             }
         }
@@ -282,6 +327,7 @@ workflow hic {
                 hic_file = add_norm.output_hic,
                 chrom_sizes = select_first([chrsz]),
                 output_filename_suffix = "_" + qualities[i],
+                runtime_environment = runtime_environment,
             }
 
             call create_eigenvector as create_eigenvector_10kb { input:
@@ -289,6 +335,7 @@ workflow hic {
                 chrom_sizes = select_first([chrsz]),
                 resolution = 10000,
                 output_filename_suffix = "_" + qualities[i],
+                runtime_environment = runtime_environment,
             }
         }
     }
@@ -297,39 +344,42 @@ workflow hic {
         call delta { input:
             # Only run delta on MAPQ >= 30
             hic = if length(add_norm.output_hic) > 1 then add_norm.output_hic[1] else select_first([input_hic]),
-            docker = delta_docker,
             resolutions = delta_resolutions,
             models_path = delta_models_path,
+            runtime_environment = delta_runtime_environment,
         }
 
         call localizer as localizer_delta { input:
             hic = if length(add_norm.output_hic) > 1 then add_norm.output_hic[1] else select_first([input_hic]),
             loops = delta.loops,
+            runtime_environment = runtime_environment,
         }
     }
 
     if (defined(input_hic)) {
         if (!no_call_tads) {
             call arrowhead as arrowhead_input_hic { input:
-                hic_file = select_first([input_hic])
+                hic_file = select_first([input_hic]),
+                runtime_environment = runtime_environment,
             }
         }
         if (!no_call_loops) {
             if (!intact) {
                 call hiccups as hiccups_input_hic { input:
                     hic_file = select_first([input_hic]),
-                    docker = hiccups_docker,
+                    runtime_environment = hiccups_runtime_environment,
                 }
             }
 
             if (intact) {
                 call hiccups_2 as hiccups_2_input_hic { input:
                     hic = select_first([input_hic]),
-                    docker = hiccups_docker,
+                    runtime_environment = hiccups_runtime_environment,
                 }
                 call localizer as localizer_intact_input_hic { input:
                     hic = select_first([input_hic]),
                     loops = hiccups_2_input_hic.merged_loops,
+                    runtime_environment = runtime_environment,
                 }
             }
         }
@@ -341,16 +391,19 @@ workflow hic {
         call slice as slice_25kb { input:
             hic_file = hic_file,
             resolution = 25000,
+            runtime_environment = runtime_environment,
         }
 
         call slice as slice_50kb { input:
             hic_file = hic_file,
             resolution = 50000,
+            runtime_environment = runtime_environment,
         }
 
         call slice as slice_100kb { input:
             hic_file = hic_file,
             resolution = 100000,
+            runtime_environment = runtime_environment,
         }
     }
 }
@@ -358,6 +411,7 @@ workflow hic {
 task get_ligation_site_regex {
     input {
         Array[String] restriction_enzymes
+        RuntimeEnvironment runtime_environment
     }
 
     String output_path = "ligation_site_regex.txt"
@@ -378,6 +432,8 @@ task get_ligation_site_regex {
     runtime {
         cpu : "1"
         memory: "500 MB"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
@@ -386,6 +442,7 @@ task normalize_assembly_name {
         String assembly_name
         String normalized_assembly_name_output_path = "normalized_assembly_name.txt"
         String assembly_is_supported_output_path = "is_supported.txt"
+        RuntimeEnvironment runtime_environment
     }
 
     command <<<
@@ -404,6 +461,8 @@ task normalize_assembly_name {
     runtime {
         cpu : "1"
         memory: "500 MB"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
@@ -414,6 +473,7 @@ task align {
         String ligation_site
         Int num_cpus = 32
         Int disk_size_gb = 1000
+        RuntimeEnvironment runtime_environment
     }
 
     command {
@@ -467,6 +527,8 @@ task align {
         cpu : "~{num_cpus}"
         memory: "64 GB"
         disks: "local-disk ~{disk_size_gb} HDD"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
@@ -477,6 +539,7 @@ task chimeric_sam_specific {
         File restriction_sites
         Boolean single_ended
         Int num_cpus = 8
+        RuntimeEnvironment runtime_environment
     }
 
     command <<<
@@ -503,6 +566,8 @@ task chimeric_sam_specific {
         cpu : "~{num_cpus}"
         disks: "local-disk 1000 HDD"
         memory: "16 GB"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
@@ -512,6 +577,7 @@ task chimeric_sam_nonspecific {
         File ligation_count
         Boolean single_ended
         Int num_cpus = 8
+        RuntimeEnvironment runtime_environment
     }
 
     command <<<
@@ -540,6 +606,8 @@ task chimeric_sam_nonspecific {
         cpu : "~{num_cpus}"
         disks: "local-disk ~{if(single_ended) then 6000 else 1000} HDD"
         memory: "16 GB"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
@@ -548,6 +616,7 @@ task merge {
         Array[File] bams
         Int num_cpus = 8
         String output_bam_filename = "merged"
+        RuntimeEnvironment runtime_environment
     }
 
     command <<<
@@ -569,6 +638,8 @@ task merge {
         cpu : "~{num_cpus}"
         memory: "16 GB"
         disks: "local-disk 6000 HDD"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
@@ -577,6 +648,7 @@ task dedup {
         File bam
         Int num_cpus = 8
         Int disk_size_gb = 5000
+        RuntimeEnvironment runtime_environment
     }
 
     command <<<
@@ -597,6 +669,8 @@ task dedup {
         cpu : "~{num_cpus}"
         disks: "local-disk ~{disk_size_gb} HDD"
         memory: "32 GB"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
@@ -604,6 +678,7 @@ task pre_to_pairs {
     input {
         File pre
         File chrom_sizes
+        RuntimeEnvironment runtime_environment
     }
 
     command {
@@ -621,6 +696,8 @@ task pre_to_pairs {
         cpu : "8"
         memory: "16 GB"
         disks: "local-disk 3000 HDD"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
@@ -630,6 +707,7 @@ task bam_to_pre {
         Int quality
         Int num_cpus = 8
         String output_filename_suffix = ""
+        RuntimeEnvironment runtime_environment
     }
 
     command <<<
@@ -657,6 +735,8 @@ task bam_to_pre {
         cpu : "~{num_cpus}"
         disks: "local-disk 3000 HDD"
         memory : "64 GB"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
@@ -671,6 +751,7 @@ task calculate_stats {
         String output_filename_suffix = ""
         Boolean single_ended = false
         Int quality = 0
+        RuntimeEnvironment runtime_environment
     }
 
     command <<<
@@ -725,6 +806,8 @@ task calculate_stats {
         cpu : "1"
         disks: "local-disk 4000 HDD"
         memory : "16 GB"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
@@ -740,6 +823,7 @@ task create_hic {
         File? chrsz
         File? restriction_sites
         Int num_cpus = 24
+        RuntimeEnvironment runtime_environment
     }
 
     command <<<
@@ -779,6 +863,8 @@ task create_hic {
         cpu : "~{num_cpus}"
         disks: "local-disk 2000 HDD"
         memory : "256 GB"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
@@ -789,6 +875,7 @@ task add_norm {
         Array[String] normalization_methods = []
         Int quality
         Int num_cpus = 24
+        RuntimeEnvironment runtime_environment
     }
 
     command {
@@ -813,6 +900,8 @@ task add_norm {
         cpu : "~{num_cpus}"
         disks: "local-disk 128 HDD"
         memory : "72 GB"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
@@ -821,6 +910,7 @@ task arrowhead {
     input {
         File hic_file
         Int quality = 0
+        RuntimeEnvironment runtime_environment
     }
 
     command <<<
@@ -846,6 +936,8 @@ task arrowhead {
         cpu : "1"
         disks: "local-disk 100 HDD"
         memory : "32 GB"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
@@ -853,7 +945,7 @@ task hiccups {
     input {
         File hic_file
         Int quality = 0
-        String docker
+        RuntimeEnvironment runtime_environment
     }
 
     command {
@@ -877,7 +969,8 @@ task hiccups {
         cpu : "1"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 HDD"
-        docker: "~{docker}"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
@@ -897,7 +990,7 @@ task hiccups_2 {
         File hic
         Int quality = 0
         Int num_cpus = 2
-        String docker
+        RuntimeEnvironment runtime_environment
     }
 
     command {
@@ -925,7 +1018,8 @@ task hiccups_2 {
         cpu : "~{num_cpus}"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 HDD"
-        docker: "~{docker}"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "64 GB"
@@ -946,6 +1040,7 @@ task localizer {
         File loops
         Int quality = 0
         Int num_cpus = 24
+        RuntimeEnvironment runtime_environment
     }
 
     command {
@@ -978,6 +1073,8 @@ task localizer {
         cpu : "~{num_cpus}"
         disks: "local-disk 100 HDD"
         memory: "64 GB"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
@@ -989,7 +1086,7 @@ task delta {
         String normalization = "SCALE"
         String stem = "predicted"
         String models_path = "beta-models"
-        String docker
+        RuntimeEnvironment runtime_environment
     }
 
     command {
@@ -1017,7 +1114,8 @@ task delta {
         cpu : "2"
         bootDiskSizeGb: "20"
         disks: "local-disk 100 SSD"
-        docker: "~{docker}"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "32 GB"
@@ -1040,6 +1138,7 @@ task create_eigenvector {
         Int resolution = 5000
         String output_filename_suffix = ""
         String normalization = "SCALE"
+        RuntimeEnvironment runtime_environment
     }
 
     command {
@@ -1064,6 +1163,8 @@ task create_eigenvector {
         cpu : "~{num_cpus}"
         disks: "local-disk 100 HDD"
         memory : "8 GB"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
@@ -1074,6 +1175,7 @@ task slice {
         Int minimum_num_clusters = 2
         Int maximum_num_clusters = 13
         Int num_kmeans_runs = 4
+        RuntimeEnvironment runtime_environment
     }
 
     command {
@@ -1100,6 +1202,8 @@ task slice {
         cpu : "1"
         disks: "local-disk 100 SSD"
         memory : "24 GB"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
@@ -1109,6 +1213,7 @@ task create_accessibility_track {
         File chrom_sizes
         Int ram_gb = 348
         Int disk_size_gb = 1000
+        RuntimeEnvironment runtime_environment
     }
 
     command <<<
@@ -1129,12 +1234,15 @@ task create_accessibility_track {
         cpu : "1"
         memory: "~{ram_gb} GB"
         disks: "local-disk ~{disk_size_gb} HDD"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
 task exit_early {
     input {
         String message
+        RuntimeEnvironment runtime_environment
     }
 
     command <<<
@@ -1146,5 +1254,7 @@ task exit_early {
     runtime {
         cpu : "1"
         memory: "500 MB"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }

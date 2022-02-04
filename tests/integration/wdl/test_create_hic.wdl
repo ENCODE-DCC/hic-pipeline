@@ -13,6 +13,7 @@ workflow test_create_hic {
         Array[Int] resolutions
         Int quality
         Int num_cpus
+        RuntimeEnvironment runtime_environment
     }
 
     call hic.create_hic { input:
@@ -25,5 +26,6 @@ workflow test_create_hic {
         resolutions = resolutions,
         assembly_name = assembly_name,
         num_cpus = num_cpus,
+        runtime_environment = runtime_environment,
     }
 }

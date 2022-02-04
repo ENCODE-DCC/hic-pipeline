@@ -8,6 +8,7 @@ workflow test_align {
         File idx_tar
         String ligation_site
         Int num_cpus
+        RuntimeEnvironment runtime_environment
     }
 
     call hic.align { input:
@@ -15,5 +16,6 @@ workflow test_align {
         idx_tar = idx_tar,
         ligation_site = ligation_site,
         num_cpus = num_cpus,
+        runtime_environment = runtime_environment,
     }
 }

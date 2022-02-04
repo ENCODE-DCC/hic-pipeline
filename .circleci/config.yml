@@ -71,6 +71,34 @@ commands:
               | tar xJ
             sudo mv shellcheck-stable/shellcheck /usr/local/bin
 
+  add_runtime_environment_to_inputs:
+    description: Add runtime environment to input JSONs
+    parameters:
+      docker_tag:
+        description: Docker image tag to use for tests
+        type: string
+    steps:
+      - run:
+          name: Add runtime environment to input JSONs
+          command: |
+            for i in tests/unit/json/*.json tests/integration/json/*.json; do
+              python tests/add_runtime_environment_to_input.py $i << parameters.docker_tag >>
+            done
+
+  add_docker_to_inputs:
+    description: Add docker to input JSONs
+    parameters:
+      docker_tag:
+        description: Docker image tag to use for tests
+        type: string
+    steps:
+      - run:
+          name: Add docker to input JSONs
+          command: |
+            for i in tests/functional/json/*.json; do
+              python tests/add_docker_to_input.py $i << parameters.docker_tag >>
+            done
+
 jobs:
   lint:
     <<: *py37
@@ -94,6 +122,9 @@ jobs:
       tag:
         description: pytest-workflow tag, e.g. functional, integration, test_align
         type: string
+      docker_tag:
+        description: Docker tag to use
+        type: string
       num_parallel_workflows:
         description: Max number of tests to execute in parallel
         type: integer
@@ -104,10 +135,13 @@ jobs:
     resource_class: << parameters.resource_class >>
     steps:
       - checkout
+      - add_runtime_environment_to_inputs:
+          docker_tag: << parameters.docker_tag >>
+      - add_docker_to_inputs:
+          docker_tag: << parameters.docker_tag >>
       - run:
           name: Run pytest-workflow WDL tests using tox
           command: |
-            export HIC_DOCKER_IMAGE_TAG=<< pipeline.parameters.main_tag >>
             pyenv global 3.7.0
             pip install --upgrade pip
             pip install tox
@@ -195,6 +229,7 @@ workflows:
           name: test_wdl_unit
           resource_class: xlarge
           tag: unit
+          docker_tag: << pipeline.parameters.main_tag  >>
           num_parallel_workflows: 16
           requires:
             - build_main
@@ -203,6 +238,7 @@ workflows:
           name: test_wdl_integration
           resource_class: xlarge
           tag: integration
+          docker_tag: << pipeline.parameters.main_tag  >>
           num_parallel_workflows: 16
           requires:
             - build_main
@@ -211,6 +247,7 @@ workflows:
           name: test_wdl_functional
           resource_class: 2xlarge
           tag: functional
+          docker_tag: << pipeline.parameters.main_tag  >>
           num_parallel_workflows: 16
           requires:
             - build_main

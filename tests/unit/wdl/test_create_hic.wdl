@@ -13,6 +13,7 @@ workflow test_create_hic {
         File? restriction_sites
         String assembly_name
         Int quality
+        RuntimeEnvironment runtime_environment
     }
 
     call hic.create_hic { input:
@@ -25,5 +26,6 @@ workflow test_create_hic {
         resolutions = resolutions,
         quality = quality,
         assembly_name = assembly_name,
+        runtime_environment = runtime_environment,
     }
 }
