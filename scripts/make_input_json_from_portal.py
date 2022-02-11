@@ -27,13 +27,29 @@ REFERENCE_FILES = {
             PORTAL_URL,
             "/files/GRCh38_EBV.chrom.sizes/@@download/GRCh38_EBV.chrom.sizes.tsv",
         ),
-    }
+    },
+    "mm10": {
+        "restriction_sites": {
+            "DpnII": urljoin(
+                PORTAL_URL, "/files/ENCFF930KBK/@@download/ENCFF930KBK.txt.gz"
+            ),
+            "MboI": urljoin(
+                PORTAL_URL, "/files/ENCFF930KBK/@@download/ENCFF930KBK.txt.gz"
+            ),
+        },
+        "bwa_index": urljoin(
+            PORTAL_URL, "/files/ENCFF018NEO/@@download/ENCFF018NEO.tar.gz"
+        ),
+        "chrom_sizes": urljoin(
+            PORTAL_URL,
+            "/files/mm10_no_alt.chrom.sizes/@@download/mm10_no_alt.chrom.sizes.tsv",
+        ),
+    },
 }
 ENZYMES = ("HindIII", "DpnII", "MboI", "none")
 _NO_ENZYME_FRAGMENTATION_METHODS = (
     "chemical (micrococcal nuclease)",
     "chemical (DNaseI)",
-    "shearing (Covaris S2)",
 )
 ALLOWED_STATUSES = ("released", "in progress")
 
@@ -43,12 +59,22 @@ def main():
     args = parser.parse_args()
     auth = read_auth_from_file(args.keypair_file)
     experiment = get_experiment(args.accession, auth=auth)
-    fastqs = get_fastqs_from_experiment(experiment)
+    organism = experiment["replicates"][0]["library"]["biosample"]["organism"]["@id"]
+    if organism == "/organisms/mouse/":
+        assembly_name = "mm10"
+    elif organism == "/organisms/human/":
+        assembly_name = "GRCh38"
+    else:
+        raise ValueError(f"Organism {organism} not supported")
+    try:
+        fastqs = get_fastqs_from_experiment(experiment)
+    except ValueError:
+        fastqs = get_fastqs_from_experiment(experiment, read_group_num_path_parts=2)
     if args.ligation_site_regex is None:
         enzymes = args.enzymes or get_enzymes_from_experiment(experiment)
         input_json = get_input_json(
             fastqs=fastqs,
-            assembly_name=args.assembly_name,
+            assembly_name=assembly_name,
             enzymes=enzymes,
             no_delta=args.no_delta,
             no_slice=args.no_slice,
@@ -56,7 +82,7 @@ def main():
     else:
         input_json = get_input_json(
             fastqs=fastqs,
-            assembly_name=args.assembly_name,
+            assembly_name=assembly_name,
             ligation_site_regex=args.ligation_site_regex,
             no_delta=args.no_delta,
             no_slice=args.no_slice,
@@ -98,7 +124,7 @@ def get_enzymes_from_experiment(experiment, enzymes=ENZYMES):
     return used_enzymes
 
 
-def get_fastqs_from_experiment(experiment):
+def get_fastqs_from_experiment(experiment, read_group_num_path_parts=1):
     fastq_pairs_by_replicate = {}
     read_group_ids = set()
     for file in experiment["files"]:
@@ -111,10 +137,11 @@ def get_fastqs_from_experiment(experiment):
             # close but not readily useful
             library_accession = file["replicate"]["library"].split("/")[2]
             sample_name = experiment["accession"]
+            read_group_id = "_".join(
+                file["submitted_file_name"].split("/")[-read_group_num_path_parts:]
+            )
             read_group_id = (
-                file["submitted_file_name"]
-                .split("/")[-1]
-                .replace(".fastq.gz", "")
+                read_group_id.replace(".fastq.gz", "")
                 .replace("_R1", "")
                 .replace("_R2", "")
             )
@@ -144,7 +171,9 @@ def get_fastqs_from_experiment(experiment):
                 if read_group_id not in read_group_ids:
                     read_group_ids.add(read_group_id)
                 else:
-                    raise ValueError("Read group ids must be unique")
+                    raise ValueError(
+                        f"Read group ids must be unique, found duplicate id {read_group_id}"
+                    )
                 fastq_pairs_by_replicate[biological_replicate].append(fastq_pair)
     output = [replicate for replicate in fastq_pairs_by_replicate.values()]
     return output
@@ -214,12 +243,6 @@ def get_parser():
     )
     parser.add_argument(
         "--keypair-file", help="Path to keypairs.json", default="~/keypairs.json"
-    )
-    parser.add_argument(
-        "--assembly-name",
-        choices=("GRCh38",),
-        default="GRCh38",
-        help="Name of assembly, mm10 is not yet supported",
     )
     parser.add_argument("--ligation-site-regex", help="Regex for ligation site")
     return parser
