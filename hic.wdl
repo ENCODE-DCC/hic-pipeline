@@ -78,6 +78,7 @@ workflow hic {
       "singularity": singularity
     }
 
+    Int align_ram_gb = if intact then 88 else 64
     String delta_models_path = if intact then "ultimate-models" else "beta-models"
     Array[Int] delta_resolutions = if intact then [5000, 2000, 1000] else [5000, 10000]
     Array[Int] create_hic_in_situ_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100]
@@ -119,6 +120,7 @@ workflow hic {
                 idx_tar = select_first([reference_index]),
                 ligation_site = select_first([ligation_site]),
                 num_cpus = align_num_cpus,
+                ram_gb = align_ram_gb,
                 disk_size_gb = align_disk_size_gb,
                 runtime_environment = runtime_environment,
             }
@@ -472,6 +474,7 @@ task align {
         File idx_tar        # reference bwa index tar
         String ligation_site
         Int num_cpus = 32
+        Int ram_gb = 64
         Int disk_size_gb = 1000
         RuntimeEnvironment runtime_environment
     }
@@ -525,7 +528,7 @@ task align {
 
     runtime {
         cpu : "~{num_cpus}"
-        memory: "64 GB"
+        memory: "~{ram_gb} GB"
         disks: "local-disk ~{disk_size_gb} HDD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
