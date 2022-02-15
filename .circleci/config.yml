@@ -29,7 +29,7 @@ defaults: &defaults
 
 machine_defaults: &machine_defaults
   machine:
-    image: ubuntu-1604:201903-01
+    image: ubuntu-2004:202201-02
   working_directory: ~/ENCODE-DCC/hic-pipeline
 
 py37: &py37
@@ -142,6 +142,7 @@ jobs:
       - run:
           name: Run pytest-workflow WDL tests using tox
           command: |
+            pyenv install 3.7.0
             pyenv global 3.7.0
             pip install --upgrade pip
             pip install tox
