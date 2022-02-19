@@ -49,7 +49,13 @@ workflow hic {
         Boolean no_eigenvectors = false
         Boolean no_slice = false
         Int align_num_cpus = 32
-        Int align_disk_size_gb = 1000
+        Int align_ram_gb_in_situ = 64
+        Int align_ram_gb_intact = 88
+        Int align_disk_size_gb_in_situ = 1000
+        Int align_disk_size_gb_intact = 1500
+        Int chimeric_sam_nonspecific_disk_size_gb = 6000
+        Int chimeric_sam_specific_disk_size_gb = 1000
+        Int? dedup_ram_gb
         Int? dedup_disk_size_gb
         Int? create_hic_num_cpus
         Int? add_norm_num_cpus
@@ -78,7 +84,8 @@ workflow hic {
       "singularity": singularity
     }
 
-    Int align_ram_gb = if intact then 88 else 64
+    Int align_ram_gb = if intact then align_ram_gb_intact else align_ram_gb_in_situ
+    Int align_disk_size_gb = if intact then align_disk_size_gb_intact else align_disk_size_gb_in_situ
     String delta_models_path = if intact then "ultimate-models" else "beta-models"
     Array[Int] delta_resolutions = if intact then [5000, 2000, 1000] else [5000, 10000]
     Array[Int] create_hic_in_situ_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100]
@@ -132,6 +139,7 @@ workflow hic {
                     bam = bam_and_ligation_count.bam,
                     ligation_count = bam_and_ligation_count.ligation_count,
                     single_ended = bam_and_ligation_count.single_ended,
+                    disk_size_gb = chimeric_sam_nonspecific_disk_size_gb,
                     runtime_environment = runtime_environment,
                 }
             }
@@ -144,6 +152,7 @@ workflow hic {
                     ligation_count = bam_and_ligation_count.ligation_count,
                     restriction_sites = select_first([restriction_sites]),
                     single_ended = bam_and_ligation_count.single_ended,
+                    disk_size_gb = chimeric_sam_specific_disk_size_gb,
                     runtime_environment = runtime_environment,
                 }
             }
@@ -164,6 +173,7 @@ workflow hic {
 
         call dedup { input:
             bam = merge.bam,
+            ram_gb = dedup_ram_gb,
             disk_size_gb = dedup_disk_size_gb,
             runtime_environment = runtime_environment,
         }
@@ -542,6 +552,8 @@ task chimeric_sam_specific {
         File restriction_sites
         Boolean single_ended
         Int num_cpus = 8
+        Int ram_gb = 16
+        Int disk_size_gb = 1000
         RuntimeEnvironment runtime_environment
     }
 
@@ -567,8 +579,8 @@ task chimeric_sam_specific {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 1000 HDD"
-        memory: "16 GB"
+        disks: "local-disk ~{disk_size_gb} HDD"
+        memory: "~{ram_gb} GB"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
     }
@@ -580,6 +592,8 @@ task chimeric_sam_nonspecific {
         File ligation_count
         Boolean single_ended
         Int num_cpus = 8
+        Int ram_gb = 16
+        Int disk_size_gb = 1000
         RuntimeEnvironment runtime_environment
     }
 
@@ -607,8 +621,8 @@ task chimeric_sam_nonspecific {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk ~{if(single_ended) then 6000 else 1000} HDD"
-        memory: "16 GB"
+        memory: "~{ram_gb} GB"
+        disks: "local-disk ~{disk_size_gb} HDD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
     }
@@ -650,6 +664,7 @@ task dedup {
     input {
         File bam
         Int num_cpus = 8
+        Int ram_gb = 32
         Int disk_size_gb = 5000
         RuntimeEnvironment runtime_environment
     }
@@ -670,8 +685,8 @@ task dedup {
 
     runtime {
         cpu : "~{num_cpus}"
+        memory: "~{ram_gb} GB"
         disks: "local-disk ~{disk_size_gb} HDD"
-        memory: "32 GB"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
     }
@@ -825,7 +840,7 @@ task create_hic {
         String? assembly_name
         File? chrsz
         File? restriction_sites
-        Int num_cpus = 24
+        Int num_cpus = 16
         RuntimeEnvironment runtime_environment
     }
 
@@ -1214,7 +1229,7 @@ task create_accessibility_track {
     input {
         File pre
         File chrom_sizes
-        Int ram_gb = 348
+        Int ram_gb = 512
         Int disk_size_gb = 1000
         RuntimeEnvironment runtime_environment
     }
