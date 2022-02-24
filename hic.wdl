@@ -53,10 +53,12 @@ workflow hic {
         Int align_ram_gb_intact = 88
         Int align_disk_size_gb_in_situ = 1000
         Int align_disk_size_gb_intact = 1500
-        Int chimeric_sam_nonspecific_disk_size_gb = 6000
-        Int chimeric_sam_specific_disk_size_gb = 1000
-        Int? dedup_ram_gb
-        Int? dedup_disk_size_gb
+        Int chimeric_sam_nonspecific_disk_size_gb = 7000
+        Int chimeric_sam_specific_disk_size_gb = 1500
+        Int dedup_ram_gb_in_situ = 32
+        Int dedup_ram_gb_intact = 48
+        Int dedup_disk_size_gb_in_situ = 5000
+        Int dedup_disk_size_gb_intact = 7500
         Int? create_hic_num_cpus
         Int? add_norm_num_cpus
         Int? create_accessibility_track_ram_gb
@@ -86,6 +88,8 @@ workflow hic {
 
     Int align_ram_gb = if intact then align_ram_gb_intact else align_ram_gb_in_situ
     Int align_disk_size_gb = if intact then align_disk_size_gb_intact else align_disk_size_gb_in_situ
+    Int dedup_ram_gb = if intact then dedup_ram_gb_intact else dedup_ram_gb_in_situ
+    Int dedup_disk_size_gb = if intact then dedup_disk_size_gb_intact else dedup_disk_size_gb_in_situ
     String delta_models_path = if intact then "ultimate-models" else "beta-models"
     Array[Int] delta_resolutions = if intact then [5000, 2000, 1000] else [5000, 10000]
     Array[Int] create_hic_in_situ_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100]
