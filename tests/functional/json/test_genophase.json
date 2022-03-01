@@ -2,16 +2,7 @@
   "genophase.bams": [
     "tests/data/sample_subsampled.bam"
   ],
-  "genophase.dbsnp_vcf": "tests/data/dummy.txt",
-  "genophase.dbsnp_vcf_index": "tests/data/dummy.txt",
   "genophase.gatk_num_cpus": 1,
-  "genophase.hapmap_vcf": "tests/data/dummy.txt",
-  "genophase.hapmap_vcf_index": "tests/data/dummy.txt",
-  "genophase.mills_vcf": "tests/data/dummy.txt",
-  "genophase.mills_vcf_index": "tests/data/dummy.txt",
-  "genophase.no_bundle": true,
   "genophase.no_phasing": true,
-  "genophase.omni_vcf": "tests/data/dummy.txt",
-  "genophase.omni_vcf_index": "tests/data/dummy.txt",
   "genophase.reference_fasta": "https://www.encodeproject.org/files/GRCh38_no_alt_analysis_set_GCA_000001405.15/@@download/GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta.gz"
 }
