@@ -157,7 +157,7 @@ task gatk {
 
     command <<<
         mkdir bundle
-        if [[ ~{if(defined(bundle_tar)) then "0" else "1"} -eq 1 ]]
+        if [[ ~{if defined(bundle_tar) then "1" else "0"} -eq 1 ]]
         then
             tar -xvzf ~{bundle_tar} -C bundle
         fi
