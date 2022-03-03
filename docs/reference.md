@@ -4,15 +4,24 @@
 
 - [Reference](#reference)
   - [Contents](#contents)
+  - [Workflows](#workflows)
   - [Inputs](#inputs)
     - [Entrypoints](#entrypoints)
       - [From fastqs](#from-fastqs)
-      - [From hic file for loop and TAD calls](#from-hic-file-for-loop-and-tad-calls)
+      - [From hic file for annotations](#from-hic-file-for-annotations)
       - [Generating restriction site files](#generating-restriction-site-files)
     - [Input descriptions](#input-descriptions)
     - [Reference files](#reference-files)
   - [Outputs](#outputs)
-    - [Output descriptions](#output-descriptions)
+  - [Genophase](#genophase)
+
+## Workflows
+
+[hic.wdl](../hic.wdl) is for starting with raw data (fastq) and producing `.hic` contact matrices and annotations (loops, TADs, subcompartments, stripes, loop domains, and A/B compartments). It is based on [Juicer](https://github.com/aidenlab/juicer)
+
+[genophase.wdl](../genophase,wdl) takes in BAM files and produces phased variant calls. It is based on [hic2gatk](https://github.com/aidenlab/hic2gatk) and the [3D-DNA pipeline](https://github.com/aidenlab/3d-dna/).
+
+`hic.wdl` is described below. For details on the other workflow, please jump to the [genophase](#genophase) section.
 
 ## Inputs
 
@@ -35,9 +44,11 @@ Runs the pipeline from the very beginning starting from `fastq` files. `read_gro
 * `chrsz`
 * `reference_index`
 
-#### From hic file for loop and TAD calls
+If you are using a standard reference assembly like `GRCh38` or `mm10`, you should also specify it for the `assembly_name` input.
 
-Runs the pipeline starting with a `.hic` file for loop and TAD calling.
+#### From hic file for annotations
+
+Runs the pipeline starting with a `.hic` file for producing annotations.
 
 *Required inputs*
 * `input_hic`
@@ -49,7 +60,7 @@ Use the WDL `make_restriction_site_locations.wdl` to generate the restriction si
 *Required inputs*
 * `reference_fasta`
 * `restriction_enzyme`
-* `assembly_name`, should be set to `true`
+* `assembly_name`
 
 ### Input descriptions
 
@@ -83,12 +94,17 @@ Use the WDL `make_restriction_site_locations.wdl` to generate the restriction si
 * `input_hic` is an input `.hic` file which will be used to call loops and domains
 * `normalization_methods` is an array of normalization methods to use for `.hic` file generation as per Juicer Tools `pre`. If not specified then will use `pre` defaults of `VC`, `VC_SQRT`, `KR`, and `SCALE`. Valid methods are `VC`, `VC_SQRT`, `KR`, `SCALE`, `GW_KR`, `GW_SCALE`, `GW_VC`, `INTER_KR`, `INTER_SCALE`, and `INTER_VC.
 * `reference_fasta` is FASTA file for the genome of interest to be used for generating restriction site locations. For the output locations file to have a descriptive filename it is also recommended to specify the `assembly_name`
-* `no_pairs` is a boolean which if `true` results in skipping generating `.pairs` files, defaults to `false`
-* `no_call_loops` is a boolean which if `true` results in skipping calling loops, defaults to `false`. Since the loop calling requires GPUs it is recommended to set to `true` if you do not
-* `no_call_tads` is a boolean which if `true` skips calling domains with arrowhead, defaults to `false`
 * `align_num_cpus` is number of threads to use for `bwa` alignment, it is recommended to leave at the default value.
 * `create_hic_num_cpus` is number of threads to use for hic creation, it is recommended to leave at the default value. If you have an OOM error for Juicer Tools `pre`, which may occur for large experiments, then supply a small value such as `4`
 * `assembly_name` is name of assembly, defaults to "unknown". If the assembly is supported by Juicer Tools `pre` then `.hic` file creation will use Juicer Tools' internal chrom sizes instead of the inputted `chrsz`, see [`Pre` documentation](https://github.com/aidenlab/juicer/wiki/Pre#usage) for list of supported values. The pipeline does some normalization of this value internally, for instance `GRCh38` will be converted into the Juicer Tools-supported `hg38`.
+
+The following flags offer control over which outputs are produced:
+* `no_pairs` is a boolean which if `true` results in skipping generating `.pairs` files, defaults to `false`
+* `no_call_loops` is a boolean which if `true` results in skipping calling loops, defaults to `false`. Since the loop calling requires GPUs it is recommended to set to `true` if you do not running the pipeline on Google Cloud
+* `no_call_tads` is a boolean which if `true` skips calling domains with arrowhead, defaults to `false`
+* `no_slice` is a boolean which if `true` skips calling subcompartments with SLICE, defaults to `false`
+* `no_delta` is a boolean which if `true` results in skipping calling loops, domains, loop domains, and stripes with DELTA, defaults to `false`. Since DELTA requires GPUs it is recommended to set to `true` if you do not running the pipeline on Google Cloud
+* `no_eigenvectors` is a boolean which if `true` skips producing A/B compartment bigWigs, defaults to `false`
 
 ### Reference files
 
@@ -99,9 +115,8 @@ In order to run the pipeline from the beginning you will need to specify the `bw
 |bwa index|GRCh38|[link](https://www.encodeproject.org/files/ENCFF643CGH/)|
 |genome fasta|GRCh38|[link](https://www.encodeproject.org/files/GRCh38_no_alt_analysis_set_GCA_000001405.15/)|
 |chromosome sizes|GRCh38|[link](https://www.encodeproject.org/files/GRCh38_EBV.chrom.sizes/)|
-|bwa index|hg19|[link](https://www.encodeproject.org/files/ENCFF807MUK/)|
-|genome fasta|hg19|[link](https://www.encodeproject.org/files/male.hg19/)|
-|chromosome sizes|hg19|[link](https://www.encodeproject.org/files/male.hg19.chrom.sizes/)|
+|bwa index|mm10|[link](https://www.encodeproject.org/files/ENCFF018NEO/)|
+|chromosome sizes|mm10|[link](https://www.encodeproject.org/files/mm10_no_alt.chrom.sizes/)|
 
 In most cases you will also need a restriction map file appropriate for the restriction enzyme and assembly. `MboI` and `DpnII` share the same restriction map because they have the same recognition site. If you don't see your enzyme here you can generate a custom sites file, see [generating restriction site files](#generating-restriction-site-files).
 
@@ -109,8 +124,7 @@ In most cases you will also need a restriction map file appropriate for the rest
 |-|-|-|
 |DpnII, MboI|GRCh38|[link](https://www.encodeproject.org/files/ENCFF246KDZ/)|
 |HindIII|GRCh38|[link](https://www.encodeproject.org/files/ENCFF509VQM/)|
-|DpnII, MboI|hg19|[link](https://www.encodeproject.org/files/ENCFF955ICX/)|
-|HindIII|hg19|[link](https://www.encodeproject.org/files/ENCFF997LWB/)|
+|DpnII, MboI|mm10|[link](https://www.encodeproject.org/files/ENCFF930KBK/)|
 
 ## Outputs
 
@@ -118,15 +132,5 @@ The exact outputs of the pipeline will depend on the combination of inputs. When
 
 A draft document describing the pipeline outputs and quality control (QC) values is [available on the ENCODE portal](https://www.encodeproject.org/documents/75926e4b-77aa-4959-8ca7-87efcba39d79/@@download/attachment/comp_doc_7july2018_final.pdf).
 
-### Output descriptions
+## Genophase
 
-* `alignable_bam` is an array of filtered BAM files, one per biological replicate
-* `out_pairs` is an array of files in [`pairs` format](https://github.com/4dn-dcic/pairix/blob/master/pairs_format_specification.md), one per biological replicate
-* `out_dedup` is an array of files in [Juicer long format](https://github.com/aidenlab/juicer/wiki/Pre#long-format), one per biological replicate
-* `library_complexity_stats_json` is an array of library complexity QC statistics in JSON format, one per biological replicate.
-* `stats` is an array of library QC statistics in JSON format, one per biological replicate. It includes statistics describing the quantity and nature of the Hi-C contacts.
-* `alignment_stats_` is an array of arrays of alignment QC statistics in plain text, one per technical replicate.
-* `merged_stats_json` is a JSON file containing alignment and library statistics for merged libraries
-* `out_hic_1` is a [`.hic` file](https://github.com/aidenlab/juicer/wiki/Data#hic-files) containing the contact matrix filtered by MAPQ >= 1
-* `out_hic_30` is a [`.hic` file](https://github.com/aidenlab/juicer/wiki/Data#hic-files) containing the contact matrix filtered by MAPQ >= 30
-* `out_tads` contains `arrowhead` domain calls in the Juicer format described [here](https://github.com/aidenlab/juicer/wiki/Arrowhead#domain-list-content)

@@ -11,7 +11,9 @@
 
 ## Introduction
 
-Here are some notes on running and using this pipeline. Using [Caper](https://github.com/ENCODE-DCC/caper) is the canonical, supported and official way to use ENCODE Uniform Processing Pipelines. The example below uses the command `caper run`, which is the simplest way to run a single pipeline. For running multiple pipelines in a production setting using `caper server` is recommended. To find details on setting up the server, refer to the [Caper documentation](https://github.com/ENCODE-DCC/caper/blob/master/DETAILS.md#usage).
+Here are some notes on running and using this pipeline. Using [Caper](https://github.com/ENCODE-DCC/caper) is the canonical, supported and official way to use ENCODE Uniform Processing Pipelines. The example below uses the command `caper run`, which is the simplest way to run a single pipeline. For running multiple pipelines in a production setting using `caper server` is recommended. To find details on setting up the server, refer to the [Caper documentation](https://github.com/ENCODE-DCC/caper/blob/master/DETAILS.md#usage).\
+
+This repository contains several workflows. For details on them, please see the [reference](./reference.md#workflows)
 
 ## Installation
 
@@ -32,7 +34,7 @@ Here are some notes on running and using this pipeline. Using [Caper](https://gi
 
 Make sure you have properly installed the pipeline as described in the [installation instructions](usage.md#installation). Make sure to run the following commands from the root of the repository (i.e. `cd hic-pipeline` if you have not done so already).
 
-1. Prepare the input JSON file. This file contains the user-specified files and parameters to run the pipeline with. Different examples of input JSON files are available [here](./reference.md#inputs). Details about the different input parameters are available [here](./reference.md#input-desciptions). Copy and paste the entirety of the following command into your terminal (uses [heredoc](https://tldp.org/LDP/abs/html/here-docs.html) syntax) and press enter/return to create a file called `input.json` pointing to the test data in this repo as pipeline input:
+1. Prepare the input JSON file. This file contains the user-specified files and parameters to run the pipeline with. Different examples of input JSON files are available [here](./reference.md#inputs). Details about the different input parameters are available [here](./reference.md#input-descriptions). Copy and paste the entirety of the following command into your terminal (uses [heredoc](https://tldp.org/LDP/abs/html/here-docs.html) syntax) and press enter/return to create a file called `input.json` pointing to the test data in this repo as pipeline input:
 
 ```bash
 cat << EOF > input.json
@@ -76,4 +78,4 @@ This pipeline can be run on a variety of platforms via Caper. For a list of supp
 
 ## Using Singularity
 
-Caper comes with built-in support for using Singularity containers instead of Docker with `--singularity` option. This is useful in HPC environments where Docker usage is restricted. See [Caper documentation](https://github.com/ENCODE-DCC/caper/blob/master/DETAILS.md) for more information.
+Caper comes with built-in support for using Singularity containers instead of Docker with `--singularity` option. This is useful in HPC environments where Docker usage is restricted. See [Caper documentation](https://github.com/ENCODE-DCC/caper/blob/master/DETAILS.md) for more information. Please note that GPU-enabled tasks (HiCCUPS and DELTA) will not work.
