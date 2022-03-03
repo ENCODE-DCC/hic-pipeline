@@ -4,26 +4,19 @@ import "./hic.wdl"
 
 workflow genophase {
     meta {
-        version: "1.11.2"
-        caper_docker: "encodedcc/hic-pipeline:1.11.2"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.11.2"
+        version: "1.11.3"
+        caper_docker: "encodedcc/hic-pipeline:1.11.3"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.11.3"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
     input {
         File reference_fasta
         Array[File] bams
-        # From GATK bundle
+        # .tar.gz archive containing Ommi, Mills, Hapmap, and 1000G VCFs + indexes
         # https://gatk.broadinstitute.org/hc/en-us/articles/360035890811-Resource-bundle
         # https://console.cloud.google.com/storage/browser/genomics-public-data/resources/broad/hg38/v0/
-        File dbsnp_vcf
-        File dbsnp_vcf_index
-        File hapmap_vcf_index
-        File hapmap_vcf
-        File mills_vcf
-        File mills_vcf_index
-        File omni_vcf
-        File omni_vcf_index
+        File? gatk_bundle_tar
         Int? gatk_num_cpus
         Int? gatk_disk_size_gb
         Int? gatk_ram_gb
@@ -31,11 +24,9 @@ workflow genophase {
         Int? run_3d_dna_disk_size_gb
         Int? run_3d_dna_ram_gb
         Boolean no_phasing = false
-        # Only for testing purposes
-        Boolean no_bundle = false
 
-        String docker = "encodedcc/hic-pipeline:1.11.2"
-        String singularity = "docker://encodedcc/hic-pipeline:1.11.2"
+        String docker = "encodedcc/hic-pipeline:1.11.3"
+        String singularity = "docker://encodedcc/hic-pipeline:1.11.3"
     }
 
     RuntimeEnvironment runtime_environment = {
@@ -66,15 +57,7 @@ workflow genophase {
         reference_fasta_index = create_reference_fasta_index.fasta_index,
         sequence_dictionary = create_gatk_references.sequence_dictionary,
         interval_list = create_gatk_references.interval_list,
-        mills_vcf = mills_vcf,
-        omni_vcf = omni_vcf,
-        hapmap_vcf = hapmap_vcf,
-        dbsnp_vcf = dbsnp_vcf,
-        mills_vcf_index = mills_vcf_index,
-        omni_vcf_index = omni_vcf_index,
-        hapmap_vcf_index = hapmap_vcf_index,
-        dbsnp_vcf_index = dbsnp_vcf_index,
-        no_bundle = no_bundle,
+        bundle_tar = gatk_bundle_tar,
         num_cpus = gatk_num_cpus,
         ram_gb = gatk_ram_gb,
         disk_size_gb = gatk_disk_size_gb,
@@ -154,6 +137,7 @@ task create_gatk_references {
     }
 }
 
+
 task gatk {
     input {
         File bam
@@ -161,16 +145,7 @@ task gatk {
         File reference_fasta_index
         File sequence_dictionary
         File interval_list
-        File mills_vcf
-        File omni_vcf
-        File hapmap_vcf
-        File dbsnp_vcf
-        File mills_vcf_index
-        File omni_vcf_index
-        File hapmap_vcf_index
-        File dbsnp_vcf_index
-        # Only for testing purposes
-        Boolean no_bundle = false
+        File? bundle_tar
         Int num_cpus = 16
         Int ram_gb = 128
         Int disk_size_gb = 1000
@@ -182,25 +157,16 @@ task gatk {
 
     command <<<
         mkdir bundle
-        if [[ ~{if(no_bundle) then "0" else "1"} -eq 1 ]]
+        if [[ ~{if defined(bundle_tar) then "1" else "0"} -eq 1 ]]
         then
-            mv \
-                ~{mills_vcf} \
-                ~{omni_vcf} \
-                ~{hapmap_vcf} \
-                ~{dbsnp_vcf} \
-                ~{mills_vcf_index} \
-                ~{omni_vcf_index} \
-                ~{hapmap_vcf_index} \
-                ~{dbsnp_vcf_index} \
-                bundle
+            tar -xvzf ~{bundle_tar} -C bundle
         fi
         mkdir reference
         mv ~{reference_fasta_index} ~{sequence_dictionary} ~{interval_list} reference
         gzip -dc ~{reference_fasta} > reference/~{basename(reference_fasta, ".gz")}
         run-gatk-after-juicer2.sh \
             -r reference/~{basename(reference_fasta, ".gz")} \
-            ~{if !no_bundle then "--gatk-bundle bundle" else ""} \
+            ~{if defined(bundle_tar) then "--gatk-bundle bundle" else ""} \
             --threads ~{num_cpus} \
             ~{bam}
         gzip -n ~{final_snp_vcf_name}
