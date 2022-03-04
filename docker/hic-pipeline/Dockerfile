@@ -150,6 +150,10 @@ RUN git clone --branch phasing https://github.com/aidenlab/3d-dna.git && \
     cd 3d-dna && \
     git checkout 63029aa3bc5ba9bbdad9dd9771ace583cc95e273
 
+RUN git clone https://github.com/sa501428/psf-to-bedpe.git && \
+    cd hic2gatk && \
+    git checkout 0.1
+
 # For sorting, LC_ALL is C
 ENV LC_ALL C
 ENV PATH=/opt:/opt/scripts:/opt/scripts/common:/opt/juicer/misc:/opt/gatk-4.2.2.0:/opt/hic2gatk:$PATH
