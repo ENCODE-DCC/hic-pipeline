@@ -61,7 +61,7 @@ EOF
 2. Run the pipeline using Caper. The `-m` flag is used to give a memorable name to the metadata JSON file the pipeline will produce once it is finished describing the run. More details about the metadata JSON can be found in the [Cromwell documentation](https://cromwell.readthedocs.io/en/stable/api/RESTAPI/#workflowmetadataresponse)
 
 ```bash
-  $ caper run hic-pipeline.wdl -i input.json -m hic_testrun_metadata.json
+  $ caper run hic.wdl -i tests/functional/json/test_hic.json -m hic_testrun_metadata.json
 ```
 
 ## Inspecting Outputs
