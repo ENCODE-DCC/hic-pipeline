@@ -256,6 +256,7 @@ task convert_psf_to_bedpe {
     }
 
     command <<<
+        set -euo pipefail
         awk -f /opt/3d-dna/phase/psf-to-bedpe.awk ~{psf} | gzip -nc > "psf.bedpe.gz"
     >>>
 
