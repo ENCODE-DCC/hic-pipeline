@@ -151,7 +151,7 @@ RUN git clone --branch phasing https://github.com/aidenlab/3d-dna.git && \
     git checkout 63029aa3bc5ba9bbdad9dd9771ace583cc95e273
 
 RUN git clone https://github.com/sa501428/psf-to-bedpe.git && \
-    cd hic2gatk && \
+    cd psf-to-bedpe && \
     git checkout 0.1
 
 # For sorting, LC_ALL is C
