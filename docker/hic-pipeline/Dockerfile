@@ -102,10 +102,6 @@ RUN git clone https://github.com/ENCODE-DCC/kentUtils_bin_v381.git && \
     cd ../../ && \
     rm -rf kentUtils_bin_v381
 
-RUN git clone --branch phasing https://github.com/aidenlab/3d-dna.git && \
-    cd 3d-dna && \
-    git checkout 634b49b9a93ac166914dc3baae586489bb793c92
-
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     cd juicer && \
@@ -149,6 +145,14 @@ RUN curl \
 RUN git clone https://github.com/aidenlab/hic2gatk.git && \
     cd hic2gatk && \
     git checkout dee2a9f6f2b0e95f0cb3e8d47eef9798cb8101aa
+
+RUN git clone --branch phasing https://github.com/aidenlab/3d-dna.git && \
+    cd 3d-dna && \
+    git checkout 63029aa3bc5ba9bbdad9dd9771ace583cc95e273
+
+RUN git clone https://github.com/sa501428/psf-to-bedpe.git && \
+    cd psf-to-bedpe && \
+    git checkout 0.1
 
 # For sorting, LC_ALL is C
 ENV LC_ALL C

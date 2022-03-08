@@ -4,9 +4,9 @@ import "./hic.wdl"
 
 workflow genophase {
     meta {
-        version: "1.11.3"
-        caper_docker: "encodedcc/hic-pipeline:1.11.3"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.11.3"
+        version: "1.12.0"
+        caper_docker: "encodedcc/hic-pipeline:1.12.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.12.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -25,8 +25,8 @@ workflow genophase {
         Int? run_3d_dna_ram_gb
         Boolean no_phasing = false
 
-        String docker = "encodedcc/hic-pipeline:1.11.3"
-        String singularity = "docker://encodedcc/hic-pipeline:1.11.3"
+        String docker = "encodedcc/hic-pipeline:1.12.0"
+        String singularity = "docker://encodedcc/hic-pipeline:1.12.0"
     }
 
     RuntimeEnvironment runtime_environment = {
@@ -71,6 +71,11 @@ workflow genophase {
             num_cpus = run_3d_dna_num_cpus,
             ram_gb = run_3d_dna_ram_gb,
             disk_size_gb = run_3d_dna_disk_size_gb,
+            runtime_environment = runtime_environment,
+        }
+
+        call convert_psf_to_bedpe { input:
+            psf = run_3d_dna.psf,
             runtime_environment = runtime_environment,
         }
     }
@@ -228,6 +233,35 @@ task run_3d_dna {
 
         File assembly_in = "snp.out.in.assembly.gz"
         File assembly = "snp.out.out.assembly.gz"
+
+        File psf = "out.psf"
+    }
+
+    runtime {
+        cpu : "~{num_cpus}"
+        disks: "local-disk ~{disk_size_gb} HDD"
+        memory: "~{ram_gb} GB"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
+    }
+}
+
+task convert_psf_to_bedpe {
+    input {
+        File psf
+        Int num_cpus = 1
+        Int disk_size_gb = 1000
+        Int ram_gb = 16
+        RuntimeEnvironment runtime_environment
+    }
+
+    command <<<
+        set -euo pipefail
+        awk -f /opt/psf-to-bedpe/psf-to-bedpe.awk ~{psf} > "psf.bedpe"
+    >>>
+
+    output {
+        File bedpe = "psf.bedpe"
     }
 
     runtime {
