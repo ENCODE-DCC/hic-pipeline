@@ -24,7 +24,7 @@ parameters:
 
 defaults: &defaults
   docker:
-    - image: cimg/base:2020.01
+    - image: cimg/base:2022.03
   working_directory: ~/ENCODE-DCC/hic-pipeline
 
 machine_defaults: &machine_defaults

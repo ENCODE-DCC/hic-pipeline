@@ -20,7 +20,11 @@ def main():
     parser = _get_parser()
     args = parser.parse_args()
     auth = _read_auth_from_file(args.keypair_file)
-    bams = _get_bams_from_experiment(accessions=args.accessions, auth=auth)
+    bams = _get_bams_from_experiment(
+        accessions=args.accessions,
+        auth=auth,
+        use_submitted_file_names=args.use_submitted_file_names,
+    )
     input_json = _get_input_json(bams=bams)
     _write_json_to_file(input_json, args.outfile)
 
@@ -35,7 +39,7 @@ def _get_experiment(accession, auth=None):
     return response.json()
 
 
-def _get_bams_from_experiment(accessions, auth):
+def _get_bams_from_experiment(accessions, auth=None, use_submitted_file_names=False):
     bams = []
     for accession in accessions:
         experiment = _get_experiment(accession, auth=auth)
@@ -55,7 +59,10 @@ def _get_bams_from_experiment(accessions, auth):
                 and file["@id"] in analysis["files"]
                 and file["file_format"] == "bam"
             ):
-                bams.append(urljoin(_PORTAL_URL, file["href"]))
+                if use_submitted_file_names:
+                    bams.append(file["submitted_file_name"])
+                else:
+                    bams.append(urljoin(_PORTAL_URL, file["href"]))
     return bams
 
 
@@ -85,10 +92,20 @@ def _get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("outfile")
     parser.add_argument(
-        "-a", "--accessions", nargs="+", help="Experiments to pool for genophasing"
+        "-a",
+        "--accessions",
+        nargs="+",
+        help="Experiments to pool for genophasing",
+        required=True,
     )
     parser.add_argument(
         "--keypair-file", help="Path to keypairs.json", default="~/keypairs.json"
+    )
+    parser.add_argument(
+        "-u",
+        "--use-submitted-file-names",
+        help="Use submitted file names (gs:// uris) for bams to avoid massive file download",
+        action="store_true",
     )
     return parser
 
