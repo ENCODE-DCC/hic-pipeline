@@ -12,7 +12,7 @@ _REFERENCE_FILES = {
         _PORTAL_URL,
         "/files/GRCh38_no_alt_analysis_set_GCA_000001405.15/@@download/GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta.gz",
     ),
-    "gatk_bundle_tar": "https://test.encodedcc.org/files/TSTFF044741/@@download/TSTFF044741.tar.gz",
+    "gatk_bundle_tar": "https://www.encodeproject.org/files/ENCFF975DYE/@@download/ENCFF975DYE.tar.gz",
 }
 
 
