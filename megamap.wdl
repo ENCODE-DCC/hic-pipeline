@@ -15,11 +15,22 @@ workflow megamap {
         File? restriction_sites
         File chrom_sizes
         String assembly_name = "undefined"
+
+        # Parameters
         Int quality = 30
+        Array[Int] create_hic_in_situ_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100]
+        Array[Int] create_hic_intact_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100, 50, 20, 10]
         Boolean intact = true
+
+        # Resource parameters
         Int? create_hic_num_cpus
+        Int? create_hic_ram_gb
+        Int? create_hic_juicer_tools_heap_size_gb
+        Int? create_hic_disk_size_gb
         Int? create_accessibility_track_ram_gb
         Int? create_accessibility_track_disk_size_gb
+
+        # Pipeline images
         String docker = "encodedcc/hic-pipeline:1.13.0"
         String singularity = "docker://encodedcc/hic-pipeline:1.13.0"
         String delta_docker = "encodedcc/hic-pipeline:1.13.0_delta"
@@ -43,8 +54,6 @@ workflow megamap {
 
     String delta_models_path = if intact then "ultimate-models" else "beta-models"
     Array[Int] delta_resolutions = if intact then [5000, 2000, 1000] else [5000, 10000]
-    Array[Int] create_hic_in_situ_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100]
-    Array[Int] create_hic_intact_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100, 50, 20, 10]
     Array[Int] create_hic_resolutions = if intact then create_hic_intact_resolutions else create_hic_in_situ_resolutions
 
     call hic.normalize_assembly_name as normalize_assembly_name { input:
@@ -87,6 +96,9 @@ workflow megamap {
             resolutions = create_hic_resolutions,
             assembly_name = normalize_assembly_name.normalized_assembly_name,
             num_cpus = create_hic_num_cpus,
+            ram_gb = create_hic_ram_gb,
+            juicer_tools_heap_size_gb = create_hic_juicer_tools_heap_size_gb,
+            disk_size_gb = create_hic_disk_size_gb,
             runtime_environment = runtime_environment,
         }
     }
@@ -102,6 +114,9 @@ workflow megamap {
             resolutions = create_hic_resolutions,
             assembly_name = assembly_name,
             num_cpus = create_hic_num_cpus,
+            ram_gb = create_hic_ram_gb,
+            juicer_tools_heap_size_gb = create_hic_juicer_tools_heap_size_gb,
+            disk_size_gb = create_hic_disk_size_gb,
             chrsz =  chrom_sizes,
             runtime_environment = runtime_environment,
         }
