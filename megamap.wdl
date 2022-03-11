@@ -85,6 +85,11 @@ workflow megamap {
         runtime_environment = runtime_environment,
     }
 
+    call convert_juicer_stats_to_json { input:
+        stats = merge_stats_from_hic_files.merged_stats,
+        runtime_environment = runtime_environment,
+    }
+
     if (normalize_assembly_name.assembly_is_supported) {
         call hic.create_hic as create_hic { input:
             pre = bam_to_pre.pre,
@@ -225,11 +230,16 @@ task merge_stats_from_hic_files {
             /opt/merge-stats.jar \
             ~{"inter_" + quality} \
             ~{sep=" " hic_files}
+        python3 \
+            "$(which jsonify_stats.py)" \
+            inter_~{quality}.txt \
+            stats_~{quality}.json
     >>>
 
     output {
         File merged_stats = "inter_~{quality}.txt"
         File merged_stats_hists = "inter_~{quality}_hists.m"
+        File stats_json = "stats_~{quality}.json"
     }
 
     runtime {
