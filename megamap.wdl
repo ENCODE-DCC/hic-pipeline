@@ -27,6 +27,9 @@ workflow megamap {
         Int? create_hic_ram_gb
         Int? create_hic_juicer_tools_heap_size_gb
         Int? create_hic_disk_size_gb
+        Int? add_norm_num_cpus
+        Int? add_norm_ram_gb
+        Int? add_norm_disk_size_gb
         Int? create_accessibility_track_ram_gb
         Int? create_accessibility_track_disk_size_gb
 
@@ -85,11 +88,6 @@ workflow megamap {
         runtime_environment = runtime_environment,
     }
 
-    call convert_juicer_stats_to_json { input:
-        stats = merge_stats_from_hic_files.merged_stats,
-        runtime_environment = runtime_environment,
-    }
-
     if (normalize_assembly_name.assembly_is_supported) {
         call hic.create_hic as create_hic { input:
             pre = bam_to_pre.pre,
@@ -136,6 +134,9 @@ workflow megamap {
     call hic.add_norm as add_norm { input:
         hic = unnormalized_hic_file,
         quality = quality,
+        num_cpus = add_norm_num_cpus,
+        ram_gb = add_norm_ram_gb,
+        disk_size_gb = add_norm_disk_size_gb,
         runtime_environment = runtime_environment,
     }
 

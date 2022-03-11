@@ -67,7 +67,12 @@ workflow hic {
         Int dedup_disk_size_gb_in_situ = 5000
         Int dedup_disk_size_gb_intact = 7500
         Int? create_hic_num_cpus
+        Int? create_hic_ram_gb
+        Int? create_hic_juicer_tools_heap_size_gb
+        Int? create_hic_disk_size_gb
         Int? add_norm_num_cpus
+        Int? add_norm_ram_gb
+        Int? add_norm_disk_size_gb
         Int? create_accessibility_track_ram_gb
         Int? create_accessibility_track_disk_size_gb
         String assembly_name = "undefined"
@@ -278,6 +283,9 @@ workflow hic {
                 resolutions = create_hic_resolutions,
                 assembly_name = assembly_name,
                 num_cpus = create_hic_num_cpus,
+                ram_gb = create_hic_ram_gb,
+                juicer_tools_heap_size_gb = create_hic_juicer_tools_heap_size_gb,
+                disk_size_gb = create_hic_disk_size_gb,
                 runtime_environment = runtime_environment,
             }
         }
@@ -293,6 +301,9 @@ workflow hic {
                 resolutions = create_hic_resolutions,
                 assembly_name = normalize_assembly_name.normalized_assembly_name,
                 num_cpus = create_hic_num_cpus,
+                ram_gb = create_hic_ram_gb,
+                juicer_tools_heap_size_gb = create_hic_juicer_tools_heap_size_gb,
+                disk_size_gb = create_hic_disk_size_gb,
                 runtime_environment = runtime_environment,
             }
         }
@@ -308,6 +319,8 @@ workflow hic {
             normalization_methods = normalization_methods,
             quality = qualities[i],
             num_cpus = add_norm_num_cpus,
+            ram_gb = add_norm_ram_gb,
+            disk_size_gb = add_norm_disk_size_gb,
             runtime_environment = runtime_environment,
         }
 
@@ -906,6 +919,8 @@ task add_norm {
         Array[String] normalization_methods = []
         Int quality
         Int num_cpus = 24
+        Int disk_size_gb = 256
+        Int ram_gb = 72
         RuntimeEnvironment runtime_environment
     }
 
@@ -929,8 +944,8 @@ task add_norm {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 256 HDD"
-        memory : "72 GB"
+        disks: "local-disk ~{disk_size_gb} HDD"
+        memory : "~{ram_gb} GB"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
     }
