@@ -129,6 +129,10 @@ RUN curl \
 
 RUN curl \
         -LO \
+        https://github.com/sa501428/merge-stats/releases/download/v0.3/merge-stats.jar
+
+RUN curl \
+        -LO \
         https://github.com/broadinstitute/gatk/releases/download/4.2.2.0/gatk-4.2.2.0.zip && \
     unzip -qq gatk-4.2.2.0.zip && \
     cd gatk-4.2.2.0 && \

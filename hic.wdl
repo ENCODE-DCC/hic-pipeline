@@ -19,9 +19,9 @@ struct RuntimeEnvironment {
 
 workflow hic {
     meta {
-        version: "1.12.2"
-        caper_docker: "encodedcc/hic-pipeline:1.12.2"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.12.2"
+        version: "1.13.0"
+        caper_docker: "encodedcc/hic-pipeline:1.13.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.13.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
         description: "ENCODE Hi-C pipeline, see https://github.com/ENCODE-DCC/hic-pipeline for details."
     }
@@ -41,13 +41,20 @@ workflow hic {
         # Parameters controlling delta calls
         Boolean no_delta = false
 
+        # Parameters
         Boolean intact = false
         Array[String] normalization_methods = []
+        Array[Int] create_hic_in_situ_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100]
+        Array[Int] create_hic_intact_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100, 50, 20, 10]
+
+        # Feature flags
         Boolean no_pairs = false
         Boolean no_call_loops = false
         Boolean no_call_tads = false
         Boolean no_eigenvectors = false
         Boolean no_slice = false
+
+        # Resource parameters
         Int align_num_cpus = 32
         Int align_ram_gb_in_situ = 64
         Int align_ram_gb_intact = 88
@@ -60,15 +67,20 @@ workflow hic {
         Int dedup_disk_size_gb_in_situ = 5000
         Int dedup_disk_size_gb_intact = 7500
         Int? create_hic_num_cpus
+        Int? create_hic_ram_gb
+        Int? create_hic_juicer_tools_heap_size_gb
+        Int? create_hic_disk_size_gb
         Int? add_norm_num_cpus
+        Int? add_norm_ram_gb
+        Int? add_norm_disk_size_gb
         Int? create_accessibility_track_ram_gb
         Int? create_accessibility_track_disk_size_gb
         String assembly_name = "undefined"
 
-        String docker = "encodedcc/hic-pipeline:1.12.2"
-        String singularity = "docker://encodedcc/hic-pipeline:1.12.2"
-        String delta_docker = "encodedcc/hic-pipeline:1.12.2_delta"
-        String hiccups_docker = "encodedcc/hic-pipeline:1.12.2_hiccups"
+        String docker = "encodedcc/hic-pipeline:1.13.0"
+        String singularity = "docker://encodedcc/hic-pipeline:1.13.0"
+        String delta_docker = "encodedcc/hic-pipeline:1.13.0_delta"
+        String hiccups_docker = "encodedcc/hic-pipeline:1.13.0_hiccups"
     }
 
     RuntimeEnvironment runtime_environment = {
@@ -92,8 +104,6 @@ workflow hic {
     Int dedup_disk_size_gb = if intact then dedup_disk_size_gb_intact else dedup_disk_size_gb_in_situ
     String delta_models_path = if intact then "ultimate-models" else "beta-models"
     Array[Int] delta_resolutions = if intact then [5000, 2000, 1000] else [5000, 10000]
-    Array[Int] create_hic_in_situ_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100]
-    Array[Int] create_hic_intact_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100, 50, 20, 10]
     Array[Int] create_hic_resolutions = if intact then create_hic_intact_resolutions else create_hic_in_situ_resolutions
 
     # Default MAPQ thresholds for generating .hic contact maps
@@ -273,6 +283,9 @@ workflow hic {
                 resolutions = create_hic_resolutions,
                 assembly_name = assembly_name,
                 num_cpus = create_hic_num_cpus,
+                ram_gb = create_hic_ram_gb,
+                juicer_tools_heap_size_gb = create_hic_juicer_tools_heap_size_gb,
+                disk_size_gb = create_hic_disk_size_gb,
                 runtime_environment = runtime_environment,
             }
         }
@@ -288,6 +301,9 @@ workflow hic {
                 resolutions = create_hic_resolutions,
                 assembly_name = normalize_assembly_name.normalized_assembly_name,
                 num_cpus = create_hic_num_cpus,
+                ram_gb = create_hic_ram_gb,
+                juicer_tools_heap_size_gb = create_hic_juicer_tools_heap_size_gb,
+                disk_size_gb = create_hic_disk_size_gb,
                 runtime_environment = runtime_environment,
             }
         }
@@ -303,6 +319,8 @@ workflow hic {
             normalization_methods = normalization_methods,
             quality = qualities[i],
             num_cpus = add_norm_num_cpus,
+            ram_gb = add_norm_ram_gb,
+            disk_size_gb = add_norm_disk_size_gb,
             runtime_environment = runtime_environment,
         }
 
@@ -845,6 +863,10 @@ task create_hic {
         File? chrsz
         File? restriction_sites
         Int num_cpus = 16
+        # Should always set juicer_tools_heap_size_gb < ram_gb
+        Int ram_gb = 384
+        Int juicer_tools_heap_size_gb = 370
+        Int disk_size_gb = 2000
         RuntimeEnvironment runtime_environment
     }
 
@@ -860,7 +882,7 @@ task create_hic {
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
-            -Xmx240g \
+            -Xmx~{juicer_tools_heap_size_gb}g \
             -jar /opt/scripts/common/juicer_tools.jar \
             pre \
             -n \
@@ -883,8 +905,8 @@ task create_hic {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 2000 HDD"
-        memory : "256 GB"
+        memory : "~{ram_gb} GB"
+        disks: "local-disk ~{disk_size_gb} HDD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
     }
@@ -897,6 +919,8 @@ task add_norm {
         Array[String] normalization_methods = []
         Int quality
         Int num_cpus = 24
+        Int disk_size_gb = 256
+        Int ram_gb = 72
         RuntimeEnvironment runtime_environment
     }
 
@@ -920,8 +944,8 @@ task add_norm {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 128 HDD"
-        memory : "72 GB"
+        disks: "local-disk ~{disk_size_gb} HDD"
+        memory : "~{ram_gb} GB"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
     }
