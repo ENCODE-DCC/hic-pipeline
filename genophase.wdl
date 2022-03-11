@@ -4,9 +4,9 @@ import "./hic.wdl"
 
 workflow genophase {
     meta {
-        version: "1.13.0"
-        caper_docker: "encodedcc/hic-pipeline:1.13.0"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.13.0"
+        version: "1.14.0"
+        caper_docker: "encodedcc/hic-pipeline:1.14.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.14.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -25,8 +25,8 @@ workflow genophase {
         Int? run_3d_dna_ram_gb
         Boolean no_phasing = false
 
-        String docker = "encodedcc/hic-pipeline:1.13.0"
-        String singularity = "docker://encodedcc/hic-pipeline:1.13.0"
+        String docker = "encodedcc/hic-pipeline:1.14.0"
+        String singularity = "docker://encodedcc/hic-pipeline:1.14.0"
     }
 
     RuntimeEnvironment runtime_environment = {
