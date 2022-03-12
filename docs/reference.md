@@ -31,6 +31,7 @@
   - [Failure during `hic.normalize_assembly_name`](#failure-during-hicnormalize_assembly_name)
   - [Generic out of memory (OOM) issue](#generic-out-of-memory-oom-issue)
   - [Generic out of disk issue](#generic-out-of-disk-issue)
+  - [Failure during localizer, hiccups, or arrowhead](#failure-during-localizer-hiccups-or-arrowhead)
 
 # Workflows
 
@@ -326,3 +327,7 @@ If you `Killed` in the logs for the failed task, this means the machine ran out 
 ## Generic out of disk issue
 
 If you see messages like `no space left on device`, this means that the task ran out of disk. Double the disk for that failed task by updating the appropriate input (`hic.[task_name]_disk_size_gb`).
+
+## Failure during localizer, hiccups, or arrowhead
+
+If you see things like "0 loops written to file", "data is too sparse", it means your data is not deep enough to call loops and/or domains. Turn off the loop and domain calls with `"hic.no_call_loops": true` and `"hic.no_call_tads": true` , then rerun the workflow.
