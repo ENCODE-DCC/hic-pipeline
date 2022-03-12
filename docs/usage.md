@@ -11,7 +11,9 @@
 
 ## Introduction
 
-Here are some notes on running and using this pipeline. Using [Caper](https://github.com/ENCODE-DCC/caper) is the canonical, supported and official way to use ENCODE Uniform Processing Pipelines. The example below uses the command `caper run`, which is the simplest way to run a single pipeline. For running multiple pipelines in a production setting using `caper server` is recommended. To find details on setting up the server, refer to the [Caper documentation](https://github.com/ENCODE-DCC/caper/blob/master/DETAILS.md#usage).
+Here are some notes on running and using this pipeline. Using [Caper](https://github.com/ENCODE-DCC/caper) is the canonical, supported and official way to use ENCODE Uniform Processing Pipelines. The example below uses the command `caper run`, which is the simplest way to run a single pipeline. For running multiple pipelines in a production setting using `caper server` is recommended. To find details on setting up the server, refer to the [Caper documentation](https://github.com/ENCODE-DCC/caper/blob/master/DETAILS.md#usage).\
+
+This repository contains several workflows. For details on them, please see the [reference](./reference.md#workflows)
 
 ## Installation
 
@@ -28,11 +30,13 @@ Here are some notes on running and using this pipeline. Using [Caper](https://gi
 3. Follow [Caper's README](https://github.com/ENCODE-DCC/caper) carefully to configure it for your platform (local, cloud, cluster, etc.)
 > **IMPORTANT**: Configure your Caper configuration file `~/.caper/default.conf` correctly for your platform.
 
+If using local Docker, go to `Docker Preferences > Resources > Advanced > Memory` and set the max memory to 12 GB. Otherwise it may fail due to resource issues.
+
 ## Running Workflows
 
 Make sure you have properly installed the pipeline as described in the [installation instructions](usage.md#installation). Make sure to run the following commands from the root of the repository (i.e. `cd hic-pipeline` if you have not done so already).
 
-1. Prepare the input JSON file. This file contains the user-specified files and parameters to run the pipeline with. Different examples of input JSON files are available [here](./reference.md#inputs). Details about the different input parameters are available [here](./reference.md#input-desciptions). Copy and paste the entirety of the following command into your terminal (uses [heredoc](https://tldp.org/LDP/abs/html/here-docs.html) syntax) and press enter/return to create a file called `input.json` pointing to the test data in this repo as pipeline input:
+1. Prepare the input JSON file. This file contains the user-specified files and parameters to run the pipeline with. Different examples of input JSON files are available [here](./reference.md#inputs). Details about the different input parameters are available [here](./reference.md#input-descriptions). Copy and paste the entirety of the following command into your terminal (uses [heredoc](https://tldp.org/LDP/abs/html/here-docs.html) syntax) and press enter/return to create a file called `input.json` pointing to the test data in this repo as pipeline input:
 
 ```bash
 cat << EOF > input.json
@@ -59,7 +63,7 @@ EOF
 2. Run the pipeline using Caper. The `-m` flag is used to give a memorable name to the metadata JSON file the pipeline will produce once it is finished describing the run. More details about the metadata JSON can be found in the [Cromwell documentation](https://cromwell.readthedocs.io/en/stable/api/RESTAPI/#workflowmetadataresponse)
 
 ```bash
-  $ caper run hic-pipeline.wdl -i input.json -m hic_testrun_metadata.json
+  $ caper run hic.wdl -i tests/functional/json/test_hic.json -m hic_testrun_metadata.json
 ```
 
 ## Inspecting Outputs
@@ -76,4 +80,4 @@ This pipeline can be run on a variety of platforms via Caper. For a list of supp
 
 ## Using Singularity
 
-Caper comes with built-in support for using Singularity containers instead of Docker with `--singularity` option. This is useful in HPC environments where Docker usage is restricted. See [Caper documentation](https://github.com/ENCODE-DCC/caper/blob/master/DETAILS.md) for more information.
+Caper comes with built-in support for using Singularity containers instead of Docker with `--singularity` option. This is useful in HPC environments where Docker usage is restricted. See [Caper documentation](https://github.com/ENCODE-DCC/caper/blob/master/DETAILS.md) for more information. Please note that GPU-enabled tasks (HiCCUPS and DELTA) will not work.

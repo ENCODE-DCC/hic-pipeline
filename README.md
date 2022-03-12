@@ -30,6 +30,12 @@ To verify your installation, you can run the following pipeline with a test data
 > Note: this will incur some cost when running in cloud environments.
 
 ```bash
+$ caper run hic.wdl -i tests/functional/json/test_hic.json
+```
+
+To run locally, you must first install `docker`. Then run the following command:
+
+```bash
 $ caper run hic.wdl -i tests/functional/json/test_hic.json --docker
 ```
 
