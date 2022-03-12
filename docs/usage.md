@@ -30,6 +30,8 @@ This repository contains several workflows. For details on them, please see the 
 3. Follow [Caper's README](https://github.com/ENCODE-DCC/caper) carefully to configure it for your platform (local, cloud, cluster, etc.)
 > **IMPORTANT**: Configure your Caper configuration file `~/.caper/default.conf` correctly for your platform.
 
+If using local Docker, go to `Docker Preferences > Resources > Advanced > Memory` and set the max memory to 12 GB. Otherwise it may fail due to resource issues.
+
 ## Running Workflows
 
 Make sure you have properly installed the pipeline as described in the [installation instructions](usage.md#installation). Make sure to run the following commands from the root of the repository (i.e. `cd hic-pipeline` if you have not done so already).
