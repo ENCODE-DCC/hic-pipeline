@@ -1259,6 +1259,7 @@ task create_accessibility_track {
     input {
         File pre
         File chrom_sizes
+        Int sorting_threads
         Int ram_gb = 512
         Int disk_size_gb = 1000
         RuntimeEnvironment runtime_environment
@@ -1270,7 +1271,7 @@ task create_accessibility_track {
         gzip -dc ~{pre} > $PRE_FILE
         awk \
             'BEGIN{OFS="\t"}{cut[$2" "$3]++; cut[$6" "$7]++}END{for(i in cut){split(i, arr, " "); print arr[1], arr[2]-1, arr[2], cut[i]}}' \
-            $PRE_FILE | sort -k1,1 -k2,2n --parallel=10 -S6G > merged30.bedgraph
+            $PRE_FILE | sort -k1,1 -k2,2n --parallel=~{sorting_threads} -S6G > merged30.bedgraph
         bedGraphToBigWig merged30.bedgraph ~{chrom_sizes} inter_30.bw
     >>>
 
