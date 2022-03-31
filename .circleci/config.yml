@@ -49,6 +49,7 @@ commands:
         type: string
         default: ''
     steps:
+      - run: sudo pip install --upgrade setuptools
       - run: sudo pip install tox
       - run: tox -e << parameters.toxenv >> -- << parameters.extra_args >>
 
