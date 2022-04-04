@@ -1269,9 +1269,9 @@ task create_accessibility_track {
         set -euo pipefail
         PRE_FILE=pre.txt
         gzip -dc ~{pre} > $PRE_FILE
-        awk '{print $1}' ~{chrom_sizes} \
-          | parallel -j ~{number_of_threads} --will-cite -k awk -v chr=$1 'BEGIN{OFS="\t"}$2==chr{c[$3]++}$6==chr{c[$7]++}END{for (i in c) {print chr, i-1, i, c[i]}}' $PRE_FILE \
-          | sort -k2,2n > tmp.bedgraph
+        processChromosome () {awk -v chr=$1 'BEGIN{OFS="\t"}$2==chr{c[$3]++}$6==chr{c[$7]++}END{for (i in c) {print chr, i-1, i, c[i]}}' $PRE_FILE | sort -k2,2n}
+        export -f processChromosome
+        awk '{print $1}' ~{chrom_sizes} | parallel -j ~{number_of_threads} --will-cite --joblog temp.log -k processChromosome {} > tmp.bedgraph
         sort -k1,1 -k2,2n -S6G tmp.bedgraph > merged30.bedgraph
         bedGraphToBigWig merged30.bedgraph ~{chrom_sizes} inter_30.bw
     >>>
