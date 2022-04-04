@@ -1259,8 +1259,7 @@ task create_accessibility_track {
     input {
         File pre
         File chrom_sizes
-        Int number_of_threads = 8
-        Int ram_gb = 512
+        Int ram_gb = 64
         Int disk_size_gb = 1000
         RuntimeEnvironment runtime_environment
     }
