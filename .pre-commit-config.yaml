@@ -2,7 +2,7 @@
 exclude: ^tests/data/
 repos:
   - repo: https://github.com/psf/black
-    rev: 21.8b0
+    rev: 22.3.0
     hooks:
       - id: black
         language_version: python3.7
@@ -38,7 +38,7 @@ repos:
       - id: check-yaml
 
   - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-    rev: 0.1.0
+    rev: 0.1.1
     hooks:
       - id: yamlfmt
         args: [--mapping, '2', --sequence, '4', --offset, '2', --preserve-quotes]

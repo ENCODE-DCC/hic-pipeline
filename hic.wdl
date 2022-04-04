@@ -1259,7 +1259,7 @@ task create_accessibility_track {
     input {
         File pre
         File chrom_sizes
-        Int ram_gb = 512
+        Int ram_gb = 64
         Int disk_size_gb = 1000
         RuntimeEnvironment runtime_environment
     }
@@ -1268,9 +1268,7 @@ task create_accessibility_track {
         set -euo pipefail
         PRE_FILE=pre.txt
         gzip -dc ~{pre} > $PRE_FILE
-        awk \
-            'BEGIN{OFS="\t"}{cut[$2" "$3]++; cut[$6" "$7]++}END{for(i in cut){split(i, arr, " "); print arr[1], arr[2]-1, arr[2], cut[i]}}' \
-            $PRE_FILE | sort -k1,1 -k2,2n -S6G > merged30.bedgraph
+        awk '{print $1}' ~{chrom_sizes} | while read chrom; do awk -v chr=${chrom} 'BEGIN{OFS="\t"}$2==chr{c[$3]++}$6==chr{c[$7]++}END{for (i in c) {print chr, i-1, i, c[i]}}' $PRE_FILE | sort -k2,2n >> merged30.bedgraph; done;
         bedGraphToBigWig merged30.bedgraph ~{chrom_sizes} inter_30.bw
     >>>
 
