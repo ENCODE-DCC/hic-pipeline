@@ -4,9 +4,9 @@ import "./hic.wdl"
 
 workflow diploidify {
     meta {
-        version: "1.14.1"
-        caper_docker: "encodedcc/hic-pipeline:1.14.1"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.14.1"
+        version: "1.14.2"
+        caper_docker: "encodedcc/hic-pipeline:1.14.2"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.14.2"
     }
 
     input {
@@ -33,8 +33,8 @@ workflow diploidify {
         Int? create_diploid_dhs_ram_gb
         Int? create_diploid_dhs_disk_size_gb
 
-        String docker = "encodedcc/hic-pipeline:1.14.1"
-        String singularity = "docker://encodedcc/hic-pipeline:1.14.1"
+        String docker = "encodedcc/hic-pipeline:1.14.2"
+        String singularity = "docker://encodedcc/hic-pipeline:1.14.2"
     }
 
     RuntimeEnvironment runtime_environment = {

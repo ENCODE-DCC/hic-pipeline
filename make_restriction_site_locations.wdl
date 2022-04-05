@@ -7,9 +7,9 @@ struct RuntimeEnvironment {
 
 workflow make_restriction_site_locations {
     meta {
-        version: "1.14.1"
-        caper_docker: "encodedcc/hic-pipeline:1.14.1"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.14.1"
+        version: "1.14.2"
+        caper_docker: "encodedcc/hic-pipeline:1.14.2"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.14.2"
     }
 
     parameter_meta {
@@ -22,8 +22,8 @@ workflow make_restriction_site_locations {
         File reference_fasta
         String assembly_name
         String restriction_enzyme
-        String docker = "encodedcc/hic-pipeline:1.14.1"
-        String singularity = "docker://encodedcc/hic-pipeline:1.14.1"
+        String docker = "encodedcc/hic-pipeline:1.14.2"
+        String singularity = "docker://encodedcc/hic-pipeline:1.14.2"
     }
 
 
