@@ -10,7 +10,7 @@
       - path: test-output/stats_30.txt
         md5sum: b0307a12254b0d27d80f8de0185eaade
       - path: test-output/stats_30.json
-        md5sum: 564c8d3745da89e62212a013e14ea37b
+        md5sum: a16b810ec0139f2d79546c3bee60516f
       - path: test-output/stats_30_hists.m
         md5sum: f7bee57645e3559b76ddbc56dfd69166
   - name: test_calculate_stats_no_restriction_sites
@@ -24,6 +24,6 @@
       - path: test-output/stats_30.txt
         md5sum: d6620bdcc8e357f759b8b9453f2b7862
       - path: test-output/stats_30.json
-        md5sum: d1fb143af566d8ed077883f933ba9e92
+        md5sum: 8ed3e1a3332c03382b125df23e76ae55
       - path: test-output/stats_30_hists.m
         md5sum: b8ee427cbaae7358ab598ab44e1f3472

@@ -21,7 +21,7 @@
       - path: test-output/merged_nodups_30.txt.gz
         md5sum: ee923f74237094ac00cd701650af906c
       - path: test-output/stats_30.json
-        md5sum: 32642f5a175b0fe904a024fd7a1b1a35
+        md5sum: 498c78ee3d8f7ddc898b29af04e24ce0
       - path: test-output/eigenvector_5000_30.bw
         md5sum: a566c66fcdfb9fe7ce00c99388cd4ca0
       - path: test-output/eigenvector_5000_30.wig
