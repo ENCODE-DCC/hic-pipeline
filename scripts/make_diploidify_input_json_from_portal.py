@@ -22,12 +22,9 @@ def main():
     bams = _get_bams_files_from_experiment(
         accessions=args.accessions,
         auth=auth,
-        use_submitted_file_names=args.use_submitted_file_names
+        use_submitted_file_names=args.use_submitted_file_names,
     )
-    vcf = _get_vcf_file_from_annotation(
-        annotation=args.annotation,
-        auth=auth
-    )
+    vcf = _get_vcf_file_from_annotation(annotation=args.annotation, auth=auth)
     input_json = _get_input_json(bams=bams, vcf=vcf)
     _write_json_to_file(input_json, args.outfile)
 
@@ -42,7 +39,9 @@ def _get_experiment(accession, auth=None):
     return response.json()
 
 
-def _get_bams_files_from_experiment(accessions, auth=None, use_submitted_file_names=False):
+def _get_bams_files_from_experiment(
+    accessions, auth=None, use_submitted_file_names=False
+):
     bams = []
     for accession in accessions:
         experiment = _get_experiment(accession, auth=auth)
@@ -67,6 +66,7 @@ def _get_bams_files_from_experiment(accessions, auth=None, use_submitted_file_na
                 else:
                     bams.append(urljoin(_PORTAL_URL, file["href"]))
     return bams
+
 
 def _get_vcf_file_from_annotation(annotation, auth=None):
     accession = _get_experiment(annotation, auth=auth)
@@ -94,7 +94,7 @@ def _get_input_json(bams, vcf):
     input_json = {
         "diploidify.bams": bams,
         "diploidify.vcf": vcf,
-        "diploidify.chrom_sizes": _REFERENCE_FILES["chrom_sizes"]
+        "diploidify.chrom_sizes": _REFERENCE_FILES["chrom_sizes"],
     }
     return input_json
 
@@ -142,4 +142,3 @@ def _get_parser():
 
 if __name__ == "__main__":
     main()
-
