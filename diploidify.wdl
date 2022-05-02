@@ -57,6 +57,7 @@ workflow diploidify {
     call prepare_bam { input:
         bam = merge.bam,
         quality = quality,
+        vcf = vcf,
         chrom_sizes = chrom_sizes,
         num_cpus = prepare_bam_num_cpus,
         ram_gb = prepare_bam_ram_gb,
@@ -103,6 +104,7 @@ task filter_chrom_sizes {
 task prepare_bam {
     input {
         File bam
+        File vcf
         File chrom_sizes
         Int quality
         Int num_cpus = 8
@@ -113,9 +115,12 @@ task prepare_bam {
     command <<<
         export CHROM_SIZES_FILENAME="assembly.chrom.sizes"
         mv ~{chrom_sizes} $CHROM_SIZES_FILENAME
+        export VCF_FILENAME="snp.vcf"
+        gzip -dc ~{vcf} > $VCF_FILENAME
         bash /opt/juicer/CPU/diploidify.sh \
             --from-stage prep \
             --to-stage prep \
+            --vcf $VCF_FILENAME \
             --chrom-sizes $CHROM_SIZES_FILENAME \
             --mapq ~{quality} \
             --juicer-dir /opt \
