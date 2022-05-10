@@ -1270,7 +1270,7 @@ task create_accessibility_track {
         gzip -dc ~{pre} > $PRE_FILE
         awk '{print $1}' ~{chrom_sizes} | while read chrom; do awk -v chr=${chrom} 'BEGIN{OFS="\t"}$2==chr{c[$3]++}$6==chr{c[$7]++}END{for (i in c) {print chr, i-1, i, c[i]}}' $PRE_FILE | sort -k2,2n >> merged30.bedgraph; done;
         sort -k1,1 -k2,2n -S6G merged30.bedgraph > merged30.sorted.bedgraph
-        bedGraphToBigWig merged30.bedgraph ~{chrom_sizes} inter_30.bw
+        bedGraphToBigWig merged30.sorted.bedgraph ~{chrom_sizes} inter_30.bw
     >>>
 
     output {
