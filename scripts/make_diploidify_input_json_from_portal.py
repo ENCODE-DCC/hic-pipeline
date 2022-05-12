@@ -10,7 +10,7 @@ _ALLOWED_STATUSES = ("released", "in progress")
 _REFERENCE_FILES = {
     "chrom_sizes": urljoin(
         _PORTAL_URL,
-        "/files/GRCh38_no_alt_analysis_set_GCA_000001405.15/@@download/GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta.gz",
+        "/files/GRCh38_EBV.chrom.sizes/@@download/GRCh38_EBV.chrom.sizes.tsv",
     ),
 }
 
