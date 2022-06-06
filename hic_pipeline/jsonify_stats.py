@@ -210,6 +210,22 @@ def jsonify_stats(parsed_data):
                 output[k] = parse_to_int_or_float(v)
             except ValueError:
                 continue
+    try:
+        pct_sequenced_total_duplicates = output["pct_sequenced_total_duplicates"]
+        pct_unique_total_duplicates = output["pct_unique_total_duplicates"]
+        output["pct_sequenced_total_duplicates"] = pct_unique_total_duplicates
+        output["pct_unique_total_duplicates"] = pct_sequenced_total_duplicates
+    except KeyError:
+        pass
+
+    try:
+        pct_sequenced_total_unique = output["pct_sequenced_total_unique"]
+        pct_unique_total_unique = output["pct_unique_total_unique"]
+        output["pct_sequenced_total_unique"] = pct_unique_total_unique
+        output["pct_unique_total_unique"] = pct_sequenced_total_unique
+    except KeyError:
+        pass
+
     return output
 
 
