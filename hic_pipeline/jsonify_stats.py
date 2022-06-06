@@ -60,12 +60,12 @@ def parse_to_total_and_percentage(value):
 
 
 def parse_to_total_and_two_percentages(
-    value, first_percentage_name="pct_unique", second_percentage_name="pct_sequenced"
+    value, first_percentage_name="pct_sequenced", second_percentage_name="pct_unique"
 ):
     """
     For unique and duplicates, they are percentage of alignable / percentage of
-    sequenced reads. For the rest, they are percentage of unique reads / percentage of
-    sequenced reads.
+    sequenced reads. For the rest, they are percentage of sequenced reads / percentage of
+    unique reads.
 
     The separator of the two percentages can be either a slash and a comma.
     """
@@ -210,6 +210,22 @@ def jsonify_stats(parsed_data):
                 output[k] = parse_to_int_or_float(v)
             except ValueError:
                 continue
+    try:
+        pct_sequenced_total_duplicates = output["pct_sequenced_total_duplicates"]
+        pct_unique_total_duplicates = output["pct_unique_total_duplicates"]
+        output["pct_sequenced_total_duplicates"] = pct_unique_total_duplicates
+        output["pct_unique_total_duplicates"] = pct_sequenced_total_duplicates
+    except KeyError:
+        pass
+
+    try:
+        pct_sequenced_total_unique = output["pct_sequenced_total_unique"]
+        pct_unique_total_unique = output["pct_unique_total_unique"]
+        output["pct_sequenced_total_unique"] = pct_unique_total_unique
+        output["pct_unique_total_unique"] = pct_sequenced_total_unique
+    except KeyError:
+        pass
+
     return output
 
 
