@@ -251,3 +251,64 @@ task merge_stats_from_hic_files {
         singularity: runtime_environment.singularity
     }
 }
+
+task merge_bigwigs {
+    input {
+        Array[File] bigwig_files
+        File chrom_sizes
+    }
+
+    command <<<
+        bigWigMerge \
+            ~{sep=" " bigwig_files} \
+            combined.bedGraph
+        sort -k1,1 -k2,2n combined.bedGraph > combined.sorted.bedGraph
+        bedGraphToBigWig \
+            combined.sorted.bedGraph \
+            ~{chrom_sizes} \
+            merged.bw
+    <<<
+
+    output {
+        File merged_bigwig = "merged.bw"
+    }
+
+    runtime {
+        cpu : 1
+        memory: "8 GB"
+        disks: "local-disk 500 HDD"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
+    }
+}
+
+task sum_hic_files {
+    input {
+        Array[File] hic_files
+        Int num_cpus = 16
+        Int ram_gb = 100
+    }
+
+    command <<<
+        set -euo pipefail
+        java \
+            -jar \
+            /opt/juicer/CPU/juicer_tools_2.16.00.jar \
+            sum \
+            --threads ~{num_cpus} \
+            summed.hic \
+            ~{sep=" " hic_files}
+    >>>
+
+    output {
+        File summed_hic = "summed.hic"
+    }
+
+    runtime {
+        cpu : "~{num_cpus}"
+        disks: "local-disk 500 HDD"
+        memory : "~{ram_gb} GB"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
+    }
+}
