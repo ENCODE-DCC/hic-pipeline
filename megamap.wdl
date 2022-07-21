@@ -12,7 +12,6 @@ workflow megamap {
     input {
         Array[File] bigwig_files
         Array[File] hic_files
-        File? restriction_sites
         File chrom_sizes
 
         # Parameters
