@@ -65,7 +65,7 @@ workflow megamap {
         hic_files = hic_files,
         runtime_environment = runtime_environment,
     }
-    
+
     call sum_hic_files { input:
         hic_files = hic_files,
         runtime_environment = runtime_environment,
