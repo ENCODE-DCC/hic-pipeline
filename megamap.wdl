@@ -22,8 +22,6 @@ workflow megamap {
         Boolean intact = true
 
         # Resource parameters
-        Int? create_hic_juicer_tools_heap_size_gb
-        Int? create_hic_disk_size_gb
         Int? add_norm_num_cpus
         Int? add_norm_ram_gb
         Int? add_norm_disk_size_gb
