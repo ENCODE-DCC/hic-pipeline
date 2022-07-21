@@ -10,11 +10,10 @@ workflow megamap {
     }
 
     input {
-        Array[File] bams
+        Array[File] bigwig_files
         Array[File] hic_files
         File? restriction_sites
         File chrom_sizes
-        String assembly_name = "undefined"
 
         # Parameters
         Int quality = 30
@@ -23,15 +22,11 @@ workflow megamap {
         Boolean intact = true
 
         # Resource parameters
-        Int? create_hic_num_cpus
-        Int? create_hic_ram_gb
         Int? create_hic_juicer_tools_heap_size_gb
         Int? create_hic_disk_size_gb
         Int? add_norm_num_cpus
         Int? add_norm_ram_gb
         Int? add_norm_disk_size_gb
-        Int? create_accessibility_track_ram_gb
-        Int? create_accessibility_track_disk_size_gb
 
         # Pipeline images
         String docker = "encodedcc/hic-pipeline:1.14.3"
@@ -59,27 +54,10 @@ workflow megamap {
     Array[Int] delta_resolutions = if intact then [5000, 2000, 1000] else [5000, 10000]
     Array[Int] create_hic_resolutions = if intact then create_hic_intact_resolutions else create_hic_in_situ_resolutions
 
-    call hic.normalize_assembly_name as normalize_assembly_name { input:
-        assembly_name = assembly_name,
-        runtime_environment = runtime_environment,
-    }
 
-    call hic.merge as merge { input:
-        bams = bams,
-        runtime_environment = runtime_environment,
-    }
-
-    call hic.bam_to_pre as bam_to_pre { input:
-        bam = merge.bam,
-        quality = quality,
-        runtime_environment = runtime_environment,
-    }
-
-    call hic.create_accessibility_track as accessibility { input:
-        pre = bam_to_pre.pre,
+    call merge_bigwigs as accessibility { input:
+        bigwig_files = bigwig_files,
         chrom_sizes = chrom_sizes,
-        ram_gb = create_accessibility_track_ram_gb,
-        disk_size_gb = create_accessibility_track_disk_size_gb,
         runtime_environment = runtime_environment,
     }
 
@@ -87,52 +65,14 @@ workflow megamap {
         hic_files = hic_files,
         runtime_environment = runtime_environment,
     }
-
-    if (normalize_assembly_name.assembly_is_supported) {
-        call hic.create_hic as create_hic { input:
-            pre = bam_to_pre.pre,
-            pre_index = bam_to_pre.index,
-            restriction_sites = restriction_sites,
-            quality = quality,
-            stats = merge_stats_from_hic_files.merged_stats,
-            stats_hists = merge_stats_from_hic_files.merged_stats_hists,
-            resolutions = create_hic_resolutions,
-            assembly_name = normalize_assembly_name.normalized_assembly_name,
-            num_cpus = create_hic_num_cpus,
-            ram_gb = create_hic_ram_gb,
-            juicer_tools_heap_size_gb = create_hic_juicer_tools_heap_size_gb,
-            disk_size_gb = create_hic_disk_size_gb,
-            runtime_environment = runtime_environment,
-        }
+    
+    call sum_hic_files { input:
+        hic_files = hic_files,
+        runtime_environment = runtime_environment,
     }
-
-    if (!normalize_assembly_name.assembly_is_supported) {
-        call hic.create_hic as create_hic_with_chrom_sizes { input:
-            pre = bam_to_pre.pre,
-            pre_index = bam_to_pre.index,
-            restriction_sites = restriction_sites,
-            quality = quality,
-            stats = merge_stats_from_hic_files.merged_stats,
-            stats_hists = merge_stats_from_hic_files.merged_stats_hists,
-            resolutions = create_hic_resolutions,
-            assembly_name = assembly_name,
-            num_cpus = create_hic_num_cpus,
-            ram_gb = create_hic_ram_gb,
-            juicer_tools_heap_size_gb = create_hic_juicer_tools_heap_size_gb,
-            disk_size_gb = create_hic_disk_size_gb,
-            chrsz =  chrom_sizes,
-            runtime_environment = runtime_environment,
-        }
-    }
-
-    File unnormalized_hic_file = select_first([
-        if (defined(create_hic.output_hic))
-        then create_hic.output_hic
-        else create_hic_with_chrom_sizes.output_hic
-    ])
 
     call hic.add_norm as add_norm { input:
-        hic = unnormalized_hic_file,
+        hic = sum_hic_files.summed_hic,
         quality = quality,
         num_cpus = add_norm_num_cpus,
         ram_gb = add_norm_ram_gb,
@@ -256,6 +196,7 @@ task merge_bigwigs {
     input {
         Array[File] bigwig_files
         File chrom_sizes
+        RuntimeEnvironment runtime_environment
     }
 
     command <<<
@@ -267,15 +208,15 @@ task merge_bigwigs {
             combined.sorted.bedGraph \
             ~{chrom_sizes} \
             merged.bw
-    <<<
+    >>>
 
     output {
         File merged_bigwig = "merged.bw"
     }
 
     runtime {
-        cpu : 1
-        memory: "8 GB"
+        cpu : 4
+        memory: "32 GB"
         disks: "local-disk 500 HDD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
@@ -287,6 +228,7 @@ task sum_hic_files {
         Array[File] hic_files
         Int num_cpus = 16
         Int ram_gb = 100
+        RuntimeEnvironment runtime_environment
     }
 
     command <<<
