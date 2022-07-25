@@ -1,7 +1,5 @@
 version 1.0
 
-import "./hic.wdl"
-
 workflow genophase {
     meta {
         version: "1.14.3"
@@ -34,7 +32,7 @@ workflow genophase {
       "singularity": singularity
     }
 
-    call hic.merge as merged { input:
+    call concatenate_bams as merged { input:
         bams = bams,
         runtime_environment = runtime_environment,
     }
@@ -84,9 +82,9 @@ workflow genophase {
 task concatenate_bams {
     input {
         Array[File] bams
-        Int disk_size_gb
-        Int num_cpus
-        Int ram_gb
+        Int disk_size_gb = 500
+        Int num_cpus = 16
+        Int ram_gb = 100
         RuntimeEnvironment runtime_environment
     }
 
