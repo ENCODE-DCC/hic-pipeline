@@ -81,6 +81,42 @@ workflow genophase {
     }
 }
 
+task concatenate_bams {
+    input {
+        Array[File] bams
+        Int disk_size_gb
+        Int num_cpus
+        Int ram_gb
+        RuntimeEnvironment runtime_environment
+    }
+
+    command <<<
+        for bam in ~{sep=" " bams}
+        do
+        header_filename=$(basename $bam | sed 's/\.bam/_header\.bam/g')
+        samtools view -H $bam > $header_filename
+        done
+
+        samtools merge --no-PG \
+            megaheader.bam \
+            *_header.bam
+
+        samtools cat -h megaheader.bam ~{sep=" " bams} -o concatenated.bam
+    >>>
+
+    output {
+        File concatenated = "concatenated.bam"
+    }
+
+    runtime {
+        cpu : "~{num_cpus}"
+        memory: "~{ram_gb} GB"
+        disks: "local-disk ~{disk_size_gb} HDD"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
+    }
+}
+
 task create_fasta_index {
     input {
         File fasta
