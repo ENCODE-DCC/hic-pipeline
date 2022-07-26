@@ -1,5 +1,10 @@
 version 1.0
 
+struct RuntimeEnvironment {
+    String docker
+    String singularity
+}
+
 workflow genophase {
     meta {
         version: "1.14.3"
@@ -95,15 +100,18 @@ task concatenate_bams {
         samtools view -H $bam > $header_filename
         done
 
-        samtools merge --no-PG \
-            megaheader.bam \
+        samtools merge \
+            --no-PG megaheader.bam \
             *_header.bam
 
-        samtools cat -h megaheader.bam ~{sep=" " bams} -o concatenated.bam
+        samtools cat \
+            -@ ~{num_cpus} \
+            -h megaheader.bam ~{sep=" " bams} \
+            -o concatenated.bam
     >>>
 
     output {
-        File concatenated = "concatenated.bam"
+        File bam = "concatenated.bam"
     }
 
     runtime {
