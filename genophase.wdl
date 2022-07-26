@@ -26,6 +26,7 @@ workflow genophase {
         Int? run_3d_dna_num_cpus
         Int? run_3d_dna_disk_size_gb
         Int? run_3d_dna_ram_gb
+        Int? concatenate_bams_disk_size_gb
         Boolean no_phasing = false
 
         String docker = "encodedcc/hic-pipeline:1.14.3"
@@ -87,7 +88,7 @@ workflow genophase {
 task concatenate_bams {
     input {
         Array[File] bams
-        Int disk_size_gb = 500
+        Int disk_size_gb = 6000
         Int num_cpus = 16
         Int ram_gb = 100
         RuntimeEnvironment runtime_environment
