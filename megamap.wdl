@@ -4,9 +4,9 @@ import "./hic.wdl"
 
 workflow megamap {
     meta {
-        version: "1.14.3"
-        caper_docker: "encodedcc/hic-pipeline:1.14.3"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.14.3"
+        version: "1.15.0"
+        caper_docker: "encodedcc/hic-pipeline:1.15.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.15.0"
     }
 
     input {
@@ -26,10 +26,10 @@ workflow megamap {
         Int? add_norm_disk_size_gb
 
         # Pipeline images
-        String docker = "encodedcc/hic-pipeline:1.14.3"
-        String singularity = "docker://encodedcc/hic-pipeline:1.14.3"
-        String delta_docker = "encodedcc/hic-pipeline:1.14.3_delta"
-        String hiccups_docker = "encodedcc/hic-pipeline:1.14.3_hiccups"
+        String docker = "encodedcc/hic-pipeline:1.15.0"
+        String singularity = "docker://encodedcc/hic-pipeline:1.15.0"
+        String delta_docker = "encodedcc/hic-pipeline:1.15.0_delta"
+        String hiccups_docker = "encodedcc/hic-pipeline:1.15.0_hiccups"
     }
 
     RuntimeEnvironment runtime_environment = {

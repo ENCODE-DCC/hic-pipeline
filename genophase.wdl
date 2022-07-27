@@ -7,9 +7,9 @@ struct RuntimeEnvironment {
 
 workflow genophase {
     meta {
-        version: "1.14.3"
-        caper_docker: "encodedcc/hic-pipeline:1.14.3"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.14.3"
+        version: "1.15.0"
+        caper_docker: "encodedcc/hic-pipeline:1.15.0"
+        caper_singularity: "docker://encodedcc/hic-pipeline:1.15.0"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
     }
 
@@ -29,8 +29,8 @@ workflow genophase {
         Int? concatenate_bams_disk_size_gb
         Boolean no_phasing = false
 
-        String docker = "encodedcc/hic-pipeline:1.14.3"
-        String singularity = "docker://encodedcc/hic-pipeline:1.14.3"
+        String docker = "encodedcc/hic-pipeline:1.15.0"
+        String singularity = "docker://encodedcc/hic-pipeline:1.15.0"
     }
 
     RuntimeEnvironment runtime_environment = {
