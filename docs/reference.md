@@ -39,7 +39,7 @@
 
 [genophase.wdl](../genophase,wdl) takes in BAM files and produces phased variant calls. It is based on [hic2gatk](https://github.com/aidenlab/hic2gatk) and the [3D-DNA pipeline](https://github.com/aidenlab/3d-dna/).
 
-[megamap.wdl](../megamap,wdl) takes in BAM files. It is based on [Juicer](https://github.com/aidenlab/juicer)
+[megamap.wdl](../megamap,wdl) takes in HIC and BigWig files. It is based on [Juicer](https://github.com/aidenlab/juicer)
 
 [diploidify.wdl](../diploidify,wdl) takes in BAM files and produces phased variant calls. It is based on [Juicer](https://github.com/aidenlab/juicer) [hic2gatk](https://github.com/aidenlab/hic2gatk) and the [3D-DNA pipeline](https://github.com/aidenlab/3d-dna/).
 
@@ -271,18 +271,17 @@ The two haplotype-specific *corrected* accessibility tracks are available under 
 
 ## Megamap
 
-This is the workflow contained in [megamap.wdl](../megamap,wdl). It is very similar to the main `hic.wdl`. However, it starts from deduplicated bams from a previous run of the `hic.wdl` workflow. It also takes in the `.hic` files from the same previous runs as the bams in order to be able to calculate stats for the merged data.
+This is the workflow contained in [megamap.wdl](../megamap,wdl). It is very similar to the main `hic.wdl`. However, it starts from .hic and DNA accessibility raw signal BigWig files from a previous run of the `hic.wdl` workflow.
 
 ### Inputs
 
-The required inputs are `megamap.assembly_name`, `megamap.bams`, `megamap.chrom_sizes`, and `megamap.hic_files`. An example input is below:
+The required inputs are `megamap.bigwig_files`, `megamap.chrom_sizes`, and `megamap.hic_files`. An example input is below:
 
 ```json
 {
-  "megamap.assembly_name": "GRCh38",
-  "megamap.bams": [
-    "https://www.encodeproject.org/files/ENCFF194KEQ/@@download/ENCFF194KEQ.bam",
-    "https://www.encodeproject.org/files/ENCFF169MUQ/@@download/ENCFF169MUQ.bam"
+  "megamap.bigwig_files": [
+    "https://www.encodeproject.org/files/ENCFF370ZZP/@@download/ENCFF370ZZP.bigWig",
+    "https://www.encodeproject.org/files/ENCFF169MUQ/@@download/ENCFF745TVA.bigWig"
   ],
   "megamap.chrom_sizes": "https://www.encodeproject.org/files/GRCh38_no_alt_analysis_set_GCA_000001405.15/@@download/GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta.gz",
   "megamap.hic_files": [
@@ -312,14 +311,6 @@ Use the WDL `make_restriction_site_locations.wdl` to generate the restriction si
 # Troubleshooting
 
 If a workflow failed, you will see `Failed` status for that ID in `caper list`. To see what went wrong, run `caper debug WORKFLOW_ID`, replacing `WORKFLOW_ID` with the actual workflow ID given by `caper`. It will find the stdout/stderr of the failed tasks and print them to the terminal. Sometimes this information is not enough, and you may need to find the backend logs for the failed task, which capture issues that may have occurred before the task even started executing. The paths to these are available in the workflow metadata JSON which you can get via `caper metadata 1234`. Then, the paths to the logs are available under `.calls.[task_name].[shard_index].backendLogs`.
-
-## Failure during create_hic
-
-If you see `Killed` in the logs, try reducing the number of CPUs for `create_hic` task by setting `"hic.create_hic_num_cpus": 4` in your input JSON.
-
-## Failure during `hic.normalize_assembly_name`
-
-If this task fails, it almost certainly means something is wrong with your installation. Check that `docker` is installed and running if running locally.
 
 ## Generic out of memory (OOM) issue
 

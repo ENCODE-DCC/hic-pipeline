@@ -103,8 +103,8 @@ RUN git clone https://github.com/aidenlab/EigenVector.git && \
 
 RUN git clone https://github.com/ENCODE-DCC/kentUtils_bin_v381.git && \
     cd kentUtils_bin_v381/bin && \
-    chmod +x wigToBigWig bedGraphToBigWig && \
-    mv wigToBigWig bedGraphToBigWig /usr/local/bin && \
+    chmod +x wigToBigWig bedGraphToBigWig bigWigMerge && \
+    mv wigToBigWig bedGraphToBigWig bigWigMerge /usr/local/bin && \
     cd ../../ && \
     rm -rf kentUtils_bin_v381
 
@@ -115,7 +115,7 @@ RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     chmod +x CPU/* CPU/common/* misc/* && \
     find -mindepth 1 -maxdepth 1  -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
 
-# Install Juicer tools
+# Install Juicer tools 2.13 and 2.16
 RUN curl \
         -L \
         https://github.com/aidenlab/Juicebox/releases/download/v2.13.06/juicer_tools_2.13.06.jar \
@@ -124,6 +124,12 @@ RUN curl \
     ln -s juicer/CPU scripts && \
     ln -s /opt/juicer/CPU/common/juicer_tools /opt/juicer/CPU/juicer_tools && \
     ln -s /opt/juicer/CPU/common/juicer_tools.jar /opt/juicer/CPU/juicer_tools.jar
+
+RUN curl \
+        -L \
+        https://github.com/aidenlab/Juicebox/releases/download/v2.16.00/juicer_tools_2.16.00.jar \
+        -o /opt/juicer/CPU/juicer_tools_2.16.00.jar && \
+    chmod 666 /opt/juicer/CPU/juicer_tools_2.16.00.jar
 
 RUN curl \
         -LO \
