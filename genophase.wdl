@@ -1,6 +1,9 @@
 version 1.0
 
-import "./hic.wdl"
+struct RuntimeEnvironment {
+    String docker
+    String singularity
+}
 
 workflow genophase {
     meta {
@@ -23,6 +26,7 @@ workflow genophase {
         Int? run_3d_dna_num_cpus
         Int? run_3d_dna_disk_size_gb
         Int? run_3d_dna_ram_gb
+        Int? concatenate_bams_disk_size_gb
         Boolean no_phasing = false
 
         String docker = "encodedcc/hic-pipeline:1.14.3"
@@ -34,9 +38,10 @@ workflow genophase {
       "singularity": singularity
     }
 
-    call hic.merge as merged { input:
+    call concatenate_bams as merged { input:
         bams = bams,
         runtime_environment = runtime_environment,
+        disk_size_gb = concatenate_bams_disk_size_gb,
     }
 
     call create_fasta_index as create_reference_fasta_index { input:
@@ -78,6 +83,45 @@ workflow genophase {
             psf = run_3d_dna.psf,
             runtime_environment = runtime_environment,
         }
+    }
+}
+
+task concatenate_bams {
+    input {
+        Array[File] bams
+        Int disk_size_gb = 6000
+        Int num_cpus = 16
+        Int ram_gb = 100
+        RuntimeEnvironment runtime_environment
+    }
+
+    command <<<
+        for bam in ~{sep=" " bams}
+        do
+        header_filename=$(basename $bam | sed 's/\.bam/_header\.bam/g')
+        samtools view -H $bam > $header_filename
+        done
+
+        samtools merge \
+            --no-PG megaheader.bam \
+            *_header.bam
+
+        samtools cat \
+            -@ ~{num_cpus} \
+            -h megaheader.bam ~{sep=" " bams} \
+            -o concatenated.bam
+    >>>
+
+    output {
+        File bam = "concatenated.bam"
+    }
+
+    runtime {
+        cpu : "~{num_cpus}"
+        memory: "~{ram_gb} GB"
+        disks: "local-disk ~{disk_size_gb} HDD"
+        docker: runtime_environment.docker
+        singularity: runtime_environment.singularity
     }
 }
 
