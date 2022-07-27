@@ -41,6 +41,7 @@ workflow genophase {
     call concatenate_bams as merged { input:
         bams = bams,
         runtime_environment = runtime_environment,
+        disk_size_gb = concatenate_bams_disk_size_gb,
     }
 
     call create_fasta_index as create_reference_fasta_index { input:
