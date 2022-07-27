@@ -200,6 +200,7 @@ genophase.gatk_ram_gb
 genophase.run_3d_dna_num_cpus
 genophase.run_3d_dna_disk_size_gb
 genophase.run_3d_dna_ram_gb
+genophase.concatenate_bams_disk_size_gb
 ```
 
 #### Reference Files
