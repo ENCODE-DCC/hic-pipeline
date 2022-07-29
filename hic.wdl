@@ -923,6 +923,7 @@ task add_norm {
         Int num_cpus = 24
         Int disk_size_gb = 256
         Int ram_gb = 72
+        String juicer_tools_jar = "/opt/scripts/common/juicer_tools.jar"
         RuntimeEnvironment runtime_environment
     }
 
@@ -933,7 +934,7 @@ task add_norm {
             -Ddevelopment=false \
             -Djava.awt.headless=true \
             -Xmx60g \
-            -jar /opt/scripts/common/juicer_tools.jar \
+            -jar ~{juicer_tools_jar} \
             addNorm \
             ~{if length(normalization_methods) > 0 then "-k" else ""} ~{sep="," normalization_methods} \
             --threads ~{num_cpus} \
