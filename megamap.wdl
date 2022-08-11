@@ -72,7 +72,7 @@ workflow megamap {
         hic = sum_hic_files.summed_hic,
         quality = quality,
         juicer_tools_jar = "/opt/juicer/CPU/juicer_tools_2.17.00.jar",
-        normalization_command = "addNorm2",
+        normalization_command = "addnorm2",
         num_cpus = add_norm_num_cpus,
         ram_gb = add_norm_ram_gb,
         disk_size_gb = add_norm_disk_size_gb,
