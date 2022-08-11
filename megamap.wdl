@@ -71,6 +71,8 @@ workflow megamap {
     call hic.add_norm as add_norm { input:
         hic = sum_hic_files.summed_hic,
         quality = quality,
+        juicer_tools_jar = "/opt/juicer/CPU/juicer_tools_2.17.00.jar",
+        normalization_command = "addNorm2",
         num_cpus = add_norm_num_cpus,
         ram_gb = add_norm_ram_gb,
         disk_size_gb = add_norm_disk_size_gb,
@@ -232,7 +234,7 @@ task sum_hic_files {
         set -euo pipefail
         java \
             -jar \
-            /opt/juicer/CPU/juicer_tools_2.16.00.jar \
+            /opt/juicer/CPU/juicer_tools_2.17.00.jar \
             sum \
             --threads ~{num_cpus} \
             summed.hic \

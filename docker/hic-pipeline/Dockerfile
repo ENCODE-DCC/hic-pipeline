@@ -115,7 +115,7 @@ RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     chmod +x CPU/* CPU/common/* misc/* && \
     find -mindepth 1 -maxdepth 1  -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
 
-# Install Juicer tools 2.13 and 2.16
+# Install Juicer tools 2.13 and 2.17
 RUN curl \
         -L \
         https://github.com/aidenlab/Juicebox/releases/download/v2.13.06/juicer_tools_2.13.06.jar \
@@ -127,9 +127,9 @@ RUN curl \
 
 RUN curl \
         -L \
-        https://github.com/aidenlab/Juicebox/releases/download/v2.16.00/juicer_tools_2.16.00.jar \
-        -o /opt/juicer/CPU/juicer_tools_2.16.00.jar && \
-    chmod 666 /opt/juicer/CPU/juicer_tools_2.16.00.jar
+        https://github.com/aidenlab/Juicebox/releases/download/v2.17.00/juicer_tools_2.17.00.jar \
+        -o /opt/juicer/CPU/juicer_tools_2.17.00.jar && \
+    chmod 666 /opt/juicer/CPU/juicer_tools_2.17.00.jar
 
 RUN curl \
         -LO \
