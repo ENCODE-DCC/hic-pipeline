@@ -38,12 +38,6 @@ workflow genophase {
       "singularity": singularity
     }
 
-    call concatenate_bams as merged { input:
-        bams = bams,
-        runtime_environment = runtime_environment,
-        disk_size_gb = concatenate_bams_disk_size_gb,
-    }
-
     call create_fasta_index as create_reference_fasta_index { input:
         fasta = reference_fasta,
         runtime_environment = runtime_environment,
@@ -57,7 +51,7 @@ workflow genophase {
     }
 
     call gatk { input:
-        bam = merged.bam,
+        bams = bams,
         reference_fasta = reference_fasta,
         reference_fasta_index = create_reference_fasta_index.fasta_index,
         sequence_dictionary = create_gatk_references.sequence_dictionary,
@@ -72,7 +66,7 @@ workflow genophase {
     if (!no_phasing) {
         call run_3d_dna { input:
             vcf = gatk.snp_vcf,
-            bam = merged.bam,
+            bams = bams,
             num_cpus = run_3d_dna_num_cpus,
             ram_gb = run_3d_dna_ram_gb,
             disk_size_gb = run_3d_dna_disk_size_gb,
@@ -189,7 +183,7 @@ task create_gatk_references {
 
 task gatk {
     input {
-        File bam
+        Array[File] bams
         File reference_fasta
         File reference_fasta_index
         File sequence_dictionary
@@ -217,7 +211,7 @@ task gatk {
             -r reference/~{basename(reference_fasta, ".gz")} \
             ~{if defined(bundle_tar) then "--gatk-bundle bundle" else ""} \
             --threads ~{num_cpus} \
-            ~{bam}
+            ~{sep=" " bams}
         gzip -n ~{final_snp_vcf_name}
         gzip -n ~{final_indel_vcf_name}
     >>>
@@ -240,7 +234,7 @@ task gatk {
 task run_3d_dna {
     input {
         File vcf
-        File bam
+        Array[File] bams
         Int num_cpus = 8
         Int disk_size_gb = 2000
         Int ram_gb = 100
@@ -256,7 +250,7 @@ task run_3d_dna {
             --threads ~{num_cpus} \
             --to-stage update_vcf \
             ${VCF_FILENAME} \
-            ~{bam}
+            ~{sep=" " bams}
         gzip -n *.txt *.vcf *.assembly
         ls
     >>>
