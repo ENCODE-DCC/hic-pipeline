@@ -164,9 +164,9 @@ RUN git clone https://github.com/aidenlab/hic2gatk.git && \
     cd hic2gatk && \
     git checkout 6f2a092fb0f68e586949af9bb4d57ed592c8e2ad
 
-RUN git clone --branch phasing https://github.com/aidenlab/3d-dna.git && \
+RUN git clone --branch encode-debug https://github.com/aidenlab/3d-dna.git && \
     cd 3d-dna && \
-    git checkout 63029aa3bc5ba9bbdad9dd9771ace583cc95e273
+    git checkout c2040994678dd4eeac519897a75ce4227b18f0a2
 
 RUN git clone https://github.com/sa501428/psf-to-bedpe.git && \
     cd psf-to-bedpe && \
