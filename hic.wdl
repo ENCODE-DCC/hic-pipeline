@@ -919,6 +919,8 @@ task add_norm {
     input {
         File hic
         Array[String] normalization_methods = []
+        Int? mthreads
+        Int? save_ram
         Int quality
         Int num_cpus = 24
         Int disk_size_gb = 256
@@ -938,6 +940,8 @@ task add_norm {
             -jar ~{juicer_tools_jar} \
             ~{normalization_command} \
             ~{if length(normalization_methods) > 0 then "-k" else ""} ~{sep="," normalization_methods} \
+            ~{"--mthreads" + mthreads} \
+            ~{"--save-ram" + save_ram} \ 
             --threads ~{num_cpus} \
             inter_~{quality}.hic
     }
