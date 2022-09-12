@@ -21,6 +21,8 @@ workflow megamap {
         Boolean intact = true
 
         # Resource parameters
+        Int? add_norm_mthreads
+        Int? add_norm_save_ram
         Int? add_norm_num_cpus
         Int? add_norm_ram_gb
         Int? add_norm_disk_size_gb
@@ -70,7 +72,11 @@ workflow megamap {
 
     call hic.add_norm as add_norm { input:
         hic = sum_hic_files.summed_hic,
+        mthreads = add_norm_mthreads,
+        save_ram = add_norm_save_ram,
         quality = quality,
+        juicer_tools_jar = "/opt/juicer/CPU/juicer_tools_2.17.00.jar",
+        normalization_command = "addnorm2",
         num_cpus = add_norm_num_cpus,
         ram_gb = add_norm_ram_gb,
         disk_size_gb = add_norm_disk_size_gb,
@@ -232,7 +238,7 @@ task sum_hic_files {
         set -euo pipefail
         java \
             -jar \
-            /opt/juicer/CPU/juicer_tools_2.16.00.jar \
+            /opt/juicer/CPU/juicer_tools_2.17.00.jar \
             sum \
             --threads ~{num_cpus} \
             summed.hic \
