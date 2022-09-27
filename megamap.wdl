@@ -107,6 +107,8 @@ workflow megamap {
         call hic.localizer as localizer_intact { input:
             hic = add_norm.output_hic,
             loops = hiccups_2.merged_loops,
+            localizer_resolution = 10,
+            localizer_window = 10,
             quality = quality,
             runtime_environment = runtime_environment,
         }
@@ -137,6 +139,8 @@ workflow megamap {
     call hic.localizer as localizer_delta { input:
         hic = add_norm.output_hic,
         loops = delta.loops,
+        localizer_resolution = 10,
+        localizer_window = 10,
         runtime_environment = runtime_environment,
     }
 
