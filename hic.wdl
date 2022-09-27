@@ -1092,6 +1092,8 @@ task localizer {
     input {
         File hic
         File loops
+        Int localizer_resolution = 100
+        Int localizer_window = 1
         Int quality = 0
         Int num_cpus = 24
         RuntimeEnvironment runtime_environment
@@ -1109,8 +1111,8 @@ task localizer {
             -jar /opt/feature_tools.jar \
             localizer \
             -k SCALE \
-            -r 100 \
-            -w 1 \
+            -r ~{localizer_resolution} \
+            -w ~{localizer_window} \
             --threads ~{num_cpus} \
             ~{hic} \
             $LOOPS_FILE \
