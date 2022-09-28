@@ -162,7 +162,7 @@ RUN curl \
 
 RUN git clone https://github.com/aidenlab/hic2gatk.git && \
     cd hic2gatk && \
-    git checkout 6f2a092fb0f68e586949af9bb4d57ed592c8e2ad
+    git checkout d0e8be187bba4d05d56c6502cb1318f45560f492
 
 RUN git clone --branch encode-debug https://github.com/aidenlab/3d-dna.git && \
     cd 3d-dna && \

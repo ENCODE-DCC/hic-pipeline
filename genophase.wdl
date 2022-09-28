@@ -16,6 +16,7 @@ workflow genophase {
     input {
         File reference_fasta
         Array[File] bams
+        String donor_id
         # .tar.gz archive containing Ommi, Mills, Hapmap, and 1000G VCFs + indexes
         # https://gatk.broadinstitute.org/hc/en-us/articles/360035890811-Resource-bundle
         # https://console.cloud.google.com/storage/browser/genomics-public-data/resources/broad/hg38/v0/
@@ -53,6 +54,7 @@ workflow genophase {
     call gatk { input:
         bams = bams,
         reference_fasta = reference_fasta,
+        donor_id = donor_id,
         reference_fasta_index = create_reference_fasta_index.fasta_index,
         sequence_dictionary = create_gatk_references.sequence_dictionary,
         interval_list = create_gatk_references.interval_list,
@@ -188,6 +190,7 @@ task gatk {
         File reference_fasta_index
         File sequence_dictionary
         File interval_list
+        String donor_id
         File? bundle_tar
         Int num_cpus = 16
         Int ram_gb = 128
@@ -210,6 +213,7 @@ task gatk {
         run-gatk-after-juicer2.sh \
             -r reference/~{basename(reference_fasta, ".gz")} \
             ~{if defined(bundle_tar) then "--gatk-bundle bundle" else ""} \
+            --sample ~{donor_id} \
             --threads ~{num_cpus} \
             ~{sep=" " bams}
         gzip -n ~{final_snp_vcf_name}
