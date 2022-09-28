@@ -176,7 +176,7 @@ This is the workflow contained in [genophase.wdl](../genophase,wdl). It calls SN
 
 ### Inputs
 
-Three inputs are required to run the pipeline, `genophase.bams`, `genophase.gatk_bundle_tar`, and `genophase.reference_fasta`
+Four inputs are required to run the pipeline, `genophase.bams`, `genophase.donor_id`, `genophase.gatk_bundle_tar`, and `genophase.reference_fasta`
 
 The BAM files must have `RG` tags, which are required by GATK. A complete example input JSON is below.
 
@@ -186,6 +186,7 @@ The BAM files must have `RG` tags, which are required by GATK. A complete exampl
     "https://www.encodeproject.org/files/ENCFF920JIL/@@download/ENCFF920JIL.bam",
     "https://www.encodeproject.org/files/ENCFF792QCT/@@download/ENCFF792QCT.bam"
   ],
+  "genophase.donor_id": "ENCDONORFOO"
   "genophase.gatk_bundle_tar": "https://www.encodeproject.org/files/ENCFF975DYE/@@download/ENCFF975DYE.tar.gz",
   "genophase.reference_fasta": "https://www.encodeproject.org/files/GRCh38_no_alt_analysis_set_GCA_000001405.15/@@download/GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta.gz"
 }
