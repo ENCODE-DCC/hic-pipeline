@@ -2,8 +2,8 @@
   "genophase.bams": [
     "tests/data/sample_subsampled.bam"
   ],
-  "genophase.gatk_num_cpus": 1,
   "genophase.donor_id": "SPAM",
+  "genophase.gatk_num_cpus": 1,
   "genophase.no_phasing": true,
   "genophase.reference_fasta": "https://www.encodeproject.org/files/GRCh38_no_alt_analysis_set_GCA_000001405.15/@@download/GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta.gz"
 }
