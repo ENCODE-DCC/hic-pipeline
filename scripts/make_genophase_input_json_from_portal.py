@@ -75,7 +75,7 @@ def _get_donor_id_from_experiment(accessions, auth=None, use_submitted_file_name
     donor_id = None
     for accession in accessions:
         experiment = _get_experiment(accession, auth=auth)
-        if donor_id is not None:
+        if donor_id is None:
             donor_id = experiment["replicates"][0]["library"]["biosample"]["donor"]["accession"]
         else:
             if donor_id != experiment["replicates"][0]["library"]["biosample"]["donor"]["accession"]:
