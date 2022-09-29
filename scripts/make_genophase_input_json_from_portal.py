@@ -79,7 +79,7 @@ def _get_donor_id_from_experiment(accessions, auth=None, use_submitted_file_name
             donor_id = experiment["replicates"][0]["library"]["biosample"]["donor"]["accession"]
         else:
             if donor_id != experiment["replicates"][0]["library"]["biosample"]["donor"]["accession"]:
-                raise Warning("These datasets do not belong to the same donor.")
+                print("These datasets do not belong to the same donor.")
     return donor_id
 
 
