@@ -79,7 +79,7 @@ def _get_donor_id_from_experiment(accessions, auth=None):
             donor_id = experiment["replicates"][0]["library"]["biosample"]["donor"]["accession"]
         else:
             if donor_id != experiment["replicates"][0]["library"]["biosample"]["donor"]["accession"]:
-                print("These datasets do not belong to the same donor.")
+                raise ValueError("These datasets do not belong to the same donor.")
     return donor_id
 
 
