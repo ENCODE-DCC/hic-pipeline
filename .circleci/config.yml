@@ -32,9 +32,9 @@ machine_defaults: &machine_defaults
     image: ubuntu-2004:202201-02
   working_directory: ~/ENCODE-DCC/hic-pipeline
 
-py37: &py37
+py39: &py39
   docker:
-    - image: circleci/python:3.7.4-stretch
+    - image: circleci/python:3.9
   working_directory: ~/ENCODE-DCC/hic-pipeline
 
 commands:
@@ -42,7 +42,7 @@ commands:
     description: Install and run tox with a given environment
     parameters:
       toxenv:
-        description: The name of the environment as per tox.ini, e.g. py37 or lint
+        description: The name of the environment as per tox.ini, e.g. py39 or lint
         type: string
       extra_args:
         description: Extra arguments that are consumed only when running pytest
@@ -101,19 +101,19 @@ commands:
 
 jobs:
   lint:
-    <<: *py37
+    <<: *py39
     steps:
       - checkout
       - install_shellcheck
       - run_tox:
           toxenv: lint
 
-  test_py37:
-    <<: *py37
+  test_py39:
+    <<: *py39
     steps:
       - checkout
       - run_tox:
-          toxenv: py37
+          toxenv: py39
 
   test_wdl:
     <<: *machine_defaults
@@ -142,8 +142,8 @@ jobs:
       - run:
           name: Run pytest-workflow WDL tests using tox
           command: |
-            pyenv install 3.7.0
-            pyenv global 3.7.0
+            pyenv install 3.9.10
+            pyenv global 3.9.10
             pip install --upgrade pip
             pip install tox
             tox -e wdl -- --kwd --tag << parameters.tag >> --wt << parameters.num_parallel_workflows >>
@@ -223,7 +223,7 @@ workflows:
           dockerfile_directory: docker/delta
           cache_tag: << pipeline.parameters.delta_cache_tag >>
       - lint
-      - test_py37:
+      - test_py39:
           requires:
             - lint
       - test_wdl:

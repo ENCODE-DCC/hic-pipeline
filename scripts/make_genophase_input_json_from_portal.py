@@ -25,7 +25,8 @@ def main():
         auth=auth,
         use_submitted_file_names=args.use_submitted_file_names,
     )
-    input_json = _get_input_json(bams=bams)
+    donor_id = _get_donor_id_from_experiment(accessions=args.accessions, auth=auth)
+    input_json = _get_input_json(bams=bams, donor_id=donor_id)
     _write_json_to_file(input_json, args.outfile)
 
 
@@ -48,6 +49,7 @@ def _get_bams_from_experiment(accessions, auth=None, use_submitted_file_names=Fa
             if (
                 a["status"] in _ALLOWED_STATUSES
                 and a["lab"] == "/labs/encode-processing-pipeline/"
+                and a["pipelines"][0] == "/pipelines/ENCPL839OAB/"
             ):
                 analysis = a
                 break
@@ -66,11 +68,31 @@ def _get_bams_from_experiment(accessions, auth=None, use_submitted_file_names=Fa
     return bams
 
 
-def _get_input_json(bams):
+def _get_donor_id_from_experiment(accessions, auth=None):
+    donor_id = None
+    for accession in accessions:
+        experiment = _get_experiment(accession, auth=auth)
+        if donor_id is None:
+            donor_id = experiment["replicates"][0]["library"]["biosample"]["donor"][
+                "accession"
+            ]
+        else:
+            if (
+                donor_id
+                != experiment["replicates"][0]["library"]["biosample"]["donor"][
+                    "accession"
+                ]
+            ):
+                raise ValueError("These datasets do not belong to the same donor.")
+    return donor_id
+
+
+def _get_input_json(bams, donor_id):
     input_json = {
         "genophase.bams": bams,
         "genophase.gatk_bundle_tar": _REFERENCE_FILES["gatk_bundle_tar"],
         "genophase.reference_fasta": _REFERENCE_FILES["reference_fasta"],
+        "genophase.donor_id": donor_id,
     }
     return input_json
 
