@@ -127,7 +127,7 @@ RUN curl \
 
 RUN curl \
         -L \
-        https://github.com/aidenlab/Juicebox/releases/download/v2.20.00/juicer_tools_2.20.00.jar \
+        https://github.com/aidenlab/Juicebox/releases/download/v2.20.00/juicer_tools.2.20.00.jar \
         -o /opt/juicer/CPU/juicer_tools_2.20.00.jar && \
     chmod 666 /opt/juicer/CPU/juicer_tools_2.20.00.jar
 
