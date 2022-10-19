@@ -1117,8 +1117,8 @@ task localizer {
             ~{hic} \
             $LOOPS_FILE \
             localized
-        gzip -n localized/localizedList_primary_100.bedpe
-        mv localized/localizedList_primary_100.bedpe.gz localized_loops_~{quality}.bedpe.gz
+        gzip -n localized/localizedList_primary_~{localizer_resolution}.bedpe
+        mv localized/localizedList_primary_~{localizer_resolution}.bedpe.gz localized_loops_~{quality}.bedpe.gz
     }
 
     output {
