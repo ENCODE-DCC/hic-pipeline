@@ -19,6 +19,7 @@ workflow megamap {
         Array[Int] create_hic_in_situ_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100]
         Array[Int] create_hic_intact_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100, 50, 20, 10]
         Boolean intact = true
+        Int localizer_resolution = 100
 
         # Resource parameters
         Int? add_norm_mthreads
@@ -107,7 +108,7 @@ workflow megamap {
         call hic.localizer as localizer_intact { input:
             hic = add_norm.output_hic,
             loops = hiccups_2.merged_loops,
-            localizer_resolution = 10,
+            localizer_resolution = localizer_resolution,
             localizer_window = 10,
             quality = quality,
             runtime_environment = runtime_environment,
@@ -139,7 +140,7 @@ workflow megamap {
     call hic.localizer as localizer_delta { input:
         hic = add_norm.output_hic,
         loops = delta.loops,
-        localizer_resolution = 10,
+        localizer_resolution = localizer_resolution,
         localizer_window = 10,
         runtime_environment = runtime_environment,
     }
