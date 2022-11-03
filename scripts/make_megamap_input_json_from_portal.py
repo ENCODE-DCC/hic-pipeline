@@ -24,9 +24,7 @@ def main():
         auth=auth,
         use_submitted_file_names=args.use_submitted_file_names,
     )
-    input_json = _get_input_json(
-        bigwig_files=bigwig_files, hic_files=hic_files
-    )
+    input_json = _get_input_json(bigwig_files=bigwig_files, hic_files=hic_files)
     _write_json_to_file(input_json, args.outfile)
 
 
@@ -121,4 +119,3 @@ def _get_parser():
 
 if __name__ == "__main__":
     main()
-
