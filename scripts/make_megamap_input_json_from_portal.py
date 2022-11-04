@@ -19,15 +19,12 @@ def main():
     parser = _get_parser()
     args = parser.parse_args()
     auth = _read_auth_from_file(args.keypair_file)
-    bams, hic_files = _get_bams_and_hic_files_from_experiment(
+    bigwig_files, hic_files = _get_bigwig_files_and_hic_files_from_experiment(
         accessions=args.accessions,
         auth=auth,
         use_submitted_file_names=args.use_submitted_file_names,
     )
-    assembly_name = _get_assembly_name(experiment=_get_experiment(args.accessions[0]))
-    input_json = _get_input_json(
-        bams=bams, hic_files=hic_files, assembly_name=assembly_name
-    )
+    input_json = _get_input_json(bigwig_files=bigwig_files, hic_files=hic_files)
     _write_json_to_file(input_json, args.outfile)
 
 
@@ -41,21 +38,10 @@ def _get_experiment(accession, auth=None):
     return response.json()
 
 
-def _get_assembly_name(experiment):
-    organism = experiment["replicates"][0]["library"]["biosample"]["organism"]["@id"]
-    if organism == "/organisms/mouse/":
-        assembly_name = "mm10"
-    elif organism == "/organisms/human/":
-        assembly_name = "GRCh38"
-    else:
-        raise ValueError(f"Organism {organism} not supported")
-    return assembly_name
-
-
-def _get_bams_and_hic_files_from_experiment(
+def _get_bigwig_files_and_hic_files_from_experiment(
     accessions, auth=None, use_submitted_file_names=False
 ):
-    bams = []
+    bigwig_files = []
     hic_files = []
     for accession in accessions:
         experiment = _get_experiment(accession, auth=auth)
@@ -71,11 +57,11 @@ def _get_bams_and_hic_files_from_experiment(
             raise ValueError("Could not find uniform processing pipeline analysis")
         for file in experiment["files"]:
             if file["status"] in _ALLOWED_STATUSES and file["@id"] in analysis["files"]:
-                if file["file_format"] == "bam":
+                if file["output_type"] == "DNA accessibility raw signal":
                     if use_submitted_file_names:
-                        bams.append(file["submitted_file_name"])
+                        bigwig_files.append(file["submitted_file_name"])
                     else:
-                        bams.append(urljoin(_PORTAL_URL, file["href"]))
+                        bigwig_files.append(urljoin(_PORTAL_URL, file["href"]))
                 if (
                     file["output_type"]
                     == "mapping quality thresholded chromatin interactions"
@@ -84,15 +70,14 @@ def _get_bams_and_hic_files_from_experiment(
                         hic_files.append(file["submitted_file_name"])
                     else:
                         hic_files.append(urljoin(_PORTAL_URL, file["href"]))
-    return bams, hic_files
+    return bigwig_files, hic_files
 
 
-def _get_input_json(bams, hic_files, assembly_name):
+def _get_input_json(bigwig_files, hic_files):
     input_json = {
-        "megamap.bams": bams,
+        "megamap.bigwig_files": bigwig_files,
         "megamap.hic_files": hic_files,
         "megamap.chrom_sizes": _REFERENCE_FILES["chrom_sizes"],
-        "megamap.assembly_name": assembly_name,
     }
     return input_json
 
