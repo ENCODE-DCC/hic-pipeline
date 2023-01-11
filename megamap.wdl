@@ -28,6 +28,30 @@ workflow megamap {
         Int? add_norm_ram_gb
         Int? add_norm_disk_size_gb
 
+        Int? create_eigenvector_disk_size_gb
+        Int? create_eigenvector_ram_gb
+
+        Int? delta_disk_size_gb
+        Int? delta_num_gpus
+        Int? delta_ram_gb
+
+        Int? slice_disk_size_gb
+        Int? slice_num_cpus
+        Int? slice_ram_gb
+
+        Int? arrowhead_disk_size_gb
+        Int? arrowhead_num_cpus
+        Int? arrowhead_ram_gb
+
+        Int? hiccups_2_disk_size_gb
+        Int? hiccups_2_num_gpus
+        Int? hiccups_2_num_cpus
+        Int? hiccups_2_ram_gb
+
+        Int? merge_bigwigs_disk_size_gb
+        Int? merge_bigwigs_num_cpus
+        Int? merge_bigwigs_ram_gb
+
         # Pipeline images
         String docker = "encodedcc/hic-pipeline:1.15.1"
         String singularity = "docker://encodedcc/hic-pipeline:1.15.1"
@@ -59,6 +83,9 @@ workflow megamap {
         bigwig_files = bigwig_files,
         chrom_sizes = chrom_sizes,
         runtime_environment = runtime_environment,
+        disk_size_gb = merge_bigwigs_disk_size_gb,
+        num_cpus = merge_bigwigs_num_cpus,
+        ram_gb = merge_bigwigs_ram_gb,
     }
 
     call merge_stats_from_hic_files { input:
@@ -88,6 +115,9 @@ workflow megamap {
         hic_file = add_norm.output_hic,
         quality = quality,
         runtime_environment = runtime_environment,
+        disk_size_gb = arrowhead_disk_size_gb,
+        num_cpus = arrowhead_num_cpus,
+        ram_gb = arrowhead_ram_gb,
     }
 
     if (!intact) {
@@ -103,6 +133,10 @@ workflow megamap {
             hic = add_norm.output_hic,
             quality = quality,
             runtime_environment = hiccups_runtime_environment,
+            disk_size_gb = hiccups_2_disk_size_gb,
+            num_cpus = hiccups_2_num_cpus,
+            num_gpus = hiccups_2_num_gpus,
+            ram_gb = hiccups_2_ram_gb,
         }
 
         call hic.localizer as localizer_intact { input:
@@ -120,6 +154,8 @@ workflow megamap {
         chrom_sizes = chrom_sizes,
         output_filename_suffix = "_" + quality,
         runtime_environment = runtime_environment,
+        disk_size_gb = create_eigenvector_disk_size_gb,
+        ram_gb = create_eigenvector_ram_gb,
     }
 
     call hic.create_eigenvector as create_eigenvector_10kb { input:
@@ -128,6 +164,8 @@ workflow megamap {
         resolution = 10000,
         output_filename_suffix = "_" + quality,
         runtime_environment = runtime_environment,
+        disk_size_gb = create_eigenvector_disk_size_gb,
+        ram_gb = create_eigenvector_ram_gb,
     }
 
     call hic.delta as delta { input:
@@ -135,6 +173,9 @@ workflow megamap {
         resolutions = delta_resolutions,
         models_path = delta_models_path,
         runtime_environment = delta_runtime_environment,
+        disk_size_gb = delta_disk_size_gb,
+        ram_gb = delta_ram_gb,
+        gpu_count = delta_num_gpus,
     }
 
     call hic.localizer as localizer_delta { input:
@@ -149,18 +190,27 @@ workflow megamap {
         hic_file = add_norm.output_hic,
         resolution = 25000,
         runtime_environment = runtime_environment,
+        disk_size_gb = slice_disk_size_gb,
+        num_cpus = slice_num_cpus,
+        ram_gb = slice_ram_gb,
     }
 
     call hic.slice as slice_50kb { input:
         hic_file = add_norm.output_hic,
         resolution = 50000,
         runtime_environment = runtime_environment,
+        disk_size_gb = slice_disk_size_gb,
+        num_cpus = slice_num_cpus,
+        ram_gb = slice_ram_gb,
     }
 
     call hic.slice as slice_100kb { input:
         hic_file = add_norm.output_hic,
         resolution = 100000,
         runtime_environment = runtime_environment,
+        disk_size_gb = slice_disk_size_gb,
+        num_cpus = slice_num_cpus,
+        ram_gb = slice_ram_gb,
     }
 }
 
@@ -204,6 +254,9 @@ task merge_bigwigs {
     input {
         Array[File] bigwig_files
         File chrom_sizes
+        Int disk_size_gb = 500
+        Int num_cpus = 4
+        Int ram_gb = 32
         RuntimeEnvironment runtime_environment
     }
 
@@ -223,9 +276,9 @@ task merge_bigwigs {
     }
 
     runtime {
-        cpu : 4
-        memory: "32 GB"
-        disks: "local-disk 500 HDD"
+        cpu : "~{num_cpus}"
+        memory: "~{ram_gb} GB"
+        disks: "local-disk ~{disk_size_gb} HDD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
     }

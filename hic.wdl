@@ -963,6 +963,9 @@ task add_norm {
 task arrowhead {
     input {
         File hic_file
+        Int disk_size_gb = 100
+        Int num_cpus = 1
+        Int ram_gb = 32
         Int quality = 0
         RuntimeEnvironment runtime_environment
     }
@@ -987,9 +990,9 @@ task arrowhead {
     }
 
     runtime {
-        cpu : "1"
-        disks: "local-disk 100 HDD"
-        memory : "32 GB"
+        cpu : "~{num_cpus}"
+        disks: "local-disk ~{disk_size_gb} HDD"
+        memory : "~{ram_gb} GB"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
     }
@@ -1043,7 +1046,10 @@ task hiccups_2 {
     input {
         File hic
         Int quality = 0
+        Int disk_size_gb = 100
         Int num_cpus = 2
+        Int num_gpus = 1
+        Int ram_gb = 64
         RuntimeEnvironment runtime_environment
     }
 
@@ -1071,12 +1077,12 @@ task hiccups_2 {
     runtime {
         cpu : "~{num_cpus}"
         bootDiskSizeGb: "20"
-        disks: "local-disk 100 HDD"
+        disks: "local-disk ~{disk_size_gb} HDD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
-        memory: "64 GB"
+        memory: "~{ram_gb} GB"
         zones: [
             "us-central1-c",
             "us-central1-f",
@@ -1139,6 +1145,9 @@ task delta {
         File hic
         Array[Int] resolutions
         Float threshold = 0.85
+        Int disk_size_gb = 100
+        Int gpu_count = 1
+        Int ram_gb = 32
         String normalization = "SCALE"
         String stem = "predicted"
         String models_path = "beta-models"
@@ -1169,12 +1178,12 @@ task delta {
     runtime {
         cpu : "2"
         bootDiskSizeGb: "20"
-        disks: "local-disk 100 SSD"
+        disks: "local-disk ~{disk_size_gb} SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         gpuType: "nvidia-tesla-p100"
-        gpuCount: 1
-        memory: "32 GB"
+        gpuCount: "~{gpu_count}"
+        memory: "~{ram_gb} GB"
         zones: [
             "us-central1-c",
             "us-central1-f",
@@ -1190,6 +1199,8 @@ task create_eigenvector {
     input {
         File hic_file
         File chrom_sizes
+        Int disk_size_gb = 100
+        Int ram_gb = 8
         Int num_cpus = 16
         Int resolution = 5000
         String output_filename_suffix = ""
@@ -1217,8 +1228,8 @@ task create_eigenvector {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 100 HDD"
-        memory : "8 GB"
+        disks: "local-disk ~{disk_size_gb} HDD"
+        memory : "~{ram_gb} GB"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
     }
@@ -1227,6 +1238,9 @@ task create_eigenvector {
 task slice {
     input {
         File hic_file
+        Int disk_size_gb = 100
+        Int ram_gb = 24
+        Int num_cpus = 1
         Int resolution = 25000
         Int minimum_num_clusters = 2
         Int maximum_num_clusters = 13
@@ -1255,9 +1269,9 @@ task slice {
     }
 
     runtime {
-        cpu : "1"
-        disks: "local-disk 100 SSD"
-        memory : "24 GB"
+        cpu : "~{num_cpus}"
+        disks: "local-disk ~{disk_size_gb} SSD"
+        memory : "~{ram_gb} GB"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
     }
