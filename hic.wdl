@@ -1182,7 +1182,7 @@ task delta {
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         gpuType: "nvidia-tesla-p100"
-        gpuCount: ~{gpu_count}
+        gpuCount: "~{gpu_count}"
         memory: "~{ram_gb} GB"
         zones: [
             "us-central1-c",

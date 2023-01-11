@@ -276,7 +276,7 @@ task merge_bigwigs {
     }
 
     runtime {
-        cpu : ~{num_cpus}
+        cpu : "~{num_cpus}"
         memory: "~{ram_gb} GB"
         disks: "local-disk ~{disk_size_gb} HDD"
         docker: runtime_environment.docker
