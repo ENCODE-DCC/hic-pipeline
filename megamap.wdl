@@ -287,6 +287,7 @@ task merge_bigwigs {
 task sum_hic_files {
     input {
         Array[File] hic_files
+        Int disk_size_gb = 500
         Int num_cpus = 16
         Int ram_gb = 100
         RuntimeEnvironment runtime_environment
@@ -309,7 +310,7 @@ task sum_hic_files {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 500 HDD"
+        disks: "local-disk ~{disk_size_gb} HDD"
         memory : "~{ram_gb} GB"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
