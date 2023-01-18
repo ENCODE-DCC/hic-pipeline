@@ -52,6 +52,8 @@ workflow megamap {
         Int? merge_bigwigs_num_cpus
         Int? merge_bigwigs_ram_gb
 
+        Int? sum_hic_files_disk_size_gb
+
         # Pipeline images
         String docker = "encodedcc/hic-pipeline:1.15.1"
         String singularity = "docker://encodedcc/hic-pipeline:1.15.1"
@@ -95,6 +97,7 @@ workflow megamap {
 
     call sum_hic_files { input:
         hic_files = hic_files,
+        disk_size_gb = sum_hic_files_disk_size_gb,
         runtime_environment = runtime_environment,
     }
 
@@ -287,6 +290,7 @@ task merge_bigwigs {
 task sum_hic_files {
     input {
         Array[File] hic_files
+        Int disk_size_gb = 500
         Int num_cpus = 16
         Int ram_gb = 100
         RuntimeEnvironment runtime_environment
@@ -309,7 +313,7 @@ task sum_hic_files {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 500 HDD"
+        disks: "local-disk ~{disk_size_gb} HDD"
         memory : "~{ram_gb} GB"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
