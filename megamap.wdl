@@ -19,6 +19,7 @@ workflow megamap {
         Array[Int] create_hic_in_situ_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100]
         Array[Int] create_hic_intact_resolutions = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2000, 1000, 500, 200, 100, 50, 20, 10]
         Boolean intact = true
+        Boolean no_delta = true
         Int localizer_resolution = 100
 
         # Resource parameters
@@ -47,6 +48,8 @@ workflow megamap {
         Int? hiccups_2_num_gpus
         Int? hiccups_2_num_cpus
         Int? hiccups_2_ram_gb
+
+        Int? localizer_disk_size_gb
 
         Int? merge_bigwigs_disk_size_gb
         Int? merge_bigwigs_num_cpus
@@ -148,6 +151,7 @@ workflow megamap {
             localizer_resolution = localizer_resolution,
             localizer_window = 10,
             quality = quality,
+            disk_size_gb = localizer_disk_size_gb,
             runtime_environment = runtime_environment,
         }
     }
@@ -171,22 +175,25 @@ workflow megamap {
         ram_gb = create_eigenvector_ram_gb,
     }
 
-    call hic.delta as delta { input:
-        hic = add_norm.output_hic,
-        resolutions = delta_resolutions,
-        models_path = delta_models_path,
-        runtime_environment = delta_runtime_environment,
-        disk_size_gb = delta_disk_size_gb,
-        ram_gb = delta_ram_gb,
-        gpu_count = delta_num_gpus,
-    }
+    if (!no_delta) {
+        call hic.delta as delta { input:
+            hic = add_norm.output_hic,
+            resolutions = delta_resolutions,
+            models_path = delta_models_path,
+            runtime_environment = delta_runtime_environment,
+            disk_size_gb = delta_disk_size_gb,
+            ram_gb = delta_ram_gb,
+            gpu_count = delta_num_gpus,
+        }
 
-    call hic.localizer as localizer_delta { input:
-        hic = add_norm.output_hic,
-        loops = delta.loops,
-        localizer_resolution = localizer_resolution,
-        localizer_window = 10,
-        runtime_environment = runtime_environment,
+        call hic.localizer as localizer_delta { input:
+            hic = add_norm.output_hic,
+            loops = delta.loops,
+            localizer_resolution = localizer_resolution,
+            localizer_window = 10,
+            disk_size_gb = localizer_disk_size_gb,
+            runtime_environment = runtime_environment,
+        }
     }
 
     call hic.slice as slice_25kb { input:

@@ -1101,6 +1101,7 @@ task localizer {
         Int localizer_resolution = 100
         Int localizer_window = 1
         Int quality = 0
+        Int disk_size_gb = 100
         Int num_cpus = 24
         RuntimeEnvironment runtime_environment
     }
@@ -1133,7 +1134,7 @@ task localizer {
 
     runtime {
         cpu : "~{num_cpus}"
-        disks: "local-disk 100 HDD"
+        disks: "local-disk ~{disk_size_gb} HDD"
         memory: "64 GB"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
