@@ -49,6 +49,8 @@ workflow megamap {
         Int? hiccups_2_num_cpus
         Int? hiccups_2_ram_gb
 
+        Int? localizer_disk_size_gb
+
         Int? merge_bigwigs_disk_size_gb
         Int? merge_bigwigs_num_cpus
         Int? merge_bigwigs_ram_gb
@@ -149,6 +151,7 @@ workflow megamap {
             localizer_resolution = localizer_resolution,
             localizer_window = 10,
             quality = quality,
+            disk_size_gb = localizer_disk_size_gb,
             runtime_environment = runtime_environment,
         }
     }
@@ -188,6 +191,7 @@ workflow megamap {
             loops = delta.loops,
             localizer_resolution = localizer_resolution,
             localizer_window = 10,
+            disk_size_gb = localizer_disk_size_gb,
             runtime_environment = runtime_environment,
         }
     }
