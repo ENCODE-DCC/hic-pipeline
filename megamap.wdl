@@ -56,6 +56,9 @@ workflow megamap {
         Int? merge_bigwigs_ram_gb
 
         Int? sum_hic_files_disk_size_gb
+        Int? sum_hic_files_ram_gb
+        Int? sum_hic_files_num_cpus
+        Int? sum_hic_files_num_threads
 
         # Pipeline images
         String docker = "encodedcc/hic-pipeline:1.15.1"
@@ -101,6 +104,9 @@ workflow megamap {
     call sum_hic_files { input:
         hic_files = hic_files,
         disk_size_gb = sum_hic_files_disk_size_gb,
+        ram_gb = sum_hic_files_ram_gb,
+        num_cpus = sum_hic_files_num_cpus,
+        num_threads = sum_hic_files_num_threads,
         runtime_environment = runtime_environment,
     }
 
@@ -299,6 +305,7 @@ task sum_hic_files {
         Array[File] hic_files
         Int disk_size_gb = 500
         Int num_cpus = 16
+        Int num_threads = 8
         Int ram_gb = 100
         RuntimeEnvironment runtime_environment
     }
@@ -309,7 +316,7 @@ task sum_hic_files {
             -jar \
             /opt/juicer/CPU/juicer_tools.2.20.00.jar \
             sum \
-            --threads ~{num_cpus} \
+            --threads ~{num_threads} \
             summed.hic \
             ~{sep=" " hic_files}
     >>>
