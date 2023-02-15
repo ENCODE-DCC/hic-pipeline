@@ -1081,7 +1081,7 @@ task hiccups_2 {
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         gpuType: "nvidia-tesla-p100"
-        gpuCount: 1
+        gpuCount: "~{num_gpus}"
         memory: "~{ram_gb} GB"
         zones: [
             "us-central1-c",
