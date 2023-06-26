@@ -63,10 +63,7 @@ def _get_bigwig_files_and_hic_files_from_experiment(
                         bigwig_files.append(file["submitted_file_name"])
                     else:
                         bigwig_files.append(urljoin(_PORTAL_URL, file["href"]))
-                if (
-                    file["output_type"]
-                    == "mapping quality thresholded contact matrix"
-                ):
+                if file["output_type"] == "mapping quality thresholded contact matrix":
                     if use_submitted_file_names:
                         hic_files.append(file["submitted_file_name"])
                     else:
