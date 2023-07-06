@@ -2,4 +2,4 @@
 keras==2.4.3
 # Numpy version set by tensorflow
 numpy
-scipy==1.5.4
+scipy==1.10.0
