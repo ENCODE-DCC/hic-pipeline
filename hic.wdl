@@ -938,7 +938,7 @@ task add_norm {
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
-            -Xmx~{if java_heap_gb > 0 then java_heap_gb else 12} \
+            -Xmx~{if java_heap_gb > 0 then java_heap_gb else 12}g \
             -jar ~{juicer_tools_jar} \
             ~{normalization_command} \
             ~{if length(normalization_methods) > 0 then "-k" else ""} ~{sep="," normalization_methods} \
