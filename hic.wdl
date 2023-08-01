@@ -930,13 +930,15 @@ task add_norm {
         RuntimeEnvironment runtime_environment
     }
 
+    Int java_heap_gb = ram_gb - 12
+
     command {
         set -euo pipefail
         cp ~{hic} inter_~{quality}.hic
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
-            -Xmx60g \
+            -Xmx~{if java_heap_gb > 0 then java_heap_gb else 12} \
             -jar ~{juicer_tools_jar} \
             ~{normalization_command} \
             ~{if length(normalization_methods) > 0 then "-k" else ""} ~{sep="," normalization_methods} \
