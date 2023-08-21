@@ -51,7 +51,7 @@ workflow megamap {
 
         Int? localizer_disk_size_gb
         Int? localizer_num_cpus
-        Int? localizer_disk_size_gb
+        Int? localizer_ram_gb
 
         Int? merge_bigwigs_disk_size_gb
         Int? merge_bigwigs_num_cpus
