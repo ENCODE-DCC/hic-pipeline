@@ -160,8 +160,8 @@ workflow megamap {
             localizer_window = 10,
             quality = quality,
             disk_size_gb = localizer_disk_size_gb,
-            num_cpus = loalizer_num_cpus,
-            ram_gb = loalizer_ram_gb,
+            num_cpus = localizer_num_cpus,
+            ram_gb = localizer_ram_gb,
             runtime_environment = runtime_environment,
         }
     }
