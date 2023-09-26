@@ -50,6 +50,8 @@ workflow megamap {
         Int? hiccups_2_ram_gb
 
         Int? localizer_disk_size_gb
+        Int? localizer_num_cpus
+        Int? localizer_ram_gb
 
         Int? merge_bigwigs_disk_size_gb
         Int? merge_bigwigs_num_cpus
@@ -158,6 +160,8 @@ workflow megamap {
             localizer_window = 10,
             quality = quality,
             disk_size_gb = localizer_disk_size_gb,
+            num_cpus = localizer_num_cpus,
+            ram_gb = localizer_ram_gb,
             runtime_environment = runtime_environment,
         }
     }
