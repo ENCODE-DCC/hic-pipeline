@@ -46,7 +46,7 @@ REFERENCE_FILES = {
         ),
     },
 }
-ENZYMES = ("HindIII", "DpnII", "MboI", "none")
+ENZYMES = ("HindIII", "DpnII", "MboI", "MseI", "none")
 _NO_ENZYME_FRAGMENTATION_METHODS = (
     "chemical (micrococcal nuclease)",
     "chemical (DNaseI)",
@@ -107,20 +107,17 @@ def get_enzymes_from_experiment(experiment, enzymes=ENZYMES):
     for replicate in experiment["replicates"]:
         fragmentation_methods.extend(replicate["library"]["fragmentation_methods"])
     fragmentation_methods = list(set(fragmentation_methods))
-    if len(fragmentation_methods) > 1:
-        raise ValueError(
-            "Currently only experiments with one fragmentation method are supported"
-        )
-    if fragmentation_methods[0] in _NO_ENZYME_FRAGMENTATION_METHODS:
-        return ["none"]
-    for enzyme in enzymes:
-        if enzyme in fragmentation_methods[0]:
-            used_enzymes.append(enzyme)
-            break
-    if not used_enzymes:
-        raise ValueError(
-            "Unsupported fragmentation method: {}".format(fragmentation_methods[0])
-        )
+    for fragmentation_method in fragmentation_methods:
+        if fragmentation_method in _NO_ENZYME_FRAGMENTATION_METHODS:
+            used_enzymes.append("none")
+        else:
+            used_enzyme = [enzyme for enzyme in enzymes if enzyme in fragmentation_method]
+            if used_enzyme:
+                used_enzymes += used_enzyme
+            else:
+                raise ValueError(
+                    "Unsupported fragmentation method: {}".format(fragmentation_method)
+                )
     return used_enzymes
 
 
