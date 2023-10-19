@@ -101,7 +101,7 @@ Runs the pipeline starting with a `.hic` file for producing annotations.
   ]
 ]
 ```
-* `restriction_enzymes` is an array of names containing the restriction enzyme(s) used to generate the Hi-C libraries. Currently only `MboI`, `HindIII`, `DpnII`, and `none` are supported. `none` is useful for libraries like DNAse produced using a non-specific cutter.
+* `restriction_enzymes` is an array of names containing the restriction enzyme(s) used to generate the Hi-C libraries. Currently only `MboI`, `HindIII`, `DpnII`, `MseI`, and `none` are supported. `none` is useful for libraries like DNAse produced using a non-specific cutter.
 * `ligation_site_regex` is a custom regular expression for counting ligation sites. If specified then `restriction_sites` file must be specified in the pipeline input. This can be just a single site, e.g. `ATGC`, or several sites wrapped in parentheses and separated by pipes, e.g. `(ATGC|CTAG)` (uses `grep -E` extended regular expression syntax)
 * `restriction_sites` is a gzipped text file containing cut sites for the given restriction enzyme. For supported enzymes you can generate this using the [reference building entrypoint](#generating-restriction-site-files). Note that if you need to generate a sites file for a multiple digest or for an unsupported enzyme you will need to edit this script and run it yourself: https://github.com/aidenlab/juicer/blob/encode/misc/generate_site_positions.py
 * `chrsz` is a chromosome sizes file for the desired assembly. It is a gzipped and tab-separated text file whose rows take the form `[chromosome][TAB][size]`. You can find these on the ENCODE portal for some human and mouse assemblies, see [reference files](#reference-files)

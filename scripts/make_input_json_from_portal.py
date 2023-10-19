@@ -19,6 +19,9 @@ REFERENCE_FILES = {
             "MboI": urljoin(
                 PORTAL_URL, "/files/ENCFF132WAM/@@download/ENCFF132WAM.txt.gz"
             ),
+            "MboI+MseI": urljoin(
+                PORTAL_URL, "/files/ENCFF275YUI/@@download/ENCFF275YUI.txt.gz"
+            ),
         },
         "bwa_index": urljoin(
             PORTAL_URL, "/files/ENCFF643CGH/@@download/ENCFF643CGH.tar.gz"
@@ -35,6 +38,9 @@ REFERENCE_FILES = {
             ),
             "MboI": urljoin(
                 PORTAL_URL, "/files/ENCFF930KBK/@@download/ENCFF930KBK.txt.gz"
+            ),
+            "MboI+MseI": urljoin(
+                PORTAL_URL, "/files/ENCFF708TJX/@@download/ENCFF708TJX.txt.gz"
             ),
         },
         "bwa_index": urljoin(
@@ -110,16 +116,17 @@ def get_enzymes_from_experiment(experiment, enzymes=ENZYMES):
     for fragmentation_method in fragmentation_methods:
         if fragmentation_method in _NO_ENZYME_FRAGMENTATION_METHODS:
             used_enzymes.append("none")
-        else:
-            used_enzyme = [
-                enzyme for enzyme in enzymes if enzyme in fragmentation_method
-            ]
-            if used_enzyme:
-                used_enzymes += used_enzyme
-            else:
-                raise ValueError(
-                    "Unsupported fragmentation method: {}".format(fragmentation_method)
-                )
+            continue
+        for enzyme in enzymes:
+            if enzyme in fragmentation_method:
+                used_enzymes += enzyme
+                break
+        if not any([used_enzyme in fragmentation_method for used_enzyme in used_enzymes]):
+            raise ValueError(
+                "Unsupported fragmentation method: {}".format(fragmentation_method)
+            )
+    if any([used_enzyme == "none" for used_enzyme in used_enzymes]) and any([used_enzyme != "none" for used_enzyme in used_enzymes]):
+        raise ValueError("Unsupported fragmentation methods: both specific and non-specific cutters used.")
     return used_enzymes
 
 
@@ -197,7 +204,7 @@ def get_input_json(
         if enzymes != ["none"]:
             input_json["hic.restriction_sites"] = REFERENCE_FILES[assembly_name][
                 "restriction_sites"
-            ][enzymes[0]]
+            ][enzymes.join("+")]
 
     if ligation_site_regex is not None:
         input_json["hic.ligation_site_regex"] = ligation_site_regex
