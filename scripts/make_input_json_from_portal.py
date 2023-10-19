@@ -119,7 +119,7 @@ def get_enzymes_from_experiment(experiment, enzymes=ENZYMES):
             continue
         for enzyme in enzymes:
             if enzyme in fragmentation_method:
-                used_enzymes += enzyme
+                used_enzymes.append(enzyme)
                 break
         if not any(
             [used_enzyme in fragmentation_method for used_enzyme in used_enzymes]
