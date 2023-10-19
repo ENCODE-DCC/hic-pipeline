@@ -111,7 +111,9 @@ def get_enzymes_from_experiment(experiment, enzymes=ENZYMES):
         if fragmentation_method in _NO_ENZYME_FRAGMENTATION_METHODS:
             used_enzymes.append("none")
         else:
-            used_enzyme = [enzyme for enzyme in enzymes if enzyme in fragmentation_method]
+            used_enzyme = [
+                enzyme for enzyme in enzymes if enzyme in fragmentation_method
+            ]
             if used_enzyme:
                 used_enzymes += used_enzyme
             else:
