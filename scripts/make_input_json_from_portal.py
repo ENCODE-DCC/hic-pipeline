@@ -210,7 +210,7 @@ def get_input_json(
         if enzymes != ["none"]:
             input_json["hic.restriction_sites"] = REFERENCE_FILES[assembly_name][
                 "restriction_sites"
-            ][enzymes.join("+")]
+            ]["+".join(enzymes)]
 
     if ligation_site_regex is not None:
         input_json["hic.ligation_site_regex"] = ligation_site_regex
