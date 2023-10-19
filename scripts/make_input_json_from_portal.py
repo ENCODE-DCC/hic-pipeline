@@ -121,12 +121,18 @@ def get_enzymes_from_experiment(experiment, enzymes=ENZYMES):
             if enzyme in fragmentation_method:
                 used_enzymes += enzyme
                 break
-        if not any([used_enzyme in fragmentation_method for used_enzyme in used_enzymes]):
+        if not any(
+            [used_enzyme in fragmentation_method for used_enzyme in used_enzymes]
+        ):
             raise ValueError(
                 "Unsupported fragmentation method: {}".format(fragmentation_method)
             )
-    if any([used_enzyme == "none" for used_enzyme in used_enzymes]) and any([used_enzyme != "none" for used_enzyme in used_enzymes]):
-        raise ValueError("Unsupported fragmentation methods: both specific and non-specific cutters used.")
+    if any([used_enzyme == "none" for used_enzyme in used_enzymes]) and any(
+        [used_enzyme != "none" for used_enzyme in used_enzymes]
+    ):
+        raise ValueError(
+            "Unsupported fragmentation methods: both specific and non-specific cutters used."
+        )
     return used_enzymes
 
 
