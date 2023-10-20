@@ -39,6 +39,9 @@ REFERENCE_FILES = {
             "MboI": urljoin(
                 PORTAL_URL, "/files/ENCFF930KBK/@@download/ENCFF930KBK.txt.gz"
             ),
+            "MseI": urljoin(
+                PORTAL_URL, "/files/ENCFF416DZA/@@download/ENCFF416DZA.txt.gz"
+            ),
             "MboI+MseI": urljoin(
                 PORTAL_URL, "/files/ENCFF708TJX/@@download/ENCFF708TJX.txt.gz"
             ),
