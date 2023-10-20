@@ -19,6 +19,9 @@ REFERENCE_FILES = {
             "MboI": urljoin(
                 PORTAL_URL, "/files/ENCFF132WAM/@@download/ENCFF132WAM.txt.gz"
             ),
+            "MseI": urljoin(
+                PORTAL_URL, "/files/ENCFF558CCI/@@download/ENCFF558CCI.txt.gz"
+            ),
             "MboI+MseI": urljoin(
                 PORTAL_URL, "/files/ENCFF275YUI/@@download/ENCFF275YUI.txt.gz"
             ),
@@ -213,7 +216,7 @@ def get_input_json(
         if enzymes != ["none"]:
             input_json["hic.restriction_sites"] = REFERENCE_FILES[assembly_name][
                 "restriction_sites"
-            ]["+".join(enzymes)]
+            ]["+".join(sorted(enzymes))]
 
     if ligation_site_regex is not None:
         input_json["hic.ligation_site_regex"] = ligation_site_regex
