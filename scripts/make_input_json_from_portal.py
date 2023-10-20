@@ -139,7 +139,7 @@ def get_enzymes_from_experiment(experiment, enzymes=ENZYMES):
         raise ValueError(
             "Unsupported fragmentation methods: both specific and non-specific cutters used."
         )
-    return used_enzymes
+    return sorted(used_enzymes)
 
 
 def get_fastqs_from_experiment(experiment, read_group_num_path_parts=1):
@@ -216,7 +216,7 @@ def get_input_json(
         if enzymes != ["none"]:
             input_json["hic.restriction_sites"] = REFERENCE_FILES[assembly_name][
                 "restriction_sites"
-            ]["+".join(sorted(enzymes))]
+            ]["+".join(enzymes)]
 
     if ligation_site_regex is not None:
         input_json["hic.ligation_site_regex"] = ligation_site_regex
