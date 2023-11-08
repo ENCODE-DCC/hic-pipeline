@@ -19,6 +19,12 @@ REFERENCE_FILES = {
             "MboI": urljoin(
                 PORTAL_URL, "/files/ENCFF132WAM/@@download/ENCFF132WAM.txt.gz"
             ),
+            "MseI": urljoin(
+                PORTAL_URL, "/files/ENCFF558CCI/@@download/ENCFF558CCI.txt.gz"
+            ),
+            "MboI+MseI": urljoin(
+                PORTAL_URL, "/files/ENCFF275YUI/@@download/ENCFF275YUI.txt.gz"
+            ),
         },
         "bwa_index": urljoin(
             PORTAL_URL, "/files/ENCFF643CGH/@@download/ENCFF643CGH.tar.gz"
@@ -36,6 +42,12 @@ REFERENCE_FILES = {
             "MboI": urljoin(
                 PORTAL_URL, "/files/ENCFF930KBK/@@download/ENCFF930KBK.txt.gz"
             ),
+            "MseI": urljoin(
+                PORTAL_URL, "/files/ENCFF416DZA/@@download/ENCFF416DZA.txt.gz"
+            ),
+            "MboI+MseI": urljoin(
+                PORTAL_URL, "/files/ENCFF708TJX/@@download/ENCFF708TJX.txt.gz"
+            ),
         },
         "bwa_index": urljoin(
             PORTAL_URL, "/files/ENCFF018NEO/@@download/ENCFF018NEO.tar.gz"
@@ -46,7 +58,7 @@ REFERENCE_FILES = {
         ),
     },
 }
-ENZYMES = ("HindIII", "DpnII", "MboI", "none")
+ENZYMES = ("HindIII", "DpnII", "MboI", "MseI", "none")
 _NO_ENZYME_FRAGMENTATION_METHODS = (
     "chemical (micrococcal nuclease)",
     "chemical (DNaseI)",
@@ -107,21 +119,27 @@ def get_enzymes_from_experiment(experiment, enzymes=ENZYMES):
     for replicate in experiment["replicates"]:
         fragmentation_methods.extend(replicate["library"]["fragmentation_methods"])
     fragmentation_methods = list(set(fragmentation_methods))
-    if len(fragmentation_methods) > 1:
+    for fragmentation_method in fragmentation_methods:
+        if fragmentation_method in _NO_ENZYME_FRAGMENTATION_METHODS:
+            used_enzymes.append("none")
+            continue
+        for enzyme in enzymes:
+            if enzyme in fragmentation_method:
+                used_enzymes.append(enzyme)
+                break
+        if not any(
+            [used_enzyme in fragmentation_method for used_enzyme in used_enzymes]
+        ):
+            raise ValueError(
+                "Unsupported fragmentation method: {}".format(fragmentation_method)
+            )
+    if any([used_enzyme == "none" for used_enzyme in used_enzymes]) and any(
+        [used_enzyme != "none" for used_enzyme in used_enzymes]
+    ):
         raise ValueError(
-            "Currently only experiments with one fragmentation method are supported"
+            "Unsupported fragmentation methods: both specific and non-specific cutters used."
         )
-    if fragmentation_methods[0] in _NO_ENZYME_FRAGMENTATION_METHODS:
-        return ["none"]
-    for enzyme in enzymes:
-        if enzyme in fragmentation_methods[0]:
-            used_enzymes.append(enzyme)
-            break
-    if not used_enzymes:
-        raise ValueError(
-            "Unsupported fragmentation method: {}".format(fragmentation_methods[0])
-        )
-    return used_enzymes
+    return sorted(used_enzymes)
 
 
 def get_fastqs_from_experiment(experiment, read_group_num_path_parts=1):
@@ -198,7 +216,7 @@ def get_input_json(
         if enzymes != ["none"]:
             input_json["hic.restriction_sites"] = REFERENCE_FILES[assembly_name][
                 "restriction_sites"
-            ][enzymes[0]]
+            ]["+".join(enzymes)]
 
     if ligation_site_regex is not None:
         input_json["hic.ligation_site_regex"] = ligation_site_regex

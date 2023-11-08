@@ -5,6 +5,7 @@ RESTRICTION_ENZYME_TO_SITE = {
     "HindIII": "AAGCTAGCTT",
     "DpnII": "GATCGATC",
     "MboI": "GATCGATC",
+    "MseI": "TTATAA",
     "none": "XXXX",
 }
 

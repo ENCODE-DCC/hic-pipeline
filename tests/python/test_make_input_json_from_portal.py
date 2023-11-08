@@ -88,15 +88,17 @@ def test_get_enzymes_from_experiment_mnase_returns_none_enzyme():
     assert result == ["none"]
 
 
-def test_get_enzymes_from_experiment_multiple_fragmentation_methods_raises():
-    experiment = {
-        "replicates": [
-            {"library": {"fragmentation_methods": ["chemical (MboI restriction)"]}},
-            {"library": {"fragmentation_methods": ["chemical (MseI restriction)"]}},
-        ]
-    }
-    with pytest.raises(ValueError):
-        get_enzymes_from_experiment(experiment, enzymes=["MboI", "MseI"])
+def test_get_enzymes_from_experiment_multiple_fragmentation_methods():
+    result = get_enzymes_from_experiment(
+        {
+            "replicates": [
+                {"library": {"fragmentation_methods": ["chemical (MboI restriction)"]}},
+                {"library": {"fragmentation_methods": ["chemical (MseI restriction)"]}},
+            ]
+        },
+        enzymes=["MboI", "MseI"],
+    )
+    assert result == ["MboI", "MseI"]
 
 
 def test_get_enzymes_from_experiment_unknown_fragmentation_methods_raises():
