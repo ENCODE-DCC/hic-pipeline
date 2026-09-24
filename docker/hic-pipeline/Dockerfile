@@ -28,6 +28,7 @@ RUN apt-get update && \
         parallel \
         python3 \
         unzip \
+        pigz \
     && rm -rf /var/lib/apt/lists/*
 
 # GAWK has the 'and' function, needed for chimeric_blacklist
@@ -55,7 +56,17 @@ RUN curl -OL "https://github.com/lh3/bwa/archive/v${BWA_VERSION}.zip" && \
     cd .. && \
     rm -rf "bwa-v${BWA_VERSION}"
 
-RUN export SAMTOOLS_VERSION=1.14 && \
+# Install latest mawk from source (Ubuntu 16.04 apt version is very old)
+RUN curl -o mawk.tar.gz -L "https://invisible-island.net/archives/mawk/mawk-1.3.4-20260302.tgz" && \
+    tar xzf mawk.tar.gz && \
+    cd mawk-*/ && \
+    ./configure && \
+    make && \
+    make install && \
+    cd .. && \
+    rm -rf mawk-*/ mawk.tar.gz
+
+RUN export SAMTOOLS_VERSION=1.23 && \
     curl -OL "https://github.com/samtools/samtools/releases/download/${SAMTOOLS_VERSION}/samtools-${SAMTOOLS_VERSION}.tar.bz2" && \
     bunzip2 "samtools-${SAMTOOLS_VERSION}.tar.bz2" && \
     tar xf "samtools-${SAMTOOLS_VERSION}.tar" && \
@@ -111,7 +122,7 @@ RUN git clone https://github.com/ENCODE-DCC/kentUtils_bin_v381.git && \
 # Install Juicer
 RUN git clone --branch encode https://github.com/theaidenlab/juicer.git && \
     cd juicer && \
-    git checkout 50d557f1d4725a475071fce5975839602bd311e5 && \
+    git checkout 4b9e91c6e46e01ee0f551eba8445aa522e638494 && \
     chmod +x CPU/* CPU/common/* misc/* && \
     find -mindepth 1 -maxdepth 1  -type d -not -name "CPU" -not -name ".git" -not -name "misc" | xargs rm -rf
 

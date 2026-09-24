@@ -19,9 +19,9 @@ struct RuntimeEnvironment {
 
 workflow hic {
     meta {
-        version: "1.15.1"
-        caper_docker: "encodedcc/hic-pipeline:1.15.1"
-        caper_singularity: "docker://encodedcc/hic-pipeline:1.15.1"
+        version: "1.15.2"
+        caper_docker: "weiszd/hic-pipeline:1.15.2"
+        caper_singularity: "docker://weiszd/hic-pipeline:1.15.2"
         croo_out_def: "https://raw.githubusercontent.com/ENCODE-DCC/hic-pipeline/dev/croo_out_def.json"
         description: "ENCODE Hi-C pipeline, see https://github.com/ENCODE-DCC/hic-pipeline for details."
     }
@@ -62,8 +62,8 @@ workflow hic {
         Int align_disk_size_gb_intact = 1500
         Int chimeric_sam_nonspecific_disk_size_gb = 7000
         Int chimeric_sam_specific_disk_size_gb = 1500
-        Int dedup_ram_gb_in_situ = 32
-        Int dedup_ram_gb_intact = 48
+        Int dedup_ram_gb_in_situ = 256
+        Int dedup_ram_gb_intact = 256
         Int dedup_disk_size_gb_in_situ = 5000
         Int dedup_disk_size_gb_intact = 7500
         Int? create_hic_num_cpus
@@ -77,10 +77,12 @@ workflow hic {
         Int? create_accessibility_track_disk_size_gb
         String assembly_name = "undefined"
 
-        String docker = "encodedcc/hic-pipeline:1.15.1"
-        String singularity = "docker://encodedcc/hic-pipeline:1.15.1"
+        String docker = "weiszd/hic-pipeline:1.15.2"
+        String singularity = "docker://weiszd/hic-pipeline:1.15.2"
         String delta_docker = "encodedcc/hic-pipeline:1.15.1_delta"
         String hiccups_docker = "encodedcc/hic-pipeline:1.15.1_hiccups"
+        String delta_singularity = "docker://encodedcc/hic-pipeline:1.15.1_delta"
+        String hiccups_singularity = "docker://encodedcc/hic-pipeline:1.15.1_hiccups"
     }
 
     RuntimeEnvironment runtime_environment = {
@@ -90,12 +92,12 @@ workflow hic {
 
     RuntimeEnvironment hiccups_runtime_environment = {
       "docker": hiccups_docker,
-      "singularity": singularity
+      "singularity": hiccups_singularity
     }
 
     RuntimeEnvironment delta_runtime_environment = {
       "docker": delta_docker,
-      "singularity": singularity
+      "singularity": delta_singularity
     }
 
     Int align_ram_gb = if intact then align_ram_gb_intact else align_ram_gb_in_situ
@@ -465,7 +467,7 @@ task get_ligation_site_regex {
 
     runtime {
         cpu : "1"
-        memory: "500 MB"
+        memory: "2 GB"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
     }
@@ -494,7 +496,7 @@ task normalize_assembly_name {
 
     runtime {
         cpu : "1"
-        memory: "500 MB"
+        memory: "2 GB"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
     }
@@ -582,15 +584,14 @@ task chimeric_sam_specific {
     command <<<
         set -euo pipefail
         RESTRICTION_SITES_FILENAME=restriction_sites.txt
-        gzip -dc ~{restriction_sites} > $RESTRICTION_SITES_FILENAME
+        pigz -dc ~{restriction_sites} > $RESTRICTION_SITES_FILENAME
         cp ~{ligation_count} result_norm.txt.res.txt
-        samtools view -h -@ ~{num_cpus - 1} ~{bam} > result.sam
-        awk \
+        samtools view -h -@ ~{num_cpus - 1} ~{bam} | \
+            awk \
             -v stem=result_norm \
             -v site_file=$RESTRICTION_SITES_FILENAME \
             ~{if(single_ended) then "-v singleend=1" else ""} \
-            -f "$(which chimeric_sam.awk)" \
-            result.sam | \
+            -f "$(which chimeric_sam.awk)" | \
             samtools sort -t cb -n --threads ~{num_cpus} > chimeric_sam_specific.bam
     >>>
 
@@ -622,17 +623,12 @@ task chimeric_sam_nonspecific {
     command <<<
         set -euo pipefail
         cp ~{ligation_count} result_norm.txt.res.txt
-        samtools view -h -@ ~{num_cpus - 1} ~{bam} > result.sam
-        awk \
+        samtools view -h -@ ~{num_cpus - 1} ~{bam} | \
+            awk \
             -v stem=result_norm \
             ~{if(single_ended) then "-v singleend=1" else ""} \
-            -f "$(which chimeric_sam.awk)" \
-            result.sam > result.sam2
-        ~{if(single_ended) then "samtools sort -t cb -n --threads " + num_cpus + " result.sam2 > chimeric_sam_nonspecific.bam && exit 0" else ""}
-        awk \
-            -v avgInsertFile=result_norm.txt.res.txt \
-            -f "$(which adjust_insert_size.awk)" \
-            result.sam2 | \
+            -f "$(which chimeric_sam.awk)" | \
+            ~{if(single_ended) then "" else "awk -v avgInsertFile=result_norm.txt.res.txt -f $(which adjust_insert_size.awk) |"} \
             samtools sort -t cb -n --threads ~{num_cpus} > chimeric_sam_nonspecific.bam
     >>>
 
@@ -699,8 +695,8 @@ task dedup {
             -h \
             -@ ~{num_cpus - 1} \
             ~{bam} | \
-            awk -f "$(which dups_sam.awk)" > merged_dedup.sam
-        samtools view -b -@ ~{num_cpus - 1} merged_dedup.sam > merged_dedup.bam
+            mawk -f "/gpfs0/work/david/github/juicer-encode/CPU/common/dups_sam.awk" | \
+            samtools view -b -@ ~{num_cpus - 1} > merged_dedup.bam
     >>>
 
     output {
@@ -726,7 +722,7 @@ task pre_to_pairs {
     command {
         set -euo pipefail
         PRE_FILENAME=pre.txt
-        gzip -dc ~{pre} > $PRE_FILENAME
+        pigz -dc ~{pre} > $PRE_FILENAME
         perl "$(which juicer_shortform2pairs.pl)" $PRE_FILENAME ~{chrom_sizes} pairix
     }
 
@@ -764,8 +760,8 @@ task bam_to_pre {
             -@ ~{num_cpus - 1} | \
             awk -v mapq=~{quality} -f "$(which sam_to_pre.awk)" > $MERGED_NODUPS_FILENAME
         $(which index_by_chr.awk) $MERGED_NODUPS_FILENAME 500000 > $MERGED_NODUPS_INDEX_FILENAME
-        gzip -n $MERGED_NODUPS_FILENAME
-        gzip -n $MERGED_NODUPS_INDEX_FILENAME
+        pigz -n $MERGED_NODUPS_FILENAME
+        pigz -n $MERGED_NODUPS_INDEX_FILENAME
     >>>
 
     output {
@@ -800,8 +796,8 @@ task calculate_stats {
         PRE_FILE=pre.txt
         RESTRICTION_SITES_FILENAME=restriction_sites.txt
         STATS_FILENAME=stats_~{quality}~{output_filename_suffix}.txt
-        gzip -dc ~{pre} > $PRE_FILE
-        ~{if defined(restriction_sites) then "gzip -dc " + restriction_sites + " > $RESTRICTION_SITES_FILENAME" else ""}
+        pigz -dc ~{pre} > $PRE_FILE
+        ~{if defined(restriction_sites) then "pigz -dc " + restriction_sites + " > $RESTRICTION_SITES_FILENAME" else ""}
         if [ ~{if(single_ended) then "1" else "0"} -eq 1 ]
         then
             RET=$(samtools view -f 1024 -F 256 ~{bam} | awk '{if ($0~/rt:A:7/){singdup++}else{dup++}}END{print dup,singdup}')
@@ -877,9 +873,9 @@ task create_hic {
         PRE_FILE=pre.txt
         PRE_INDEX_FILE=pre_index.txt
         RESTRICTION_SITES_FILENAME=restriction_sites.txt
-        gzip -dc ~{pre} > $PRE_FILE
-        gzip -dc ~{pre_index} > $PRE_INDEX_FILE
-        ~{if defined(restriction_sites) then "gzip -dc " + restriction_sites + " > $RESTRICTION_SITES_FILENAME" else ""}
+        pigz -dc ~{pre} > $PRE_FILE
+        pigz -dc ~{pre_index} > $PRE_INDEX_FILE
+        ~{if defined(restriction_sites) then "pigz -dc " + restriction_sites + " > $RESTRICTION_SITES_FILENAME" else ""}
         # If the assembly name is empty, then we write chrsz path into file as usual, otherwise, use the assembly name instead of the path
         java \
             -Ddevelopment=false \
@@ -982,7 +978,7 @@ task arrowhead {
             arrowhead \
             ~{hic_file} \
             contact_domains
-        gzip -n contact_domains/*
+        pigz -n contact_domains/*
         STEM=$(basename contact_domains/*.bedpe.gz .bedpe.gz)
         mv contact_domains/*.bedpe.gz "${STEM}_~{quality}.bedpe.gz"
     >>>
@@ -1030,6 +1026,7 @@ task hiccups {
         disks: "local-disk 100 HDD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
+        gpu: "1"
         gpuType: "nvidia-tesla-p100"
         gpuCount: 1
         memory: "8 GB"
@@ -1082,6 +1079,7 @@ task hiccups_2 {
         disks: "local-disk ~{disk_size_gb} HDD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
+        gpu: "~{num_gpus}"
         gpuType: "nvidia-tesla-p100"
         gpuCount: "~{num_gpus}"
         memory: "~{ram_gb} GB"
@@ -1112,7 +1110,7 @@ task localizer {
     command {
         set -euo pipefail
         export LOOPS_FILE=loops.bedpe
-        gzip -dc ~{loops} > $LOOPS_FILE
+        pigz -dc ~{loops} > $LOOPS_FILE
         java \
             -Ddevelopment=false \
             -Djava.awt.headless=true \
@@ -1127,7 +1125,7 @@ task localizer {
             ~{hic} \
             $LOOPS_FILE \
             localized
-        gzip -n localized/localizedList_primary_~{localizer_resolution}.bedpe
+        pigz -n localized/localizedList_primary_~{localizer_resolution}.bedpe
         mv localized/localizedList_primary_~{localizer_resolution}.bedpe.gz localized_loops_~{quality}.bedpe.gz
     }
 
@@ -1185,6 +1183,7 @@ task delta {
         disks: "local-disk ~{disk_size_gb} SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
+        gpu: "~{gpu_count}"
         gpuType: "nvidia-tesla-p100"
         gpuCount: "~{gpu_count}"
         memory: "~{ram_gb} GB"
@@ -1264,7 +1263,7 @@ task slice {
             ~{minimum_num_clusters},~{maximum_num_clusters},~{num_kmeans_runs} \
             slice_results \
             cell_type
-        gzip -n slice_results/*.bed
+        pigz -n slice_results/*.bed
         mv slice_results/slice_subcompartment_clusters.bed.gz slice_subcompartment_clusters_~{resolution}.bed.gz
     }
 
@@ -1293,7 +1292,7 @@ task create_accessibility_track {
     command <<<
         set -euo pipefail
         PRE_FILE=pre.txt
-        gzip -dc ~{pre} > $PRE_FILE
+        pigz -dc ~{pre} > $PRE_FILE
         awk '{print $1}' ~{chrom_sizes} | while read chrom; do awk -v chr=${chrom} 'BEGIN{OFS="\t"}$2==chr{c[$3]++}$6==chr{c[$7]++}END{for (i in c) {print chr, i-1, i, c[i]}}' $PRE_FILE | sort -k2,2n >> merged30.bedgraph; done;
         sort -k1,1 -k2,2n -S6G merged30.bedgraph > merged30.sorted.bedgraph
         bedGraphToBigWig merged30.sorted.bedgraph ~{chrom_sizes} inter_30.bw
@@ -1326,7 +1325,7 @@ task exit_early {
 
     runtime {
         cpu : "1"
-        memory: "500 MB"
+        memory: "1000 MB"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
     }
